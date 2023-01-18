@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { GameContext } from '../contexts';
+import styles from '../css/ColorBox.module.css';
 
 type ColorProps = {
 	// restrict any other styles except for 'color' property
@@ -6,10 +8,13 @@ type ColorProps = {
 	revealColorName?: boolean;
 };
 
-export const ColorBox = React.memo(({ color, revealColorName = false }: ColorProps) => {
+export const ColorBox = React.memo(() => {
+	const { state } = useContext(GameContext);
+	const { correctColor, isReveal } = state;
+
 	return (
-		<div className='color-box' style={{ color, backgroundColor: color }}>
-			{revealColorName ? color : null}
+		<div className={styles.box} style={{ color: correctColor, backgroundColor: correctColor }}>
+			{isReveal ? correctColor : null}
 		</div>
 	);
 });
