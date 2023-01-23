@@ -1,21 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { ToastProps } from '../../types/toast.type';
 import { Body, ProgressBar, Title, Toast } from './styles';
 
-export type ToastProps = {
-	children?: React.ReactNode;
-	itemType?: string;
-	title?: string;
-	message?: string;
-	id: string;
-	callback?: (id: string) => void;
-};
+type ToastProp = ToastProps & Partial<OptionalToastProps>;
 
-export default ({ children, id, itemType, title, message, callback }: ToastProps) => {
+type OptionalToastProps = {
+	children: React.ReactNode;
+	callback: (toastId: string) => void;
+};
+export default ({ children, toastId, itemType, title, message, callback }: ToastProp) => {
 	const [progress, setProgress] = useState(0);
 	const [isOpen, setIsOpen] = useState(true);
 	const [isPaused, setIsPaused] = useState(false);
 	let timerId = useRef<number | null>(null);
-	let timer = useRef<number | null>(null);
 
 	useEffect(() => {
 		if (isOpen && !isPaused) {
@@ -26,10 +23,7 @@ export default ({ children, id, itemType, title, message, callback }: ToastProps
 			}
 		}
 		// cleanup
-		return () => {
-			if (timer.current) clearTimeout(timer.current);
-			stopTimer();
-		};
+		return () => stopTimer();
 	}, [isOpen, isPaused, progress]);
 
 	const stopTimer = () => {
@@ -38,10 +32,9 @@ export default ({ children, id, itemType, title, message, callback }: ToastProps
 	};
 
 	const handleClose = () => {
-		stopTimer();
 		setIsOpen(false);
-		timer.current = setTimeout(() => console.log('Initial timeout!'), 1000);
-		// clearTimeout(timer);
+		stopTimer();
+		setTimeout(() => callback && callback(toastId), 200);
 	};
 
 	const handleMouseEnter = () => {
@@ -57,7 +50,8 @@ export default ({ children, id, itemType, title, message, callback }: ToastProps
 
 	return (
 		<Toast
-			id={id}
+			key={toastId}
+			id={toastId}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onClick={handleClose}
