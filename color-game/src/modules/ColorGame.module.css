@@ -1,4 +1,6 @@
 .container {
+    display: flex;
+    justify-content: center;
     position: fixed;
     z-index: 3;
     top: 50%;
@@ -47,10 +49,16 @@
     gap: 30px;
 }
 
+h1 {
+    width: 100%;
+    text-align: center;
+    color: white
+}
+
 button {
     display: flex;
-    justify-content: right;
     align-items: center;
+    justify-content: center;
     position: relative;
     flex: 1 1 190px;
     width: 190px;
@@ -59,19 +67,24 @@ button {
     outline: none;
     padding: 5px;
     font-size: 1.5rem;
+    text-transform: uppercase;
     border-radius: 25px;
-    border: 0.1rem solid #8f44fd;
+    border: 1px solid #8f44fd;
     color: #8f44fd;
     background-color: transparent;
     letter-spacing: 1px;
-    margin-right: 0.5rem;
-    text-transform: uppercase;
     transition: background-color, border 0.2s ease-in-out;
+}
+
+button .option {
+    align-items: center;
+    justify-content: right;
+    margin-right: 0.5rem;
 }
 
 button:hover,
 :focus {
-    border: 0.2rem solid #8f44fd;
+    border: 3px solid #8f44fd;
     background-color: #5f22b91d;
     cursor: pointer;
 }
@@ -94,6 +107,25 @@ button>img {
     color: darkgray
 }
 
+p {
+    width: 100%;
+    text-align: center;
+}
+
 button>p {
+    text-align: right;
     margin-right: 10%;
+}
+
+.emoji {
+    display: flex;
+    background: rgb(0, 0, 0);
+    width: 100%;
+    justify-content: center;
+}
+
+.emoji img {
+    font-size: 3rem;
+    width: 200px;
+    height: 215px;
 }

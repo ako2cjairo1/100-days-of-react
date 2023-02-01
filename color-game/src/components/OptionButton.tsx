@@ -1,17 +1,40 @@
 import styles from '../modules/ColorGame.module.css';
 import puff from '../assets/puff.svg';
-import { useState } from 'react';
+import { OptionProps } from '../types';
+import { FC, useState } from 'react';
 
-export type CSSColorProp = React.CSSProperties['color'];
-
-type OptionProps = {
-	color: CSSColorProp;
-	colorGuessing: CSSColorProp;
+const StatusIcon: FC<{
+	isChecking: boolean;
 	isReveal: boolean;
-	callbackFn: (answer: CSSColorProp) => void;
-};
-export const OptionButton = ({ color, colorGuessing, isReveal, callbackFn }: OptionProps) => {
+	isCorrect: boolean;
+	isSelected: boolean;
+}> = ({ isChecking, isCorrect, isReveal, isSelected }) => {
 	const { icon } = styles;
+	return (
+		<>
+			{isChecking && !isReveal ? (
+				// loading view
+				<img src={puff} />
+			) : !isChecking && isReveal ? (
+				isCorrect ? (
+					// correct answer
+					<span className={icon}>✅</span>
+				) : (
+					// if selected a wrong answer
+					isSelected && <span className={icon}>❌</span>
+				)
+			) : (
+				// default view
+				<span className={icon} style={{ marginLeft: '20px' }}>
+					⃝
+				</span>
+			)}
+		</>
+	);
+};
+
+export const OptionButton: FC<OptionProps> = ({ color, colorGuessing, isReveal, callbackFn }) => {
+	const { option } = styles;
 	const [isChecking, setIsChecking] = useState(false);
 	const [isSelected, setIsSelected] = useState(false);
 	const isCorrect = colorGuessing == color;
@@ -23,32 +46,19 @@ export const OptionButton = ({ color, colorGuessing, isReveal, callbackFn }: Opt
 		const timeout = setTimeout(() => {
 			setIsChecking(false);
 			clearTimeout(timeout);
+			// invoke callback function
 			callbackFn(color);
 		}, 1000);
 	};
 
-	const ResetOptionComponent = () => {
-		return (
-			<span className={icon} style={{ marginLeft: '20px' }}>
-				⃝
-			</span>
-		);
-	};
-
 	return (
-		<button disabled={isReveal} onClick={() => handleClick()}>
-			{isChecking && !isReveal ? (
-				// loading view
-				<img src={puff} />
-			) : !isChecking && isReveal ? (
-				isCorrect ? (
-					<span className={icon}>✅</span>
-				) : (
-					isSelected && <span className={icon}>❌</span>
-				)
-			) : (
-				<ResetOptionComponent />
-			)}
+		<button className={option} disabled={isReveal} onClick={() => handleClick()}>
+			<StatusIcon
+				isChecking={isChecking}
+				isCorrect={isCorrect}
+				isReveal={isReveal}
+				isSelected={isSelected}
+			/>
 			<p>{color}</p>
 		</button>
 	);
