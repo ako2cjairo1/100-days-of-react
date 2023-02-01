@@ -1,3 +1,3 @@
-export * from './ColorBox';
-export * from './Options';
-export * from './OptionButton';
+export { default as ColorGame } from './ColorGame';
+export * from './Box';
+export * from './ColorOptions';
