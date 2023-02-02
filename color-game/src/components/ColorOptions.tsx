@@ -1,6 +1,6 @@
-import styles from '../modules/ColorGame.module.css';
+import { OptionButton } from '.';
 import { ColorOptionsProp } from '../types';
-import { OptionButton } from './OptionButton';
+import styles from '../modules/ColorGame.module.css';
 
 export const ColorOptions = ({
 	colorOptions,

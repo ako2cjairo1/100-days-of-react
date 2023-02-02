@@ -1,4 +1,4 @@
-import { FC, memo, useState } from 'react';
+import { FC, memo, useReducer } from 'react';
 import { generateColorOptions } from '../helper';
 import styles from '../modules/ColorGame.module.css';
 import { CSSColorProp } from '../types';
@@ -8,6 +8,18 @@ import wink from '../assets/wink.gif';
 import wink2 from '../assets/wink2.gif';
 import sad from '../assets/sad.gif';
 import cry from '../assets/cry.gif';
+import { colorGameReducer } from '../reducers/colorGameReducer';
+import { ColorGameActions } from '../actions';
+
+const initialState = {
+	start: false,
+	colors: [],
+	colorGuessing: '',
+	isReveal: false,
+	gameCounter: -1,
+	correctCounter: 0,
+	isWin: false,
+};
 
 const Emoji: FC<{ isWin: boolean }> = memo(({ isWin }) => {
 	const { emoji } = styles;
@@ -21,27 +33,14 @@ const Emoji: FC<{ isWin: boolean }> = memo(({ isWin }) => {
 
 export default () => {
 	const { container, stat, emoji } = styles;
-	const [start, setStart] = useState(false);
-	const [colors, setColors] = useState<CSSColorProp[]>([]);
-	const [colorGuessing, setColorGuessing] = useState<CSSColorProp>();
-	const [isReveal, setIsReveal] = useState(false);
-	const [gameCounter, setGameCounter] = useState(-1);
-	const [correctCounter, setCorrectCounter] = useState(0);
-	const [isWin, setIsWin] = useState(false);
+	const [{ start, colors, colorGuessing, isReveal, gameCounter, correctCounter, isWin }, dispatch] =
+		useReducer(colorGameReducer, initialState);
 
 	const startGame = () => {
-		// Update scoreboard
-		setGameCounter((prev) => prev + 1);
-
+		dispatch(ColorGameActions.incrementGameCounter());
 		const timeout = setTimeout(
 			() => {
-				setStart(true);
-				// reset to new game
-				setIsReveal(false);
-				const newSetOfColors = generateColorOptions(4);
-				// update states of new set of colors
-				setColors(newSetOfColors);
-				setColorGuessing(newSetOfColors[Math.floor(Math.random() * newSetOfColors.length)]);
+				dispatch(ColorGameActions.newGame());
 				clearTimeout(timeout);
 			},
 			gameCounter <= -1 ? 200 : 3000
@@ -49,14 +48,7 @@ export default () => {
 	};
 
 	const handleReveal = (answer: CSSColorProp) => {
-		if (answer == colorGuessing) {
-			setCorrectCounter((prev) => prev + 1);
-			setIsWin(true);
-		} else {
-			setIsWin(false);
-		}
-		// reveal the correct answer
-		setIsReveal(true);
+		dispatch(ColorGameActions.revealAnswer(answer));
 		startGame();
 	};
 
