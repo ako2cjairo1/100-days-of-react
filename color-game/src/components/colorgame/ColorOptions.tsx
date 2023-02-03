@@ -1,13 +1,8 @@
-import { OptionButton } from '.';
-import { ColorOptionsProp } from '../types';
-import styles from '../modules/ColorGame.module.css';
+import { ColorOptionsProp } from '../../types';
+import { ColorGameStyles as styles } from '../../modules';
+import OptionButton from './OptionButton';
 
-export const ColorOptions = ({
-	colorOptions,
-	colorGuessing,
-	isReveal,
-	callbackFn,
-}: ColorOptionsProp) => {
+export default ({ colorOptions, colorGuessing, isReveal, callbackFn }: ColorOptionsProp) => {
 	const { options } = styles;
 	return (
 		<section className={options}>

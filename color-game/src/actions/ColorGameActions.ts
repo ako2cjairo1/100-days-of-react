@@ -1,21 +1,24 @@
-import { ActionProps, ACTION_TYPES, CSSColorProp } from '../types';
+import { ACTION_TYPES, CSSColorProp } from '../types';
 
-const newGame = (): ActionProps => {
+const newGame = () => {
 	return {
 		type: ACTION_TYPES.NEW_GAME,
 	};
 };
-const revealAnswer = (color: CSSColorProp): ActionProps => {
+
+const revealAnswer = (answer: CSSColorProp) => {
 	return {
 		type: ACTION_TYPES.REVEAL,
-		payload: color,
+		payload: answer,
 	};
 };
-const incrementGameCounter = (): ActionProps => {
+
+const incrementGameCounter = () => {
 	return {
 		type: ACTION_TYPES.INCREMENT_GAME_COUNTER,
 	};
 };
+
 export const ColorGameActions = {
 	revealAnswer,
 	newGame,
