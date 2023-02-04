@@ -2,7 +2,7 @@
 
 This is a React project for a simple color game. It allows users to guess the correct hex-value of color from a set of random 4 hex values.
 
-![Hex Color Quiz screenshot](https://github.com/ako2cjairo1/100-days-of-react/color-game/blob/master/screenshot/Hex%20Game%20Quiz.png)
+![Hex Color Quiz screenshot](https://github.com/ako2cjairo1/100-days-of-react/blob/master/color-game/screenshot/Hex%20Game%20Quiz.png)
 
 ## Installation
 
