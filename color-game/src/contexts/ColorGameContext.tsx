@@ -8,9 +8,10 @@ const voidFn = () => {};
 const GameContext = createContext<UseColorGameProps>({
 	colorGameState: initialState,
 	handleReveal: voidFn,
-	startGame: voidFn,
 	handleDisable: voidFn,
 	handleEndGame: voidFn,
+	handleStartGame: voidFn,
+	handleNewGame: voidFn,
 });
 
 // Context provided using custom hook (useReducer)
