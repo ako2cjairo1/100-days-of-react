@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ColorGame } from './components';
+import { ColorGameContext } from './contexts/ColorGameContext';
 import './main.css';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
@@ -18,6 +19,10 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 			</div>
 		</div>
 		<div className='overlay'></div>
-		<ColorGame />
+
+		{/* Wrap the components that will use the ColorGame context */}
+		<ColorGameContext colorCount={4}>
+			<ColorGame />
+		</ColorGameContext>
 	</React.StrictMode>
 );

@@ -1,15 +1,16 @@
-import { ACTION_TYPES, CSSColorProp } from '../types';
+import { ACTION_TYPES } from '../types';
 
-const newGame = () => {
+const newGame = (colorCount: number) => {
 	return {
 		type: ACTION_TYPES.NEW_GAME,
+		payload: colorCount,
 	};
 };
 
-const revealAnswer = (answer: CSSColorProp) => {
+const revealAnswer = (isWin: boolean) => {
 	return {
 		type: ACTION_TYPES.REVEAL,
-		payload: answer,
+		payload: isWin,
 	};
 };
 
@@ -19,8 +20,28 @@ const incrementGameCounter = () => {
 	};
 };
 
+const disableOptions = () => {
+	return {
+		type: ACTION_TYPES.DISABLE,
+	};
+};
+
+const endGame = () => {
+	return {
+		type: ACTION_TYPES.END,
+	};
+};
+
+const startGame = () => {
+	return {
+		type: ACTION_TYPES.START,
+	};
+};
 export const ColorGameActions = {
 	revealAnswer,
+	disableOptions,
 	newGame,
 	incrementGameCounter,
+	endGame,
+	startGame,
 };

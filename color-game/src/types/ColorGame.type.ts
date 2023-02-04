@@ -1,7 +1,10 @@
 export enum ACTION_TYPES {
 	REVEAL,
+	DISABLE,
 	NEW_GAME,
 	INCREMENT_GAME_COUNTER,
+	END,
+	START,
 }
 
 export type CSSColorProp = React.CSSProperties['color'];
@@ -11,33 +14,19 @@ export type StateProps = {
 	colors: CSSColorProp[];
 	colorGuessing: CSSColorProp;
 	isReveal: boolean;
+	disableOptions: boolean;
 	gameCounter: number;
 	correctCounter: number;
 	isWin: boolean;
 };
-export type ActionProps = {
+export type ActionProps<T> = {
 	type: ACTION_TYPES;
-	payload?: CSSColorProp;
-};
-
-export type BoxProps = {
-	// restrict any other styles except for 'color' property
-	color: CSSColorProp;
-	isReveal: boolean;
-};
-
-export type ColorOptionsProp = {
-	colorOptions: CSSColorProp[];
-	colorGuessing: CSSColorProp;
-	isReveal: boolean;
-	callbackFn: (answer: CSSColorProp) => void;
+	payload?: T;
 };
 
 export type OptionButtonProps = {
 	color: CSSColorProp;
-	colorGuessing: CSSColorProp;
-	isReveal: boolean;
-	callbackFn: (answer: CSSColorProp) => void;
+	index: number;
 };
 
 export type StatusIconProps = {
@@ -45,4 +34,13 @@ export type StatusIconProps = {
 	isReveal: boolean;
 	isCorrect: boolean;
 	isSelected: boolean;
+};
+
+export type UseColorGameProps = {
+	colorGameState: StateProps;
+	handleReveal: (isWin: boolean) => void;
+	handleNewGame: () => void;
+	handleDisable: () => void;
+	handleEndGame: () => void;
+	handleStartGame: () => void;
 };

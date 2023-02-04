@@ -1,32 +1,40 @@
-import { generateColorOptions } from '../helper';
-import { ActionProps, ACTION_TYPES, StateProps } from '../types';
+import { decrypt, encrypt, generateColorOptions } from '../colorGameHelper';
+import { ActionProps, ACTION_TYPES, CSSColorProp, StateProps } from '../types';
 
-export const initialState = {
+export const initialState: StateProps = {
 	start: false,
 	colors: [],
 	colorGuessing: '',
 	isReveal: false,
+	disableOptions: false,
 	gameCounter: -1,
 	correctCounter: 0,
 	isWin: false,
 };
 
-export const colorGameReducer = (state: StateProps, action: ActionProps) => {
+export const isMatch = (answer: CSSColorProp, correctColor: CSSColorProp) => {
+	const decryptedCorrectColor = decrypt(correctColor as string);
+	return answer === decryptedCorrectColor;
+};
+
+export const colorGameReducer = (state: StateProps, action: ActionProps<number | boolean>) => {
 	const { type, payload } = action;
 
 	switch (type) {
 		case ACTION_TYPES.NEW_GAME:
-			const colors = generateColorOptions(4);
-			const colorGuessing = colors[Math.floor(Math.random() * colors.length)];
+			const colorCount = payload as number;
+			const colors = generateColorOptions(colorCount);
+			const colorGuessing = encrypt(colors[Math.floor(Math.random() * colors.length)]);
 			return {
 				...state,
 				colors,
 				colorGuessing,
-				start: true,
 				isReveal: false,
+				disableOptions: false,
 			};
 		case ACTION_TYPES.REVEAL:
-			const isWin = payload === state.colorGuessing;
+			const isWin = payload as boolean;
+			// increment the correct stat if isWin
 			const correctCounter = isWin ? state.correctCounter + 1 : state.correctCounter;
 			return {
 				...state,
@@ -38,6 +46,21 @@ export const colorGameReducer = (state: StateProps, action: ActionProps) => {
 			return {
 				...state,
 				gameCounter: state.gameCounter + 1,
+			};
+		case ACTION_TYPES.DISABLE:
+			return {
+				...state,
+				disableOptions: true,
+			};
+		case ACTION_TYPES.END:
+			return {
+				...initialState,
+				start: false,
+			};
+		case ACTION_TYPES.START:
+			return {
+				...initialState,
+				start: true,
 			};
 		default:
 			return state;

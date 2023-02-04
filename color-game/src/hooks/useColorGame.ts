@@ -1,17 +1,18 @@
 import { useReducer } from 'react';
 import { ColorGameActions } from '../actions';
 import { colorGameReducer, initialState } from '../reducers';
-import { CSSColorProp } from '../types';
+import { UseColorGameProps } from '../types';
 
-export const useColorGame = () => {
+export const useColorGame = (colorCount: number): UseColorGameProps => {
 	const [colorGameState, dispatch] = useReducer(colorGameReducer, initialState);
-	const { newGame, revealAnswer, incrementGameCounter } = ColorGameActions;
+	const { newGame, revealAnswer, incrementGameCounter, disableOptions, endGame, startGame } =
+		ColorGameActions;
 
-	const startGame = () => {
+	const handleNewGame = () => {
 		dispatch(incrementGameCounter());
 		const timeout = setTimeout(
 			() => {
-				dispatch(newGame());
+				dispatch(newGame(colorCount));
 				clearTimeout(timeout);
 			},
 			// load quickly (200ms) at the beginning of game
@@ -19,10 +20,26 @@ export const useColorGame = () => {
 		);
 	};
 
-	const handleReveal = (answer: CSSColorProp) => {
-		dispatch(revealAnswer(answer));
-		startGame();
+	const handleReveal = (isWin: boolean) => {
+		dispatch(revealAnswer(isWin));
+		handleNewGame();
 	};
 
-	return { colorGameState, handleReveal, startGame };
+	const handleDisable = () => dispatch(disableOptions());
+
+	const handleEndGame = () => dispatch(endGame());
+
+	const handleStartGame = () => {
+		dispatch(startGame());
+		handleNewGame();
+	};
+
+	return {
+		colorGameState,
+		handleReveal,
+		handleNewGame,
+		handleDisable,
+		handleEndGame,
+		handleStartGame,
+	};
 };

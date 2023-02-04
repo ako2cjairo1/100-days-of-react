@@ -1,21 +1,16 @@
-import { ColorOptionsProp } from '../../types';
+import { useColorGameContext } from '../../contexts/ColorGameContext';
 import { ColorGameStyles as styles } from '../../modules';
 import OptionButton from './OptionButton';
 
-export default ({ colorOptions, colorGuessing, isReveal, callbackFn }: ColorOptionsProp) => {
+export default () => {
 	const { options } = styles;
+	const { colorGameState } = useColorGameContext();
+	const { colors } = colorGameState;
+
 	return (
 		<section className={options}>
-			{colorOptions.map((color) => {
-				return (
-					<OptionButton
-						key={color}
-						color={color}
-						colorGuessing={colorGuessing}
-						isReveal={isReveal}
-						callbackFn={callbackFn}
-					/>
-				);
+			{colors.map((color, index) => {
+				return <OptionButton key={color} color={color} index={index} />;
 			})}
 		</section>
 	);

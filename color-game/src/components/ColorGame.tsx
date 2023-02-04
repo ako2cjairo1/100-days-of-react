@@ -1,18 +1,14 @@
-import { useReducer } from 'react';
-import { smiley } from '../assets';
+import { loading, smiley } from '../assets';
 import { ColorGameStyles as styles } from '../modules';
 import { Box, ColorOptions, Emoji } from './colorgame/index';
-import { colorGameReducer, initialState } from '../reducers';
-import { ColorGameActions } from '../actions';
-import { useColorGame } from '../hooks';
+import { useColorGameContext } from '../contexts/ColorGameContext';
 
 export default () => {
-	const { container, stat, emoji } = styles;
+	const { container, stat, emoji, highlight, loadgame, close } = styles;
 	// custom hook for ColorGame
-	const { colorGameState, handleReveal, startGame } = useColorGame();
-	// extract states from reducer
-	const { start, colors, colorGuessing, isReveal, gameCounter, correctCounter, isWin } =
-		colorGameState;
+	const { colorGameState, handleStartGame, handleEndGame } = useColorGameContext();
+	// extract individual states from context using provided custom hook
+	const { correctCounter, gameCounter, isWin, start, isReveal } = colorGameState;
 
 	return (
 		<main className={container}>
@@ -21,24 +17,40 @@ export default () => {
 				// Show game board
 				<>
 					<div className={emoji}>
-						{gameCounter <= 0 ? <img src={smiley} /> : <Emoji isWin={isWin} />}
+						<div>
+							{start && (
+								<button className={close} onClick={handleEndGame}>
+									end
+								</button>
+							)}
+							{gameCounter <= 0 ? <img src={smiley} /> : <Emoji isWin={isWin} />}
+							<p className={stat}>
+								{isReveal && <img src={loading} />}
+								{isReveal ? (
+									<a>
+										Loading game <span className={highlight}>#{gameCounter + 1}</span>
+									</a>
+								) : gameCounter > 0 ? (
+									<a>
+										You got <span className={highlight}>{correctCounter}</span> correct guess(es)
+										out of <span className={highlight}>{gameCounter}</span>
+									</a>
+								) : (
+									''
+								)}
+							</p>
+						</div>
+						<Box />
 					</div>
-					<p className={stat}>
-						{`You got ${correctCounter} correct guess(es) out of ${gameCounter}`}
-					</p>
-					<Box color={colorGuessing} isReveal={isReveal} />
-					<ColorOptions
-						colorOptions={colors}
-						colorGuessing={colorGuessing}
-						callbackFn={handleReveal}
-						isReveal={isReveal}
-					/>
+					<ColorOptions />
 				</>
 			) : (
 				// Show introduction (start view)
 				<>
-					<button onClick={startGame}>Start Game</button>
-					<p className={stat}>Press `START GAME` to continue</p>
+					<button onClick={handleStartGame}>Start Game</button>
+					<p className={loadgame}>
+						Press `<span className={highlight}>START GAME</span>` to continue
+					</p>
 				</>
 			)}
 		</main>
