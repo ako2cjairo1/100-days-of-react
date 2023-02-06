@@ -44,12 +44,6 @@
         0px 0px 75px rgba(255, 255, 255, 1);
 }
 
-@media (max-width: 800px) {
-    .box {
-        font-size: 1.7em;
-    }
-}
-
 .options {
     display: flex;
     flex-wrap: wrap;
@@ -200,4 +194,19 @@ button>p {
     width: 30px;
     height: 30px;
     object-fit: cover;
+}
+
+@media (max-width: 800px) {
+    .box {
+        font-size: 1.7em;
+    }
+
+    .options {
+        gap: 20px
+    }
+
+    button {
+        max-width: 160px;
+        font-size: 1.3rem;
+    }
 }
