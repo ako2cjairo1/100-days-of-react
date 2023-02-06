@@ -197,7 +197,7 @@ button>p {
     object-fit: cover;
 }
 
-@media (max-width: 400px) {
+@media (max-width: 450px) {
     .box {
         font-size: 1.7em;
     }
