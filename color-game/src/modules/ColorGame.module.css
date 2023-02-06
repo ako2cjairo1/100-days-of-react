@@ -8,7 +8,7 @@
     translate: -50% -50%;
     display: flex;
     flex-wrap: wrap;
-    width: 50%;
+    width: 100%;
     min-width: 400px;
     max-width: 700px;
     padding: 15px;
@@ -50,6 +50,7 @@
     justify-content: space-evenly;
     align-items: center;
     margin-top: 20px;
+    width: 100%;
     gap: 30px;
 }
 
@@ -65,7 +66,7 @@ button {
     justify-content: center;
     position: relative;
     flex: 1 1 190px;
-    width: 190px;
+    width: 100%;
     max-width: 190px;
     height: 60px;
     outline: none;
@@ -196,17 +197,58 @@ button>p {
     object-fit: cover;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 400px) {
     .box {
         font-size: 1.7em;
     }
 
     .options {
-        gap: 20px
+        gap: 20px;
     }
 
     button {
-        max-width: 160px;
+        max-width: 170px;
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-height: 400px) {
+    .box {
+        font-size: 1.7em;
+        width: 100%;
+    }
+
+    .close {
+        top: 10%;
+    }
+
+    .emoji {
+        height: 110px;
+        padding: 10px 10px 10px 0px;
+    }
+
+    .emoji img {
+        max-width: 50px;
+        max-height: 80px;
+    }
+
+    .emoji div {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .options {
+        gap: 20px;
+    }
+
+    .stat {
+        font-size: small;
+    }
+
+    button {
+        max-width: 170px;
         font-size: 1.3rem;
     }
 }
