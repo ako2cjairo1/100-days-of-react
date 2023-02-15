@@ -17,7 +17,7 @@ const WIN_COMBINATIONS = [
 
 const initialValue: ContextProps = {
 	boxes: PAWNS,
-	// choose random pawn as the first to make a move on the board
+	// choose random pawn to make 1st move
 	currentPawn: PAWNS[pickRandom(PAWNS.length)],
 	isReset: true,
 	players: { player: 'X', computer: 'O' },
@@ -33,7 +33,7 @@ function pickRandom(len: number) {
 
 export const TicTacToeContext = createContext<ContextProps>(initialValue);
 
-let {boxes: initBoxes, currentPawn: initCurrentPawn, players: initPlayers, scores: initScores, start: initStart, matched} = initialValue
+const {boxes: initBoxes, currentPawn: initCurrentPawn, players: initPlayers, scores: initScores, start: initStart, matched: initMatched} = initialValue
 
 export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 	const [start, setStart] = useState<boolean>(initStart);
@@ -41,6 +41,8 @@ export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 	const [currentPawn, setCurrentPawn] = useState<EnumPawns>(initCurrentPawn);
 	const [players, setPlayers] = useState<TPlayers>(initPlayers);
 	const [scores, setScores] = useState<TScore>(initScores);
+	const [matched, setMatched] = useState<number[]>(initMatched)
+	const [startPawn, setStartPawn] = useState<EnumPawns>()
 
 
 	useEffect(() => {
@@ -70,9 +72,12 @@ export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 
 	const createNewGame = () => {
 		setStart(true)
-		matched = []
+		setMatched(initMatched)
+
 		// toggle which pawn to move first
-		setCurrentPawn((prevPawn) => prevPawn !== initCurrentPawn ? prevPawn : initCurrentPawn)
+		const newStart = PAWNS.filter((newPawn) => newPawn !== startPawn)[0]
+		setStartPawn(newStart)
+		setCurrentPawn(newStart)
 		setBoxes(EMPTY_BOXES);
 	};
 
@@ -96,7 +101,7 @@ export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 			) {
 				// return the winner by getting the value of 3 boxes that matched
 				winner = boxes[combination[0]];
-				matched = combination.slice()
+				setMatched(combination.slice())
 			}
 		});
 
@@ -119,6 +124,7 @@ export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 			setStart(true);
 			// create a blank board
 			setBoxes(EMPTY_BOXES);
+			setStartPawn(initCurrentPawn)
 		} else {
 			// update the board using the pawn assigned to current player then toggle to next player
 			moveToPosition(boxIdx)

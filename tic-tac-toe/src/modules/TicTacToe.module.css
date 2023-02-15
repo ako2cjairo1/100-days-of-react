@@ -86,7 +86,7 @@ button {
     transition: all 0.3s ease-in;
 }
 
-.box.active:hover:not(:disabled) {
+.box:hover:not(:disabled) {
     cursor: pointer;
     background: rgba(255, 255, 255, 0.3);
     box-shadow: 0px 0px 20px 1px #ffbb763f;
