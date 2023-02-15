@@ -1,0 +1,124 @@
+.main {
+    z-index: 3;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+    color: #fff;
+    background: rgba(33, 33, 33, 0.9);
+    border-radius: 10px;
+}
+
+.header {
+    width: 95%;
+    vertical-align:middle;
+    text-align: center;
+    box-sizing: content-box;
+    padding: 0 10px;
+    box-shadow: 2px 5px 8px rgba(0, 0, 0, .2);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+p {
+    font-weight: 400;
+    text-transform: uppercase;
+}
+a {
+    color: black;
+    font-weight: bold;
+}
+
+.header>section {
+    display: flex;
+    justify-content:space-evenly;
+}
+
+span {
+    display: block;
+    font-size: 30px;
+    will-change: transform;
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+}
+
+button {
+    padding: 5px 10px;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+.board {
+    position: relative;
+    display: flex;
+    flex-flow: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    padding: 15px;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    width: 360px;
+    gap: 15px;
+    border-radius: 10px;
+}
+
+.box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    cursor: unset;
+    font-size: 5rem;
+    font-weight: bolder;
+    color: white;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: all 0.3s ease-in;
+}
+
+.box.active:hover:not(:disabled) {
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0px 0px 20px 1px #ffbb763f;
+    border: 1px solid rgba(255, 255, 255, 0.454);
+    -webkit-transform: scale(1.25, 1.25);
+    transform: scale(1.25, 1.25);
+}
+
+.win {
+    background: rgba(255, 255, 255, 0.1);
+    animation: winner 0.8s infinite forwards; 
+}
+
+@keyframes winner {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.8);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+.inactive {
+    color: darkgray;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.active {
+    background: rgba(255, 255, 255, 0.1);
+}

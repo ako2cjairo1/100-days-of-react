@@ -2,17 +2,15 @@
     display: flex;
     justify-content: center;
     position: fixed;
-    z-index: 3;
+    /* z-index: 3; */
     top: 50%;
     left: 50%;
     translate: -50% -50%;
-    display: flex;
     flex-wrap: wrap;
     width: 100%;
     min-width: 400px;
     max-width: 700px;
     padding: 15px;
-    justify-content: center;
     border-radius: 8px;
     background: #121121;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
@@ -104,7 +102,7 @@ button .option {
     margin-right: 0.5rem;
 }
 
-button:hover,
+button:hover:not(:disabled),
 :focus {
     border: 3px solid #8f44fd;
     background-color: #5f22b91d;
