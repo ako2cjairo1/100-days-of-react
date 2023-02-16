@@ -2,22 +2,23 @@ export type ChildrenProps = {
 	children: React.ReactNode;
 };
 
-export type EnumPawns = 'X' | 'O';
+export type EnumPawns = "❌" | "⚪️";
 export type TBox = EnumPawns | null;
 export type TScore = { [P in EnumPawns]: number } & { draw: number };
 
 export type TPlayers = {
-  player: 'X',
-  computer: 'O',
+  player: "❌",
+  computer: "⚪️",
 } | {
-	player: 'O',
-  	computer: 'X',
+	player: "⚪️",
+  	computer: "❌",
   };
 
 export type ContextProps = {
 	boxes: TBox[];
 	currentPawn: EnumPawns;
 	isReset: boolean;
+	isWaiting: boolean;
 	players: TPlayers;
 	scores: TScore;
 	start: boolean;

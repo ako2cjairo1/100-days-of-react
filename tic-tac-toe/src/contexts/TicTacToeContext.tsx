@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from 'react';
 import { BoxProps, ChildrenProps, ContextProps, EnumPawns, TBox, TPlayers, TScore } from '../types';
 
 // initial box content without null for player to choose which pawn they would use
-const PAWNS: EnumPawns[] = ['X','O']
+const PAWNS: EnumPawns[] = ["❌","⚪️"]
 const EMPTY_BOXES = new Array<TBox>(9).fill(null);
 const WIN_COMBINATIONS = [
 	[0, 1, 2],
@@ -20,8 +20,9 @@ const initialValue: ContextProps = {
 	// choose random pawn to make 1st move
 	currentPawn: PAWNS[pickRandom(PAWNS.length)],
 	isReset: true,
-	players: { player: 'X', computer: 'O' },
-	scores: { X:0, O: 0, draw: 0 },
+	isWaiting: false,
+	players: { player: "❌", computer:"⚪️" },
+	scores: {"❌": 0, "⚪️": 0, draw: 0},
 	start: false,
 	matched: [],
 	playerMove: () => {},
@@ -43,6 +44,7 @@ export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 	const [scores, setScores] = useState<TScore>(initScores);
 	const [matched, setMatched] = useState<number[]>(initMatched)
 	const [startPawn, setStartPawn] = useState<EnumPawns>()
+	const [isWaiting, setIsWaiting] = useState(false)
 
 
 	useEffect(() => {
@@ -66,11 +68,10 @@ export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 		setStart(false)
 		// increment scores
 		setScores((prevScore) => ({ ...prevScore, [winner]: prevScore[winner] + 1 }));
-		// if (winner === 'draw') alert("It's a tie!");
-		// else alert(`${winner} won!`);
 	};	
 
 	const createNewGame = () => {
+		setIsWaiting(false)
 		setStart(true)
 		setMatched(initMatched)
 
@@ -82,7 +83,7 @@ export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 	};
 
 	const togglePlayer = () => {
-		setCurrentPawn((prevPawn) => (prevPawn === 'X' ? 'O' : 'X'));
+		setCurrentPawn((prevPawn) => (prevPawn === "❌" ? "⚪️" : "❌"));
 		return currentPawn;
 	};
 
@@ -118,14 +119,15 @@ export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 	const playerMove = ({boxIdx, pawn}: BoxProps) => {
 		// choose pawn before starting the game
 		if (!start && isReset) {
-			if (pawn === 'O') {
-				setPlayers({ player: 'O', computer: 'X' })
+			if (pawn ==="⚪️") {
+				setPlayers({ player:"⚪️", computer: "❌" })
 			}
 			setStart(true);
 			// create a blank board
 			setBoxes(EMPTY_BOXES);
 			setStartPawn(initCurrentPawn)
 		} else {
+			setIsWaiting(true)
 			// update the board using the pawn assigned to current player then toggle to next player
 			moveToPosition(boxIdx)
 		}
@@ -133,7 +135,10 @@ export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 
 	const computerMove = () => {
 		if(players.computer === currentPawn) {
+			setIsWaiting(true)
 			const timeout = setTimeout(() => {
+			setIsWaiting(true)
+				setIsWaiting(false)
 				let randMove = pickRandom(9)
 				// pick a valid random move
 				while (boxes[randMove] !== null) {
@@ -141,12 +146,12 @@ export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 				}
 				moveToPosition(randMove);	
 				clearTimeout(timeout)
-			}, 1000)
+			}, [1000,2000,3000][pickRandom(3)])
 		}
 	}
 
 	return (
-		<TicTacToeContext.Provider value={{ boxes, currentPawn, isReset, players, scores, start, matched, playerMove }}>
+		<TicTacToeContext.Provider value={{ boxes, currentPawn, isReset, isWaiting, players, scores, start, matched, playerMove }}>
 			{children}
 		</TicTacToeContext.Provider>
 	);

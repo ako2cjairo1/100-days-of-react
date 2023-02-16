@@ -4,7 +4,7 @@ import Board from './Board';
 
 export default () => {
 	// extract classnames from css module
-	const { main, header } = classNames;
+	const { main, header, stats, lower, hourglass } = classNames;
 	// extract states from custom hook
 	const { boxes, currentPawn, isReset, players, scores, start } = useTicTacToeContext();
 	const {player, computer} = players
@@ -13,28 +13,28 @@ export default () => {
 		<main className={main}>
 			<div className={header}>
 				{
-					!start && isReset ? <section>
-						<p>Choose your pawn</p>
-						<p>
-							( <a>{currentPawn}</a> starts first )
+					!start && isReset ? <>
+						<p className={stats}>Choose your pawn</p>
+						<p className={`${stats} ${lower}`}>
+							( "<a>{currentPawn}</a>" will start first )
 						</p>
-					</section> : <section>
-						<p>
-							Player [ <a>{player}</a> ]
-							<span>{scores[player]}</span>
+					</> : <section>
+						<p className={stats}>
+							You (<a>{player}</a>)
+							<span>{scores[player] === 0 ? '' : scores[player]}</span>
 						</p>
-						<p>
-							Tie
-							<span>{scores.draw}</span>
+						{
+							scores.draw === 0 ? null : <p className={stats}>Tie<span>{scores.draw}</span>
 						</p>
-						<p>
-							Computer [ <a>{computer}</a> ]
-							<span>{scores[computer]}</span>
+						}
+						<p className={stats}>
+							🤖 (<a>{computer}</a>)
+							<span>{scores[computer] === 0 ? '' : scores[computer]}</span>
 						</p>
 					</section>
 				}
 			</div>
-
+			{start && computer === currentPawn ? <p><span className={hourglass}>⏳</span> Computer is deciding a move...</p> : null}
 			<Board boxes={boxes} />
 		</main>
 	);

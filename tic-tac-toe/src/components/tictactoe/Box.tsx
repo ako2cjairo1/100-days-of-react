@@ -4,7 +4,7 @@ import { BoxProps } from '../../types';
 
 export const Box = ({ boxIdx, pawn }: BoxProps) => {
 	const { box, active, inactive, win } = classNames;
-	const { playerMove, isReset, start, matched } = useTicTacToeContext();
+	const { playerMove, isReset, start, matched, isWaiting } = useTicTacToeContext();
 	const isDisabled = isReset && !start ? false : start ? (start && pawn !== null) : true;
 	const matchedClass = matched.includes(boxIdx) ? win : pawn === null && inactive
 
@@ -12,7 +12,7 @@ export const Box = ({ boxIdx, pawn }: BoxProps) => {
 		<button
 			className={`${box} ${isDisabled ? matchedClass : active}`}
 			// disable if already selected
-			disabled={isDisabled}
+			disabled={isDisabled || isWaiting}
 			onClick={() => playerMove({boxIdx,pawn})}>
 			{pawn}
 		</button>
