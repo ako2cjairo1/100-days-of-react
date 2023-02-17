@@ -1,4 +1,4 @@
-import classNames from '../../modules/TicTacToe.module.css';
+import classNames from '../../modules/Game.module.css';
 import { BoardProps } from '../../types';
 import { Box } from './Box';
 

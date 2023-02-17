@@ -1,1 +1,1 @@
-export * from './TicTacToeContext';
+export * from './GameContext';

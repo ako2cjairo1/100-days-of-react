@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { TicTacToe } from './components/tictactoe';
-import { TicTacToeProvider } from './contexts/TicTacToeContext';
+import { TicTacToeProvider } from './contexts/GameContext';
 
 import './main.css';
 
