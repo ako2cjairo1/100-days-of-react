@@ -15,6 +15,7 @@ export const Box = ({ boxIdx, pawn }: BoxProps) => {
 	return (
 		<button
 			className={`${box} ${isDisabled ? matchedClass : active}`}
+			style={{ animationDelay: `${boxIdx * 0.1}s`}}
 			// disable if already selected
 			disabled={isDisabled || isWaiting}
 			onClick={() => playerMove({boxIdx,pawn})}>

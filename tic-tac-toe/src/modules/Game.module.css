@@ -101,6 +101,7 @@ button {
     -webkit-backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.18);
     transition: all 0.3s ease-in;
+    animation: winner 0.8s ease-in-out;
 }
 
 .box.active:hover:not(:disabled) {

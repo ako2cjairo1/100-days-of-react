@@ -1,16 +1,22 @@
-* {
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
-html,
-body {
-  height: 100%;
+* {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+}
+
+html {
+  color-scheme: dark light;
 }
 
 body {
   display: grid;
+  height: 100%;
+  min-height: 100vh;
   place-items: center;
-  margin: 0;
   padding: 0 24px;
   color: #1a1a1a;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
@@ -18,11 +24,9 @@ body {
   animation: gradient 10s infinite alternate linear;
 }
 
-@media (width >=500px) {
-  body {
-    margin: 0;
-    padding: 0;
-  }
+img, picture, svg, video {
+  display: block;
+  max-width: 100%;
 }
 
 .widget {
