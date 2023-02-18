@@ -2,7 +2,7 @@ import { decrypt } from '../../colorGameHelper';
 import { useColorGameContext } from '../../contexts/ColorGameContext';
 import { ColorGameStyles as styles } from '../../modules';
 
-export default () => {
+export const Box = () => {
 	const { box } = styles;
 	// get color from context
 	const { colorGameState } = useColorGameContext();

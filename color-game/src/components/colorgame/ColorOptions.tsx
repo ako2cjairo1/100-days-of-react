@@ -2,7 +2,7 @@ import { useColorGameContext } from '../../contexts/ColorGameContext';
 import { ColorGameStyles as styles } from '../../modules';
 import OptionButton from './OptionButton';
 
-export default () => {
+export const ColorOptions = () => {
 	const { options } = styles;
 	const { colorGameState } = useColorGameContext();
 	const { colors } = colorGameState;

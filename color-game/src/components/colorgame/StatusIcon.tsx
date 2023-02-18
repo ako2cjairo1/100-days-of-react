@@ -17,12 +17,7 @@ export default ({ isChecking, isCorrect, isReveal, isSelected }: StatusIconProps
 					// if selected a wrong answer
 					isSelected && <span className={icon}>❌</span>
 				)
-			) : (
-				// default view
-				<span className={icon} style={{ marginLeft: '20px' }}>
-					⃝
-				</span>
-			)}
+			) : null }
 		</>
 	);
 };
