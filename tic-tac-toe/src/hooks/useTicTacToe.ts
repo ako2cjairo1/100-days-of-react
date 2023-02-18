@@ -1,8 +1,9 @@
 import { useEffect, useReducer } from "react";
-import { movePosition, newGame, toggleCurrentPawn, initGame, setScoreBoard, setWinningMatch, setIsWaiting } from "../actions";
+import { movePosition, newGame, toggleCurrentPawn, initGame, updateScoreBoard, setWinningMatch, setIsWaiting } from "../actions";
 import { gameReducer } from "../reducers/Reducer";
 import { executeAfterSomeTime, pickRandom } from "../Helper";
 import { BoxProps, ContextProps, EnumPawns,  TBox,  TScore } from "../types";
+import confetti from "https://cdn.skypack.dev/canvas-confetti@1";
 
 // initial box content without null for player to choose which pawn they would use
 export const PAWNS: EnumPawns[] = ["❌","⚪️"]
@@ -47,8 +48,14 @@ export const useTicTacToe = (): ContextProps => {
 			let winner = checkMove();
 
 			if (winner) {
+				if(winner === players.player) {
+					confetti({
+						particleCount: 150,
+						spread: 60
+					  });
+				}
 				// game has ended, update the scores
-				setState(setScoreBoard(winner as keyof TScore))
+				setState(updateScoreBoard(winner as keyof TScore))
 				// start a new game after 3s
 				executeAfterSomeTime(() => setState(newGame(currentPawn)), 3)
 			}

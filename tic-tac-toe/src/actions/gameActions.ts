@@ -32,7 +32,7 @@ export const setWinningMatch = (combinations: number[]) => createAction({
         combinations
     }
 })
-export const setScoreBoard = (winner: keyof TScore) => createAction({
+export const updateScoreBoard = (winner: keyof TScore) => createAction({
     type: ACTIONS.UPDATE_SCORE_BOARD,
     payload: {
         winner
