@@ -3,7 +3,7 @@ import { movePosition, newGame, toggleCurrentPawn, initGame, updateScoreBoard, s
 import { gameReducer } from "../reducers/Reducer";
 import { executeAfterSomeTime, pickRandom } from "../Helper";
 import { BoxProps, ContextProps, EnumPawns,  TBox,  TScore } from "../types";
-import confetti from "https://cdn.skypack.dev/canvas-confetti@1";
+import confetti from 'canvas-confetti';
 
 // initial box content without null for player to choose which pawn they would use
 export const PAWNS: EnumPawns[] = ["❌","⚪️"]
