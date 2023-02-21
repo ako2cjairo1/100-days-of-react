@@ -1,0 +1,106 @@
+.drawing {
+	position: relative;
+}
+
+.body,
+.rightArm,
+.leftArm,
+.rightLeg,
+.leftLeg,
+.rope,
+.topPole,
+.pole,
+.basePole {
+	background: currentcolor;
+	border-radius: 20px;
+	box-shadow: 0px 0px 20px 1px currentColor;
+}
+
+.head,
+.body,
+.rightArm,
+.leftArm,
+.rightLeg,
+.leftLeg {
+	color: yellow;
+}
+
+.head {
+	width: 85px;
+	height: 85px;
+	border: 9px solid currentColor;
+	box-shadow: 0px 0px 20px 1px currentColor;
+	position: absolute;
+	top: 47px;
+	right: -37px;
+}
+.body {
+	width: 10px;
+	height: 100px;
+	position: absolute;
+	top: 130px;
+	right: 0;
+}
+.rightArm {
+	width: 100px;
+	height: 10px;
+	position: absolute;
+	top: 160px;
+	right: -98px;
+	rotate: -30deg;
+	transform-origin: left bottom;
+}
+.leftArm {
+	width: 100px;
+	height: 10px;
+	position: absolute;
+	top: 160px;
+	right: 8px;
+	rotate: 30deg;
+	transform-origin: right bottom;
+}
+
+.rightLeg {
+	width: 100px;
+	height: 10px;
+	position: absolute;
+	top: 216px;
+	right: -90px;
+	rotate: 60deg;
+	transform-origin: left bottom;
+}
+
+.leftLeg {
+	width: 100px;
+	height: 10px;
+	position: absolute;
+	top: 216px;
+	right: 0;
+	rotate: -60deg;
+	transform-origin: right bottom;
+}
+
+.rope {
+	height: 50px;
+	width: 10px;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+.topPole {
+	height: 10px;
+	width: 200px;
+	margin-left: 120px;
+}
+.pole {
+	height: 400px;
+	width: 10px;
+	margin-left: 120px;
+	margin-top: -10px;
+}
+.basePole {
+	height: 10px;
+	width: 250px;
+	margin-top: -10px;
+	background: currentColor;
+}

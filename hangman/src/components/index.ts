@@ -1,3 +1,5 @@
-export {default as HangMan} from './HangMan'
+export { default as HangMan } from './HangMan'
 export * from './Drawing'
-export * from './GuessingWord'
+export * from './Word'
+export * from './Keyboard'
+export * from './StatusMessage'
