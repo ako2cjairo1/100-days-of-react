@@ -18,8 +18,8 @@ export const Box = ({ idx, pawn }: BoxProps) => {
 		gameStatus === GAME_STATUS.AssignPawn
 			? false
 			: gameStatus === Playing
-				? gameStatus === Playing && pawn !== null
-				: true
+			? gameStatus === Playing && pawn !== null
+			: true
 
 	return (
 		<button
