@@ -2,7 +2,6 @@ import { useEffect, useReducer } from 'react'
 import confetti from 'canvas-confetti'
 import { gameActions } from '../actions'
 import { gameReducer } from '../reducers/gameReducer'
-import { executeAfterSomeTime, pickRandom } from '../helper'
 import {
 	BoxProps,
 	ContextProps,
@@ -14,6 +13,7 @@ import {
 	GAME_STATUS,
 	PAWN,
 } from '../types'
+import { executeAfterSomeTime, pickRandom } from '../helper'
 
 // initial pawns to choose from
 export const INIT_PAWNS: TPawn[] = [PAWN['⚪️'], PAWN['❌']]
