@@ -1,39 +1,44 @@
-*, *::before, *::after {
-  box-sizing: border-box;
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
 }
 
 * {
-  margin: 0;
-  padding: 0;
-  font: inherit;
+	margin: 0;
+	padding: 0;
+	font: inherit;
 }
 
 html {
-  color-scheme: dark light;
+	color-scheme: dark light;
 }
 
 body {
-  display: grid;
-  height: 100%;
-  min-height: 100vh;
-  place-items: center;
-  padding: 0 24px;
-  color: #1a1a1a;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  animation: gradient 10s infinite alternate linear;
+	display: grid;
+	height: 100%;
+	min-height: 100vh;
+	place-items: center;
+	padding: 0 24px;
+	color: #1a1a1a;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+		'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+	animation: gradient 10s infinite alternate linear;
 }
 
-img, picture, svg, video {
-  display: block;
-  max-width: 100%;
+img,
+picture,
+svg,
+video {
+	display: block;
+	max-width: 100%;
 }
 
 .widget {
-  z-index: 2;
-  border: none;
-  width: 100%;
-  height: 100%;
-  min-width: 600px;
-  min-height: 700px;
+	z-index: 2;
+	border: none;
+	width: 100%;
+	height: 100%;
+	min-width: 600px;
+	min-height: 700px;
 }

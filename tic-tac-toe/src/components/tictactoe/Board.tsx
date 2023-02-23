@@ -1,17 +1,19 @@
-import classNames from '../../modules/Game.module.css';
-import { BoardProps } from '../../types';
-import { Box } from './Box';
+import { Box } from '.'
+import classNames from '../../modules/Game.module.css'
+import { StateProps } from '../../types'
 
-const Board = ({ boxes }: BoardProps) => {
-	const { board } = classNames;
+export const Board = ({ boxes }: Pick<StateProps, 'boxes'>) => {
+	const { board } = classNames
 
 	return (
 		<div className={board}>
-			{boxes.map((box, idx) => (
-				<Box key={idx} pawn={box} boxIdx={idx} />
+			{boxes.map((pawn, idx) => (
+				<Box
+					key={idx}
+					pawn={pawn}
+					idx={idx}
+				/>
 			))}
 		</div>
-	);
-};
-
-export default Board;
+	)
+}

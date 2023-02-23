@@ -1,1 +1,1 @@
-export * from './TicTacToe.type';
+export * from './TicTacToe.type'

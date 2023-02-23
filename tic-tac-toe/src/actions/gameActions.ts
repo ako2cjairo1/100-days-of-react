@@ -1,52 +1,41 @@
-import { ActionProps, ACTIONS, EnumPawns, PayloadTypes, TPlayers, TScore } from '../types'
+import React from 'react'
+import { ActionProps, GAME_ACTION, TPawn, TPlayers, TScore } from '../types'
 
-// action creator
-const createAction = ({type, payload}: ActionProps<PayloadTypes>) => {
-    return { 
-        type, 
-        payload
-    }
+export const gameActions = (dispatch: React.Dispatch<ActionProps>) => {
+	return {
+		// game actions
+		initGame: (players: TPlayers) =>
+			dispatch({
+				type: GAME_ACTION.InitializeGame,
+				players,
+			}),
+		newGame: () =>
+			dispatch({
+				type: GAME_ACTION.NewGame,
+			}),
+		movePosition: (index: number) =>
+			dispatch({
+				type: GAME_ACTION.MovePosition,
+				index,
+			}),
+		setWinningMatch: (combinations: number[]) =>
+			dispatch({
+				type: GAME_ACTION.SetWinningMatch,
+				combinations,
+			}),
+		updateScoreBoard: (winner: keyof TScore) =>
+			dispatch({
+				type: GAME_ACTION.UpdateScoreBoard,
+				winner,
+			}),
+		toggleCurrentPawn: () =>
+			dispatch({
+				type: GAME_ACTION.ToggleCurrentPawn,
+			}),
+		setIsWaiting: (isWaiting: boolean) =>
+			dispatch({
+				type: GAME_ACTION.Waiting,
+				isWaiting,
+			}),
+	}
 }
-// game actions
-export const initGame = (players: TPlayers) => createAction({
-    type: ACTIONS.INIT_CHOOSE_PAWN,
-    payload: {
-        players
-    }
-})
-export const newGame = (pawn: EnumPawns) => createAction({ 
-    type: ACTIONS.NEW_GAME,
-    payload: { 
-        pawn 
-    }
-})
-export const movePosition = (index: number) => createAction({ 
-    type: ACTIONS.MOVE_POSITION, 
-    payload: {
-        index
-    } 
-})
-export const setWinningMatch = (combinations: number[]) => createAction({
-    type: ACTIONS.SET_MATCHED,
-    payload: {
-        combinations
-    }
-})
-export const updateScoreBoard = (winner: keyof TScore) => createAction({
-    type: ACTIONS.UPDATE_SCORE_BOARD,
-    payload: {
-        winner
-    }
-})
-export const toggleCurrentPawn = (pawn: EnumPawns) => createAction({
-    type: ACTIONS.TOGGLE_PAWN,
-    payload: {
-        pawn
-    }
-})
-export const setIsWaiting = (isWaiting: boolean) => createAction({
-    type: ACTIONS.SET_IS_WAITING,
-    payload: {
-        isWaiting
-    }
-})

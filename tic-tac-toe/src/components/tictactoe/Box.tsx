@@ -1,25 +1,35 @@
-import { useGameContext } from '../../hooks/useGameContext';
-import classNames from '../../modules/Game.module.css';
-import { BoxProps } from '../../types';
+import { useGameContext } from '../../hooks/useGameContext'
+import classNames from '../../modules/Game.module.css'
+import { BoxProps, GAME_STATUS } from '../../types'
 
-export const Box = ({ boxIdx, pawn }: BoxProps) => {
-	const { box, active, inactive, win } = classNames;
-	const { state, handlers } = useGameContext();
+export const Box = ({ idx, pawn }: BoxProps) => {
+	const { box, active, inactive, win } = classNames
+	const { Playing, Waiting } = GAME_STATUS
+
 	// extract states and handler from custom hook
-	const { isReset, start, matched, isWaiting} = state
-	const { playerMove } = handlers
-	// disable button if the game has started and/or box is not available
-	const isDisabled = isReset && !start ? false : start ? (start && pawn !== null) : true;
-	const matchedClass = matched.includes(boxIdx) ? win : pawn === null && inactive
+	const { state, handlers } = useGameContext()
+	const { gameStatus, winningMatch } = state
+	const { humanMove } = handlers
+
+	const winClass = winningMatch.includes(idx) ? win : pawn === null && inactive
+
+	// disable button if Playing and already selected
+	const disabled =
+		gameStatus === GAME_STATUS.AssignPawn
+			? false
+			: gameStatus === Playing
+				? gameStatus === Playing && pawn !== null
+				: true
 
 	return (
 		<button
-			className={`${box} ${isDisabled ? matchedClass : active}`}
-			style={{ animationDelay: `${boxIdx * 0.1}s`}}
-			// disable if already selected
-			disabled={isDisabled || isWaiting}
-			onClick={() => playerMove({boxIdx,pawn})}>
+			className={`${box} ${disabled ? winClass : active}`}
+			style={{ animationDelay: `${idx * 0.1}s` }}
+			// disable if already selected OR is waiting
+			disabled={disabled || gameStatus === Waiting}
+			onClick={() => humanMove({ idx, pawn })}
+		>
 			{pawn}
 		</button>
-	);
-};
+	)
+}

@@ -6,105 +6,119 @@ import { getAlphabet, getRandom } from '../hangmanHelper'
 import words from './words.json'
 
 const HangMan = () => {
-  const { main, stats, newGame } = styles
-  const [letters, setKeyboard] = useState<TLetter[]>([])
-  const [wordToGuess, setWordToGuess] = useState<string>('')
-  const [wrongGuessCounter, setWrongGuessCounter] = useState(0)
-  const isInit = useRef(true)
+	const { main, stats } = styles
+	const [letters, setKeyboard] = useState<TLetter[]>([])
+	const [wordToGuess, setWordToGuess] = useState<string>('')
+	const [wrongGuessCounter, setWrongGuessCounter] = useState(0)
+	const isInit = useRef(true)
 
-  useEffect(() => {
-    if (isInit.current) initGame()
+	useEffect(() => {
+		if (isInit.current) initGame()
 
-    const keyboardEventHandler = (e: KeyboardEvent) => {
-      e.preventDefault()
+		const keyboardEventHandler = (e: KeyboardEvent) => {
+			e.preventDefault()
 
-      if (e.key === 'Enter' && isDone) initGame()
-      else if (e.key.match(/^[a-z]$/) && !isDone) checkGuessedLetter(e.key)
-    }
-    document.addEventListener('keypress', keyboardEventHandler)
+			if (e.key === 'Enter' && isDone) initGame()
+			else if (e.key.match(/^[a-z]$/) && !isDone) checkGuessedLetter(e.key)
+		}
+		document.addEventListener('keypress', keyboardEventHandler)
 
-    return () => {
-      document.removeEventListener('keypress', keyboardEventHandler)
-    }
-  }, [letters])
+		return () => {
+			document.removeEventListener('keypress', keyboardEventHandler)
+		}
+	}, [letters])
 
-  const initGame = () => {
-    isInit.current = false
-    setWrongGuessCounter(0)
-    // TODO: fetch words from an api
-    const initGuessingWord = getRandom(words).toLowerCase()
-    const initLetters: TLetter[] = getAlphabet().map(letter => {
-      return {
-        letter: letter.toLowerCase(),
-        isCorrect: initGuessingWord.includes(letter.toLowerCase()),
-        isGuessed: false,
-      }
-    })
-    setKeyboard(initLetters)
-    setWordToGuess(initGuessingWord)
-  }
+	const initGame = () => {
+		isInit.current = false
+		setWrongGuessCounter(0)
 
-  const isSuccessfulGuess = letters
-    .filter(item => item.isCorrect)
-    .every(({ isGuessed }) => isGuessed)
+		// TODO: fetch words from an api
+		const options = {
+			method: 'GET',
+			mode: 'cors',
+			headers: {
+				'Access-Control-Allow-Origin': '*',
+			},
+		}
 
-  const isWrongGuess = (letter: string) => !wordToGuess.split('').includes(letter.toLowerCase())
+		fetch('https://san-random-words.vercel.app/', options)
+			.then(response => response)
+			.then(response => console.log(response))
+			.catch(err => console.error(err))
 
-  const isDone = isSuccessfulGuess || wrongGuessCounter >= 6
+		const initGuessingWord = getRandom(words).toLowerCase()
+		const initLetters: TLetter[] = getAlphabet().map(letter => {
+			return {
+				letter: letter.toLowerCase(),
+				isCorrect: initGuessingWord.includes(letter.toLowerCase()),
+				isGuessed: false,
+			}
+		})
+		setKeyboard(initLetters)
+		setWordToGuess(initGuessingWord)
+	}
 
-  const checkGuessedLetter = useCallback(
-    (letter: string) => {
-      if (letters.some(itm => itm.letter === letter && itm.isGuessed)) return
-      const updatedLetters = letters.map(item => {
-        // mark the guessed letter
-        if (item.letter === letter) {
-          return {
-            ...item,
-            isGuessed: true,
-          }
-        }
-        return item
-      })
-      setKeyboard(updatedLetters)
+	const isSuccessfulGuess = letters
+		.filter(item => item.isCorrect)
+		.every(({ isGuessed }) => isGuessed)
 
-      if (isWrongGuess(letter)) {
-        setWrongGuessCounter(prevCount => prevCount + 1)
-      }
-    },
-    [letters]
-  )
+	const isWrongGuess = (letter: string) => !wordToGuess.split('').includes(letter.toLowerCase())
 
-  return (
-    <div className={main}>
-      <div className={stats}>
-        <StatusMessage
-          isSuccessfulGuess={isSuccessfulGuess}
-          wrongGuessCounter={wrongGuessCounter}
-        />
-        <button
-          style={{ visibility: isDone ? 'visible' : 'hidden' }}
-          onClick={() => initGame()}
-        >
-          play again?
-        </button>
-      </div>
-      <Drawing
-        isHang={isDone}
-        wrongGuessCount={wrongGuessCounter}
-      />
-      <GuessingWord
-        word={wordToGuess}
-        isDone={isDone}
-        guessedLetters={letters}
-      />
+	const isDone = isSuccessfulGuess || wrongGuessCounter >= 6
 
-      <Keyboard
-        disabled={isDone}
-        letters={letters}
-        handler={checkGuessedLetter}
-      />
-    </div>
-  )
+	const checkGuessedLetter = useCallback(
+		(letter: string) => {
+			if (letters.some(itm => itm.letter === letter && itm.isGuessed)) return
+			const updatedLetters = letters.map(item => {
+				// mark the guessed letter
+				if (item.letter === letter) {
+					return {
+						...item,
+						isGuessed: true,
+					}
+				}
+				return item
+			})
+			setKeyboard(updatedLetters)
+
+			if (isWrongGuess(letter)) {
+				setWrongGuessCounter(prevCount => prevCount + 1)
+			}
+		},
+		[letters]
+	)
+
+	return (
+		<div className={main}>
+			<div className={stats}>
+				<StatusMessage
+					isSuccessfulGuess={isSuccessfulGuess}
+					wrongGuessCounter={wrongGuessCounter}
+				/>
+				<button
+					style={{ visibility: isDone ? 'visible' : 'hidden' }}
+					onClick={() => initGame()}
+				>
+					play again?
+				</button>
+			</div>
+			<Drawing
+				isHang={isDone}
+				wrongGuessCount={wrongGuessCounter}
+			/>
+			<GuessingWord
+				word={wordToGuess}
+				isDone={isDone}
+				guessedLetters={letters}
+			/>
+
+			<Keyboard
+				disabled={isDone}
+				letters={letters}
+				handler={checkGuessedLetter}
+			/>
+		</div>
+	)
 }
 
 export default HangMan

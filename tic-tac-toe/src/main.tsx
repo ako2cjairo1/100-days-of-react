@@ -1,9 +1,9 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { TicTacToe } from './components/tictactoe';
-import { TicTacToeProvider } from './contexts/GameContext';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { TicTacToe } from './components/tictactoe'
+import { TicTacToeProvider } from './contexts/GameContext'
 
-import './main.css';
+import './main.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>
@@ -11,4 +11,4 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 			<TicTacToe />
 		</TicTacToeProvider>
 	</React.StrictMode>
-);
+)

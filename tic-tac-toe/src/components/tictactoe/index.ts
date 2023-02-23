@@ -1,1 +1,6 @@
-export { default as TicTacToe } from './TicTacToe';
+export { default as TicTacToe } from './TicTacToe'
+export { Board } from './Board'
+export { Box } from './Box'
+export { ChoosePawn } from './ChoosePawn'
+export { ScoreBoard } from './ScoreBoard'
+export { Status } from './Status'
