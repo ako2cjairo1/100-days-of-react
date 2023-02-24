@@ -1,5 +1,5 @@
 .keyboard {
-	align-self: stretch;
+	/* align-self: stretch; */
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
@@ -15,6 +15,7 @@
 	font-size: 2.5rem;
 	text-transform: uppercase;
 	padding: 0.5rem;
+	border-radius: 50%;
 	font-weight: bold;
 	color: currentColor;
 
@@ -27,10 +28,42 @@
 }
 
 .keyboard > button.active {
-	background-color: hsla(122, 100%, 50%, 0.6);
+	background-color: hsl(113, 100%, 80%, 1);
+	box-shadow: 0px 0px 20px 1px #ffbb763f;
+	border: 1px solid rgba(255, 255, 255, 0.454);
 	color: currentColor;
 }
 
 .keyboard > button.inactive {
 	opacity: 0.3;
+	color: darkgray;
+}
+
+@media (prefers-color-scheme: light) {
+	.keyboard > button {
+		background-color: #b7b7b7;
+	}
+	.keyboard > button.active {
+		box-shadow: 0px 0px 20px 1px hsl(113, 100%, 80%, 1);
+		border: 1px solid rgba(255, 255, 255, 0.454);
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	.keyboard > button.active {
+		color: black;
+	}
+}
+
+@media (max-width: 400px) {
+	.keyboard {
+		gap: 0.7rem;
+		/* max-width: 350px; */
+	}
+	.keyboard > button {
+		width: 50px;
+		max-width: 50px;
+		height: 50px;
+		font-size: 1.5rem;
+	}
 }

@@ -1,19 +1,42 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import styles from '../modules/HangMan.module.css'
-import { Drawing, GuessingWord, Keyboard, StatusMessage } from '.'
-import { TLetter } from '../types/HangMan.type'
+import { Drawing, WordToGuess, Keyboard, StatusMessage } from '.'
+import { TLetter, WordDictionary } from '../types/HangMan.type'
 import { getAlphabet, getRandom } from '../hangmanHelper'
-import words from './words.json'
+import { useFetchWordsAsync } from '../hooks/useFetchWordsAsync'
+import processingGif from '../assets/processing.gif'
+import requestConfig from '../request_config.json'
+
+const API_KEY = import.meta.env.VITE_API_KEY
+const URL = import.meta.env.VITE_API_URL
+
+const options = {
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/json',
+		Authorization: `Bearer ${API_KEY}`,
+	},
+	body: JSON.stringify(requestConfig),
+}
 
 const HangMan = () => {
 	const { main, stats } = styles
+	const [words, setWords] = useState<WordDictionary>([])
 	const [letters, setKeyboard] = useState<TLetter[]>([])
 	const [wordToGuess, setWordToGuess] = useState<string>('')
 	const [wrongGuessCounter, setWrongGuessCounter] = useState(0)
 	const isInit = useRef(true)
 
+	const { data, error, isLoading } = useFetchWordsAsync(URL, options)
+
 	useEffect(() => {
-		if (isInit.current) initGame()
+		if (isInit.current && !isLoading && words.length > 0 && !error) {
+			initGame()
+		}
+
+		if (!isLoading && data && words.length <= 0) {
+			setWords(data)
+		}
 
 		const keyboardEventHandler = (e: KeyboardEvent) => {
 			e.preventDefault()
@@ -26,27 +49,15 @@ const HangMan = () => {
 		return () => {
 			document.removeEventListener('keypress', keyboardEventHandler)
 		}
-	}, [letters])
+	}, [letters, isLoading, words])
 
 	const initGame = () => {
+		console.log('INIT GAME', words)
 		isInit.current = false
 		setWrongGuessCounter(0)
 
-		// TODO: fetch words from an api
-		const options = {
-			method: 'GET',
-			mode: 'cors',
-			headers: {
-				'Access-Control-Allow-Origin': '*',
-			},
-		}
+		const initGuessingWord = getRandom(Object.values(words).map(item => item.word)).toLowerCase()
 
-		fetch('https://san-random-words.vercel.app/', options)
-			.then(response => response)
-			.then(response => console.log(response))
-			.catch(err => console.error(err))
-
-		const initGuessingWord = getRandom(words).toLowerCase()
 		const initLetters: TLetter[] = getAlphabet().map(letter => {
 			return {
 				letter: letter.toLowerCase(),
@@ -61,8 +72,6 @@ const HangMan = () => {
 	const isSuccessfulGuess = letters
 		.filter(item => item.isCorrect)
 		.every(({ isGuessed }) => isGuessed)
-
-	const isWrongGuess = (letter: string) => !wordToGuess.split('').includes(letter.toLowerCase())
 
 	const isDone = isSuccessfulGuess || wrongGuessCounter >= 6
 
@@ -81,6 +90,7 @@ const HangMan = () => {
 			})
 			setKeyboard(updatedLetters)
 
+			const isWrongGuess = (letter: string) => !wordToGuess.split('').includes(letter.toLowerCase())
 			if (isWrongGuess(letter)) {
 				setWrongGuessCounter(prevCount => prevCount + 1)
 			}
@@ -88,13 +98,20 @@ const HangMan = () => {
 		[letters]
 	)
 
+	if (isLoading) {
+		return (<span>
+			<img
+				src={processingGif}
+				style={{ width: '50px' }}
+			/>
+			Fetching random words from internet...
+		</span>)
+	}
+
 	return (
 		<div className={main}>
 			<div className={stats}>
-				<StatusMessage
-					isSuccessfulGuess={isSuccessfulGuess}
-					wrongGuessCounter={wrongGuessCounter}
-				/>
+				<StatusMessage {...{ isSuccessfulGuess, wrongGuessCounter }} />
 				<button
 					style={{ visibility: isDone ? 'visible' : 'hidden' }}
 					onClick={() => initGame()}
@@ -102,16 +119,14 @@ const HangMan = () => {
 					play again?
 				</button>
 			</div>
-			<Drawing
-				isHang={isDone}
-				wrongGuessCount={wrongGuessCounter}
-			/>
-			<GuessingWord
-				word={wordToGuess}
-				isDone={isDone}
-				guessedLetters={letters}
-			/>
-
+			<Drawing {...{ isDone, wrongGuessCounter }} />
+			<WordToGuess {...{ wordToGuess, isDone, letters }} />
+			<p>
+				Hint:{' '}
+				<q>
+					<cite>{words.find(w => w.word === wordToGuess)?.definition ?? '...'}</cite>
+				</q>
+			</p>
 			<Keyboard
 				disabled={isDone}
 				letters={letters}

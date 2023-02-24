@@ -1,19 +1,19 @@
 import styles from '../modules/HangMan.module.css'
 import { GuessingWordProps } from '../types/HangMan.type'
 
-export const GuessingWord = ({ word, isDone, guessedLetters }: GuessingWordProps) => {
+export const WordToGuess = ({ wordToGuess, isDone, letters }: GuessingWordProps) => {
 	const { letter, underline, winner } = styles
-	const wordToGuess = word.split('')
+	const splitWordToGuess = wordToGuess.split('')
 
 	const isReveal = (guessedLetter: string) => {
-		return guessedLetters.some(({ letter, isCorrect, isGuessed }) =>
+		return letters.some(({ letter, isCorrect, isGuessed }) =>
 			guessedLetter.toLowerCase() === letter.toLowerCase() && isCorrect && isGuessed ? true : false
 		)
 	}
 
 	return (
 		<div className={letter}>
-			{wordToGuess.map((letter, idx) => {
+			{splitWordToGuess.map((letter, idx) => {
 				return (
 					<span
 						key={idx}

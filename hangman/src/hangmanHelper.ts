@@ -8,5 +8,5 @@ export const getAlphabet = () => {
 
 export const getRandom = <T>(array: T[]) => {
 	const idx = Math.floor(Math.random() * array.length)
-	return array[idx]
+	return array[idx] ?? ''
 }

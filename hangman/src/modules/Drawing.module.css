@@ -29,6 +29,7 @@
 	width: 85px;
 	height: 85px;
 	border: 9px solid currentColor;
+	border-radius: 100%;
 	box-shadow: 0px 0px 20px 1px currentColor;
 	position: absolute;
 	top: 47px;
@@ -103,4 +104,65 @@
 	width: 250px;
 	margin-top: -10px;
 	background: currentColor;
+}
+
+@media (prefers-color-scheme: light) {
+	.head,
+	.body,
+	.rightArm,
+	.leftArm,
+	.rightLeg,
+	.leftLeg {
+		color: darkgoldenrod;
+	}
+	.keyboard > button {
+		color: darkgray;
+	}
+}
+
+@media (max-width: 400px) {
+	.drawing {
+		left: -70px;
+	}
+	.pole {
+		height: 300px;
+	}
+	.basePole {
+		width: 150px;
+		margin-left: 90px;
+	}
+
+	.rightArm,
+	.leftArm,
+	.rightLeg,
+	.leftLeg {
+		width: 70px;
+	}
+	.head {
+		width: 65px;
+		height: 65px;
+		top: 0px;
+		right: 30px;
+	}
+	.body {
+		top: 60px;
+		right: 55px;
+		height: 90px;
+	}
+	.rightArm {
+		top: 90px;
+		right: -15px;
+	}
+	.leftArm {
+		top: 90px;
+		right: 65px;
+	}
+	.rightLeg {
+		top: 138px;
+		right: -6px;
+	}
+	.leftLeg {
+		top: 138px;
+		right: 55px;
+	}
 }

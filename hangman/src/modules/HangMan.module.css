@@ -77,3 +77,34 @@ button:focus:not(:disabled) {
 	-webkit-transform: scale(1.1, 1.1);
 	transform: scale(1.1, 1.1);
 }
+
+@media (prefers-color-scheme: light) {
+	.stats > button {
+		background: #b7b7b7;
+	}
+	button:hover:not(:disabled),
+	button:focus:not(:disabled) {
+		background: rgba(95, 91, 91, 0.3);
+		border: 1px solid rgba(47, 46, 46, 0.454);
+	}
+}
+
+@media (max-width: 400px) {
+	.main {
+		width: 100%;
+		max-width: 500px;
+		gap: 1rem;
+	}
+	.stats {
+		font-size: unset;
+	}
+	.stats > button {
+		font-size: xx-small;
+	}
+	.letter {
+		margin-top: 20px;
+		font-size: 2rem;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+}

@@ -1,10 +1,9 @@
+import { StatusMessageProps } from "../types/HangMan.type"
+
 export const StatusMessage = ({
 	wrongGuessCounter,
 	isSuccessfulGuess,
-}: {
-	wrongGuessCounter: number
-	isSuccessfulGuess: boolean
-}) => {
+}: StatusMessageProps) => {
 	let message = <p></p>
 	const lifeCount = 6 - wrongGuessCounter
 	if (isSuccessfulGuess) {
