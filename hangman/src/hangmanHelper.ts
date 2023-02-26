@@ -8,5 +8,5 @@ export const getAlphabet = () => {
 
 export const getRandom = <T>(list: T[]) => {
 	const idx = Math.floor(Math.random() * list.length)
-	return list.at(idx) ?? list[idx]
+	return list.at(idx) ?? list?.[idx]
 }

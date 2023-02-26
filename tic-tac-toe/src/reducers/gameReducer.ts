@@ -1,48 +1,60 @@
-import { EMPTY_BOXES, init, INIT_PAWNS } from '../hooks/useTicTacToe'
+import { EMPTY_BOXES, initialState, INIT_PAWNS } from '../hooks/useTicTacToe'
 import { ActionProps, GAME_ACTION, GAME_STATUS, PAWN, StateProps } from '../types'
 
 export const gameReducer = (state: StateProps, action: ActionProps): StateProps => {
+	const { Playing, Processing, Tallying } = GAME_STATUS
+	const {
+		InitializeGame,
+		MovePosition,
+		NewGame,
+		SetWinningMatch,
+		ToggleCurrentPawn,
+		UpdateScoreBoard,
+		Waiting,
+	} = GAME_ACTION
+
+	const { boxes, currentPawn, startPawn, scores } = state
 	const { type } = action
-	const { Playing, Waiting, Tallying } = GAME_STATUS
 
 	switch (type) {
-		case GAME_ACTION.InitializeGame:
+		case InitializeGame:
+			const { players } = action.payload
 			return {
 				...state,
 				boxes: EMPTY_BOXES,
 				gameStatus: Playing,
-				players: action.players,
+				players,
 			}
 
-		case GAME_ACTION.MovePosition:
+		case MovePosition:
+			const { index } = action.payload
 			return {
 				...state,
+				boxes: boxes.map((pawn, idx) => (idx === index ? currentPawn : pawn)),
 				gameStatus: Playing,
-				boxes: state.boxes.map((pawn, idx) => (idx === action.index ? state.currentPawn : pawn)),
 			}
 
-		case GAME_ACTION.NewGame:
+		case NewGame:
 			// toggle the first pawn to move based from previous "start pawn"
-			const pawn = INIT_PAWNS.filter(newPawn => newPawn !== state.startPawn)[0]
+			const pawn = INIT_PAWNS.filter(newPawn => newPawn !== startPawn)[0]
 			return {
 				...state,
 				boxes: EMPTY_BOXES,
 				gameStatus: Playing,
-				winningMatch: init.winningMatch,
+				winningMatch: initialState.winningMatch,
 				startPawn: pawn,
 				currentPawn: pawn,
 			}
 
-		case GAME_ACTION.SetWinningMatch:
+		case SetWinningMatch:
+			const { combinations } = action.payload
 			return {
 				...state,
-				winningMatch: action.combinations,
+				winningMatch: combinations,
 			}
 
-		case GAME_ACTION.UpdateScoreBoard:
-			const scores = state.scores
-			const winner = action.winner
-
+		case UpdateScoreBoard:
+			const { winner } = action.payload
 			return {
 				...state,
 				gameStatus: Tallying,
@@ -52,16 +64,17 @@ export const gameReducer = (state: StateProps, action: ActionProps): StateProps 
 				},
 			}
 
-		case GAME_ACTION.ToggleCurrentPawn:
+		case ToggleCurrentPawn:
 			return {
 				...state,
-				currentPawn: state.currentPawn === PAWN['⚪️'] ? PAWN['❌'] : PAWN['⚪️'],
+				currentPawn: currentPawn === PAWN['⚪️'] ? PAWN['❌'] : PAWN['⚪️'],
 			}
 
-		case GAME_ACTION.Waiting:
+		case Waiting:
+			const { isWaiting } = action.payload
 			return {
 				...state,
-				gameStatus: action.isWaiting ? Waiting : Playing,
+				gameStatus: isWaiting ? Processing : Playing,
 			}
 		default:
 			return state

@@ -1,16 +1,17 @@
 import { GAME_STATUS, StatusProps } from '../../types'
 
 export const Status = ({ styles, gameStatus, players, currentPawn }: StatusProps) => {
+	const { status, hourglass } = styles
 	const { Computer } = players
-	const { Waiting } = GAME_STATUS
+	const { Processing } = GAME_STATUS
 
 	return (
-		<>
-			{gameStatus === Waiting && currentPawn === Computer ? (
+		<div className={status}>
+			{gameStatus === Processing && currentPawn === Computer ? (
 				<p>
-					<span className={styles.hourglass}>⏳</span> Computer is deciding a move...
+					<span className={hourglass}>⏳</span> Computer is deciding a move...
 				</p>
 			) : null}
-		</>
+		</div>
 	)
 }

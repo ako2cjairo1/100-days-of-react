@@ -10,8 +10,7 @@ export const Board = ({ boxes }: Pick<StateProps, 'boxes'>) => {
 			{boxes.map((pawn, idx) => (
 				<Box
 					key={idx}
-					pawn={pawn}
-					idx={idx}
+					{...{ idx, pawn }}
 				/>
 			))}
 		</div>

@@ -1,8 +1,8 @@
 import { createContext } from 'react'
-import { init, useTicTacToe } from '../hooks/useTicTacToe'
+import { initialState, useTicTacToe } from '../hooks/useTicTacToe'
 import { ChildrenProps, ContextProps } from '../types'
 
-export const GameContext = createContext<ContextProps>({ state: init, handlers: {} })
+export const GameContext = createContext<ContextProps>({ state: initialState, handlers: {} })
 
 export const TicTacToeProvider = ({ children }: ChildrenProps) => {
 	const { state, handlers } = useTicTacToe()

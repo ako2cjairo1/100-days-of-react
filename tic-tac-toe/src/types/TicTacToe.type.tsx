@@ -1,40 +1,50 @@
 export const GAME_ACTION = {
-	InitializeGame: 'Initialize and assign pawns',
+	InitializeGame: 'Initialize and Assign Pawns',
 	NewGame: 'New Game',
 	MovePosition: 'Move To Position',
 	SetWinningMatch: 'Set Winning Combination',
 	UpdateScoreBoard: 'Update Scoreboard',
 	ToggleCurrentPawn: 'Toggle Current Pawn',
-	Waiting: 'WAITING',
+	Waiting: 'Waiting',
 } as const
 
 export type ActionProps =
 	| {
-			type: typeof GAME_ACTION.InitializeGame
+		type: typeof GAME_ACTION.InitializeGame
+		payload: {
 			players: TPlayers
-	  }
+		}
+	}
 	| {
-			type: typeof GAME_ACTION.NewGame
-	  }
+		type: typeof GAME_ACTION.NewGame
+	}
 	| {
-			type: typeof GAME_ACTION.MovePosition
+		type: typeof GAME_ACTION.MovePosition
+		payload: {
 			index: number
-	  }
+		}
+	}
 	| {
-			type: typeof GAME_ACTION.SetWinningMatch
+		type: typeof GAME_ACTION.SetWinningMatch
+		payload: {
 			combinations: number[]
-	  }
+		}
+	}
 	| {
-			type: typeof GAME_ACTION.UpdateScoreBoard
+		type: typeof GAME_ACTION.UpdateScoreBoard
+		payload: {
 			winner: keyof TScore
-	  }
+		}
+	}
 	| {
-			type: typeof GAME_ACTION.ToggleCurrentPawn
-	  }
+		type: typeof GAME_ACTION.ToggleCurrentPawn
+	}
 	| {
-			type: typeof GAME_ACTION.Waiting
+		type: typeof GAME_ACTION.Waiting
+		payload: {
 			isWaiting: boolean
-	  }
+		}
+	}
 
 export const PAWN = {
 	'❌': '❌',
@@ -51,7 +61,7 @@ export const PLAYER = {
 export const GAME_STATUS = {
 	AssignPawn: 'Assign Pawns',
 	Playing: 'Playing',
-	Waiting: 'Waiting',
+	Processing: 'Processing',
 	Tallying: 'Tally Score',
 } as const
 
@@ -74,13 +84,13 @@ export type StateProps = {
 
 export type TPlayers =
 	| {
-			[PLAYER.Human]: '❌'
-			[PLAYER.Computer]: '⚪️'
-	  }
+		[PLAYER.Human]: '❌'
+		[PLAYER.Computer]: '⚪️'
+	}
 	| {
-			[PLAYER.Human]: '⚪️'
-			[PLAYER.Computer]: '❌'
-	  }
+		[PLAYER.Human]: '⚪️'
+		[PLAYER.Computer]: '❌'
+	}
 
 export type ChildrenProps = {
 	children: React.ReactNode

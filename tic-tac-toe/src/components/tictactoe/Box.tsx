@@ -4,7 +4,7 @@ import { BoxProps, GAME_STATUS } from '../../types'
 
 export const Box = ({ idx, pawn }: BoxProps) => {
 	const { box, active, inactive, win } = classNames
-	const { Playing, Waiting } = GAME_STATUS
+	const { Playing, Processing } = GAME_STATUS
 
 	// extract states and handler from custom hook
 	const { state, handlers } = useGameContext()
@@ -18,15 +18,15 @@ export const Box = ({ idx, pawn }: BoxProps) => {
 		gameStatus === GAME_STATUS.AssignPawn
 			? false
 			: gameStatus === Playing
-			? gameStatus === Playing && pawn !== null
-			: true
+				? gameStatus === Playing && pawn !== null
+				: true
 
 	return (
 		<button
 			className={`${box} ${disabled ? winClass : active}`}
 			style={{ animationDelay: `${idx * 0.1}s` }}
 			// disable if already selected OR is waiting
-			disabled={disabled || gameStatus === Waiting}
+			disabled={disabled || gameStatus === Processing}
 			onClick={() => humanMove({ idx, pawn })}
 		>
 			{pawn}

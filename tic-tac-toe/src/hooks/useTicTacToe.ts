@@ -18,7 +18,7 @@ import {
 // initial pawns to choose from
 export const INIT_PAWNS: TPawn[] = [PAWN['⚪️'], PAWN['❌']]
 // choose random pawn to make 1st move
-const START_PAWN = INIT_PAWNS[pickRandom(INIT_PAWNS.length)]
+const START_PAWN = pickRandom(INIT_PAWNS).value
 export const EMPTY_BOXES = new Array<TBox>(9).fill(null)
 const WIN_COMBINATIONS = [
 	[0, 1, 2],
@@ -32,8 +32,9 @@ const WIN_COMBINATIONS = [
 ]
 
 const { AssignPawn, Playing } = GAME_STATUS
+const { Computer, Human } = PLAYER
 
-export const init: StateProps = {
+export const initialState: StateProps = {
 	boxes: INIT_PAWNS,
 	startPawn: START_PAWN,
 	currentPawn: START_PAWN,
@@ -51,9 +52,9 @@ export const init: StateProps = {
 }
 
 export const useTicTacToe = (): ContextProps => {
-	const [gameState, dispatcher] = useReducer(gameReducer, init)
+	const [gameState, dispatcher] = useReducer(gameReducer, initialState)
 	const { boxes, currentPawn, gameStatus, winningMatch, players, scores } = gameState
-
+	// action creators
 	const {
 		initGame,
 		movePosition,
@@ -66,10 +67,11 @@ export const useTicTacToe = (): ContextProps => {
 
 	useEffect(() => {
 		if (gameStatus === Playing) {
-			let winner = checkMove()
+			const winner = checkMove()
 
 			if (winner) {
-				if (winner === players[PLAYER.Human]) {
+				// show confetti if Human player won
+				if (winner === players[Human]) {
 					confetti({
 						particleCount: 150,
 						spread: 60,
@@ -106,14 +108,14 @@ export const useTicTacToe = (): ContextProps => {
 		return boxes.every(box => box !== null) ? 'draw' : ''
 	}
 
-	const moveToPosition = (position: number) => {
-		if (gameStatus === Playing && boxes[position] === null) {
-			movePosition(position)
+	const moveToPosition = (index: number) => {
+		if (gameStatus === Playing && boxes[index] === null) {
+			movePosition(index)
 			toggleCurrentPawn()
 		}
 	}
 
-	const humanMove = ({ idx: boxIdx, pawn }: BoxProps) => {
+	const humanMove = ({ idx, pawn }: BoxProps) => {
 		if (gameStatus === AssignPawn) {
 			// choose pawn before starting the game
 			if (pawn === PAWN['⚪️']) {
@@ -122,22 +124,22 @@ export const useTicTacToe = (): ContextProps => {
 				initGame({ Computer: PAWN['⚪️'], Human: PAWN['❌'] })
 			}
 		} else {
-			moveToPosition(boxIdx)
+			moveToPosition(idx)
 		}
 	}
 
 	const computerMove = () => {
-		if (currentPawn === players[PLAYER.Computer]) {
+		if (currentPawn === players[Computer]) {
 			setIsWaiting(true)
 
 			executeAfterSomeTime(() => {
-				let randMove = pickRandom(9)
-				while (boxes[randMove] !== null) {
-					// pick a valid random move
-					randMove = pickRandom(9)
+				let randMove = pickRandom(boxes)
+				// pick a random valid move
+				while (boxes[randMove.index] !== null) {
+					randMove = pickRandom(boxes)
 				}
-				moveToPosition(randMove)
-			}, [1, 2, 3][pickRandom(3)])
+				moveToPosition(randMove.index)
+			}, pickRandom([1, 2, 3]).value)
 		}
 	}
 

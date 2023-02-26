@@ -7,7 +7,7 @@ export const gameActions = (dispatch: React.Dispatch<ActionProps>) => {
 		initGame: (players: TPlayers) =>
 			dispatch({
 				type: GAME_ACTION.InitializeGame,
-				players,
+				payload: { players },
 			}),
 		newGame: () =>
 			dispatch({
@@ -16,17 +16,17 @@ export const gameActions = (dispatch: React.Dispatch<ActionProps>) => {
 		movePosition: (index: number) =>
 			dispatch({
 				type: GAME_ACTION.MovePosition,
-				index,
+				payload: { index },
 			}),
 		setWinningMatch: (combinations: number[]) =>
 			dispatch({
 				type: GAME_ACTION.SetWinningMatch,
-				combinations,
+				payload: { combinations },
 			}),
 		updateScoreBoard: (winner: keyof TScore) =>
 			dispatch({
 				type: GAME_ACTION.UpdateScoreBoard,
-				winner,
+				payload: { winner },
 			}),
 		toggleCurrentPawn: () =>
 			dispatch({
@@ -35,7 +35,7 @@ export const gameActions = (dispatch: React.Dispatch<ActionProps>) => {
 		setIsWaiting: (isWaiting: boolean) =>
 			dispatch({
 				type: GAME_ACTION.Waiting,
-				isWaiting,
+				payload: { isWaiting },
 			}),
 	}
 }
