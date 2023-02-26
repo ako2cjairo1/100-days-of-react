@@ -1,8 +1,7 @@
-import styles from '../modules/HangMan.module.css'
 import { GuessingWordProps } from '../types/HangMan.type'
 
-export const WordToGuess = ({ wordToGuess, isDone, letters }: GuessingWordProps) => {
-	const { letter, underline, winner } = styles
+export const WordToGuess = ({ cssModule, wordToGuess, isDone, letters }: GuessingWordProps) => {
+	const { letter, underline, winner } = cssModule
 	const splitWordToGuess = wordToGuess.split('')
 
 	const isReveal = (guessedLetter: string) => {

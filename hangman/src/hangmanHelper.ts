@@ -6,7 +6,7 @@ export const getAlphabet = () => {
 	return alphabet
 }
 
-export const getRandom = <T>(array: T[]) => {
-	const idx = Math.floor(Math.random() * array.length)
-	return array[idx] ?? ''
+export const getRandom = <T>(list: T[]) => {
+	const idx = Math.floor(Math.random() * list.length)
+	return list.at(idx) ?? list[idx]
 }

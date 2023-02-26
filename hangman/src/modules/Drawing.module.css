@@ -2,6 +2,17 @@
 	position: relative;
 }
 
+.normal {
+	position: relative;
+	top: 90px;
+	left: 10px;
+}
+.hang {
+	position: relative;
+	top: 0px;
+	left: 0px;
+}
+
 .body,
 .rightArm,
 .leftArm,
@@ -124,6 +135,16 @@
 	.drawing {
 		left: -70px;
 	}
+	.normal {
+		position: relative;
+		top: 94px;
+		left: 57px;
+	}
+	.hang {
+		position: relative;
+		top: 45px;
+		left: 57px;
+	}
 	.pole {
 		height: 300px;
 	}
@@ -162,7 +183,7 @@
 		right: -6px;
 	}
 	.leftLeg {
-		top: 138px;
+		top: 135px;
 		right: 55px;
 	}
 }

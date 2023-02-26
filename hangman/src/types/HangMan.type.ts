@@ -4,11 +4,11 @@ export type TLetter = {
 	isCorrect: boolean
 }
 
-export type WordDictionary = Array<{
+export type WordDefinition = {
 	id: number
 	word: string
-	definition: string
-}>
+	info: string
+}
 
 type GuessCounter = {
 	wrongGuessCounter: number
@@ -19,6 +19,7 @@ export type DrawingProps = GuessCounter & {
 }
 
 export type GuessingWordProps = {
+	cssModule: CSSModuleClasses
 	wordToGuess: string
 	isDone: boolean
 	letters: TLetter[]
@@ -33,7 +34,13 @@ export type KeyboardProps = Pick<React.ButtonHTMLAttributes<HTMLButtonElement>, 
 	handler: (letter: string) => void
 }
 
-export type WordDictType = Array<{ id: number; word: string; definition: string }>
+export type HintProps = {
+	cssModule: CSSModuleClasses
+	wordToGuess: WordDefinition
+	isDone: boolean
+	wrongGuessCounter: number
+}
+
 export type JSONResponse = {
 	choices?: Array<{ text: string }>
 	errors?: Array<{ message: string }>

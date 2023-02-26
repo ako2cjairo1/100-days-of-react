@@ -4,9 +4,11 @@ import sadEmoji from '../assets/sad.gif'
 import smileyEmoji from '../assets/smiley.gif'
 import hangEmoji from '../assets/hang.gif'
 
-export const Drawing = ({ wrongGuessCounter: wrongGuessCount, isDone }: DrawingProps) => {
+export const Drawing = ({ wrongGuessCounter, isDone }: DrawingProps) => {
 	const {
 		drawing,
+		normal,
+		hang,
 		rope,
 		topPole,
 		pole,
@@ -19,18 +21,17 @@ export const Drawing = ({ wrongGuessCounter: wrongGuessCount, isDone }: DrawingP
 		leftLeg,
 	} = styles
 
-	const isHangMan = wrongGuessCount >= 6
-	const isSaved = isDone && wrongGuessCount < 6
-	const isWrongGuess = wrongGuessCount < 6 && wrongGuessCount
+	const isHangMan = wrongGuessCounter >= 6
+	const isSaved = isDone && wrongGuessCounter < 6
+	const isWrongGuess = wrongGuessCounter < 6 && wrongGuessCounter
 
-	const emoji =
-		isHangMan
-			? hangEmoji
-			: isSaved
-				? smileyEmoji
-				: isWrongGuess >= 1
-					? sadEmoji
-					: smileyEmoji
+	const emoji = isHangMan
+		? hangEmoji
+		: isSaved
+		? smileyEmoji
+		: isWrongGuess >= 1
+		? sadEmoji
+		: smileyEmoji
 
 	const bodyParts = [
 		<div
@@ -50,12 +51,12 @@ export const Drawing = ({ wrongGuessCounter: wrongGuessCount, isDone }: DrawingP
 		<div
 			key="rightArm"
 			className={rightArm}
-			style={isHangMan ? { rotate: "60deg", right: "-95px" } : {}}
+			style={isHangMan ? { rotate: '60deg', right: '-90px' } : {}}
 		/>,
 		<div
 			key="leftArm"
 			className={leftArm}
-			style={isHangMan ? { rotate: "20deg", right: "4px" } : {}}
+			style={isHangMan ? { rotate: '20deg', right: '4px' } : {}}
 		/>,
 		<div
 			key="rightLeg"
@@ -64,14 +65,13 @@ export const Drawing = ({ wrongGuessCounter: wrongGuessCount, isDone }: DrawingP
 		<div
 			key="leftLeg"
 			className={leftLeg}
-			style={isHangMan ? { rotate: "-70deg" } : {}}
+			style={isHangMan ? { rotate: '-70deg' } : {}}
 		/>,
 	]
 
 	return (
 		<div className={drawing}>
-			{/* <div style={positionToHang}>{bodyParts.slice(0, wrongGuessCount)}</div> */}
-			<div style={isHangMan ? {} : { position: 'relative', top: '90px', left: '100px' }}>{bodyParts}</div>
+			<div className={isHangMan ? hang : normal}>{bodyParts}</div>
 
 			<div className={rope} />
 			<div className={topPole} />

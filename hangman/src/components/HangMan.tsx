@@ -1,14 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import styles from '../modules/HangMan.module.css'
 import { Drawing, WordToGuess, Keyboard, StatusMessage } from '.'
-import { TLetter, WordDictionary } from '../types/HangMan.type'
+import { TLetter, WordDefinition } from '../types/HangMan.type'
 import { getAlphabet, getRandom } from '../hangmanHelper'
 import { useFetchWordsAsync } from '../hooks/useFetchWordsAsync'
 import processingGif from '../assets/processing.gif'
 import requestConfig from '../request_config.json'
+import { Hint } from './Hint'
 
 const API_KEY = import.meta.env.VITE_API_KEY
 const URL = import.meta.env.VITE_API_URL
+
+const requestData = {
+	...requestConfig,
+	prompt: requestConfig.prompt.replace('<category here>', 'reactjs and javascript related terms'),
+}
 
 const options = {
 	method: 'POST',
@@ -16,26 +22,34 @@ const options = {
 		'Content-Type': 'application/json',
 		Authorization: `Bearer ${API_KEY}`,
 	},
-	body: JSON.stringify(requestConfig),
+	body: JSON.stringify(requestData),
 }
 
 const HangMan = () => {
 	const { main, stats } = styles
-	const [words, setWords] = useState<WordDictionary>([])
+	const [words, setWords] = useState<Array<WordDefinition>>([])
 	const [letters, setKeyboard] = useState<TLetter[]>([])
-	const [wordToGuess, setWordToGuess] = useState<string>('')
+	const [wordToGuess, setWordToGuess] = useState<WordDefinition>({ id: 0, word: '', info: '' })
 	const [wrongGuessCounter, setWrongGuessCounter] = useState(0)
 	const isInit = useRef(true)
 
 	const { data, error, isLoading } = useFetchWordsAsync(URL, options)
 
 	useEffect(() => {
-		if (isInit.current && !isLoading && words.length > 0 && !error) {
-			initGame()
+		if (!isLoading && data && words.length <= 0) {
+			const formattedWordDefinition = data.map(item => {
+				let formattedWord = item.word.toLowerCase()
+				return {
+					...item,
+					word: formattedWord,
+					info: item.info.toLowerCase().replace(formattedWord, ''),
+				}
+			})
+			setWords(formattedWordDefinition)
 		}
 
-		if (!isLoading && data && words.length <= 0) {
-			setWords(data)
+		if (isInit.current && !isLoading && words.length > 0 && !error) {
+			initGame()
 		}
 
 		const keyboardEventHandler = (e: KeyboardEvent) => {
@@ -52,16 +66,20 @@ const HangMan = () => {
 	}, [letters, isLoading, words])
 
 	const initGame = () => {
-		console.log('INIT GAME', words)
 		isInit.current = false
 		setWrongGuessCounter(0)
 
-		const initGuessingWord = getRandom(Object.values(words).map(item => item.word)).toLowerCase()
+		// get random item from words and convert to lowercase
+		const initGuessingWord = getRandom(words)
+
+		// remove the word-to-guess from the words list
+		setWords(words.filter(item => item.word !== initGuessingWord.word))
 
 		const initLetters: TLetter[] = getAlphabet().map(letter => {
 			return {
 				letter: letter.toLowerCase(),
-				isCorrect: initGuessingWord.includes(letter.toLowerCase()),
+				//mark the letters composing the word to guess
+				isCorrect: initGuessingWord.word.includes(letter.toLowerCase()),
 				isGuessed: false,
 			}
 		})
@@ -90,7 +108,8 @@ const HangMan = () => {
 			})
 			setKeyboard(updatedLetters)
 
-			const isWrongGuess = (letter: string) => !wordToGuess.split('').includes(letter.toLowerCase())
+			const isWrongGuess = (letter: string) =>
+				!wordToGuess.word.split('').includes(letter.toLowerCase())
 			if (isWrongGuess(letter)) {
 				setWrongGuessCounter(prevCount => prevCount + 1)
 			}
@@ -98,14 +117,19 @@ const HangMan = () => {
 		[letters]
 	)
 
-	if (isLoading) {
-		return (<span>
-			<img
-				src={processingGif}
-				style={{ width: '50px' }}
-			/>
-			Fetching random words from internet...
-		</span>)
+	if (isLoading || (words && words.length <= 0)) {
+		return (
+			<div style={{ textAlign: 'center' }}>
+				<img
+					src={processingGif}
+					style={{ width: '50px', marginLeft: '40%', marginBottom: '20px' }}
+				/>
+				<p>Fetching random words from internet...</p>
+				<p>Give me a moment.</p>
+			</div>
+		)
+	} else if (!isLoading && error) {
+		return <p>{error.message}</p>
 	}
 
 	return (
@@ -120,13 +144,15 @@ const HangMan = () => {
 				</button>
 			</div>
 			<Drawing {...{ isDone, wrongGuessCounter }} />
-			<WordToGuess {...{ wordToGuess, isDone, letters }} />
-			<p>
-				Hint:{' '}
-				<q>
-					<cite>{words.find(w => w.word === wordToGuess)?.definition ?? '...'}</cite>
-				</q>
-			</p>
+			<WordToGuess
+				cssModule={styles}
+				wordToGuess={wordToGuess.word}
+				{...{ letters, isDone }}
+			/>
+			<Hint
+				cssModule={styles}
+				{...{ wordToGuess, wrongGuessCounter, isDone }}
+			/>
 			<Keyboard
 				disabled={isDone}
 				letters={letters}

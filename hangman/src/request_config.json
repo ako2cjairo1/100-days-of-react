@@ -5,5 +5,5 @@
 	"top_p": 1,
 	"frequency_penalty": 0,
 	"presence_penalty": 0,
-	"prompt": "[return only the main response. remove pre-text and post-text.] Generate exactly 50 random english words and their definitions, use JSON format with these properties: 'id' as unique number, 'word' and 'definition' are both string types."
+	"prompt": "[return only the JSON object like [{...}]. remove all non-white spaces, pre-text and post-text] (1.) Generate exactly 50 '<category here>', as the 'word', words only used English alphabet, have maximum 40 letters, provide maximum of 20 word description, definition (or fun facts) as the 'info', provide translations if possible, do not include the word used in 'word' for '<category here>' (4.) format using valid JSON format with these properties: id: <unique number>, word: <word here>, info: <definition here>. (Do not name the JSON object when you create it)."
 }
