@@ -1,5 +1,4 @@
 .keyboard {
-	/* align-self: stretch; */
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
@@ -39,6 +38,20 @@
 	color: darkgray;
 }
 
+@keyframes winner {
+	0% {
+		transform: scale(1);
+	}
+
+	50% {
+		transform: scale(0.8);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
 @media (prefers-color-scheme: light) {
 	.keyboard > button {
 		background-color: #b7b7b7;
@@ -55,15 +68,25 @@
 	}
 }
 
-@media (max-width: 400px) {
+@media (max-width: 820px) {
+	.keyboard > button {
+		max-width: 60px;
+		max-height: 60px;
+		font-size: 2rem;
+	}
+}
+
+@media (max-width: 500px) {
 	.keyboard {
-		gap: 0.7rem;
-		/* max-width: 350px; */
+		gap: 0.5rem;
 	}
 	.keyboard > button {
-		width: 50px;
-		max-width: 50px;
-		height: 50px;
-		font-size: 1.5rem;
+		width: 30px;
+		max-width: 30px;
+		height: 40px;
+		font-size: 1.4rem;
+		padding: 0.3rem;
+		border-radius: 5px;
+		font-weight: normal;
 	}
 }

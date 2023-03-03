@@ -1,0 +1,9 @@
+.error {
+	text-align: center;
+	gap: 0.5rem;
+	display: grid;
+}
+.error > .emoji {
+	display: block;
+	font-size: 50px;
+}

@@ -3,33 +3,31 @@
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+	place-items: center;
 	width: 100vh;
 	max-width: 800px;
+	padding: 35px 0;
 	gap: 1rem;
 	color: currentColor;
 	font-size: 12px;
 }
-
 .stats,
 .hint {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: center;
+	place-items: center;
 	justify-content: center;
-	width: 100%;
 	min-height: 40px;
-	padding-right: 30px;
-	gap: 0.5rem;
+	gap: 1rem;
 	font-size: 1rem;
 	text-align: center;
 }
-.stats > button {
-	border-radius: 20px;
-	font-size: small;
-	transition: all 0.3s ease-in-out;
-	animation: pulse 1s infinite;
+.show {
+	animation: animate 1s forwards;
+}
+.emoji {
+	display: inline-block;
+	font-size: 20px;
 }
 
 @keyframes pulse {
@@ -44,6 +42,33 @@
 	}
 }
 
+@keyframes animate {
+	0% {
+		transform: translateY(-20px);
+		opacity: 0;
+	}
+	100% {
+		transform: translateY(1);
+		opacity: 1;
+	}
+}
+
+.tilt {
+	animation: tilt-left-right 1.5s ease-in-out infinite;
+}
+
+@keyframes tilt-left-right {
+	0% {
+		transform: rotate(-10deg);
+	}
+	50% {
+		transform: rotate(10deg);
+	}
+	100% {
+		transform: rotate(-10deg);
+	}
+}
+
 .letter {
 	display: flex;
 	flex-wrap: wrap;
@@ -53,10 +78,12 @@
 	font-weight: bold;
 	text-transform: uppercase;
 	font-family: monospace;
+	transition: all 0.2s ease-in-out;
 }
 
 .underline {
 	border-bottom: 0.1em solid currentColor;
+	transition: all 0.2s ease-in-out;
 }
 
 button {
@@ -94,7 +121,7 @@ button:focus:not(:disabled) {
 	}
 }
 
-@media (max-width: 400px) {
+@media (max-width: 500px) {
 	.main {
 		width: 100%;
 		max-width: 500px;
@@ -103,11 +130,17 @@ button:focus:not(:disabled) {
 	.stats {
 		font-size: unset;
 	}
-	.stats > button {
-		font-size: xx-small;
+	.stats > button,
+	.hint > p {
+		font-size: small;
 	}
 	.letter {
-		margin-top: 20px;
 		font-size: 2rem;
+	}
+}
+
+@media (max-width: 820px) {
+	.main {
+		width: unset;
 	}
 }

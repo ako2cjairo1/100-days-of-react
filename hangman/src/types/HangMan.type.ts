@@ -1,3 +1,8 @@
+import { ReactElement } from 'react'
+
+export type ChildrenProps = {
+	children: ReactElement | null
+}
 export type TLetter = {
 	letter: string
 	isGuessed: boolean
@@ -18,27 +23,45 @@ export type DrawingProps = GuessCounter & {
 	isDone: boolean
 }
 
-export type GuessingWordProps = {
+type CssModule = {
 	cssModule: CSSModuleClasses
+}
+export type GuessingWordProps = CssModule & {
 	wordToGuess: string
 	isDone: boolean
-	letters: TLetter[]
+	keyboard: TLetter[]
 }
 
-export type StatusMessageProps = GuessCounter & {
-	isSuccessfulGuess: boolean
-}
+export type StatusMessageProps = CssModule &
+	GuessCounter & {
+		isSuccessfulGuess: boolean
+	}
 
 export type KeyboardProps = Pick<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> & {
 	letters: TLetter[]
 	handler: (letter: string) => void
 }
 
-export type HintProps = {
-	cssModule: CSSModuleClasses
+export type HintProps = CssModule & {
 	wordToGuess: WordDefinition
 	isDone: boolean
 	wrongGuessCounter: number
+}
+
+export type ErrorProps = {
+	message: string
+}
+
+export type MenuProps = {
+	isDone: boolean
+	category: {
+		category: string
+		itemCount: number
+	}
+	initGame: () => void
+	catName: string
+	setCatName: (catName: string) => void
+	fetchInitialGame: () => void
 }
 
 export type JSONResponse = {

@@ -1,0 +1,10 @@
+.loader {
+	text-align: center;
+	gap: 0.5rem;
+	display: grid;
+}
+.loader > img {
+	width: 50px;
+	margin-left: 40%;
+	margin-bottom: 20px;
+}

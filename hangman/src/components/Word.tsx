@@ -1,11 +1,11 @@
 import { GuessingWordProps } from '../types/HangMan.type'
 
-export const WordToGuess = ({ cssModule, wordToGuess, isDone, letters }: GuessingWordProps) => {
-	const { letter, underline, winner } = cssModule
+export const WordToGuess = ({ cssModule, wordToGuess, isDone, keyboard }: GuessingWordProps) => {
+	const { letter, underline } = cssModule
 	const splitWordToGuess = wordToGuess.split('')
 
 	const isReveal = (guessedLetter: string) => {
-		return letters.some(({ letter, isCorrect, isGuessed }) =>
+		return keyboard.some(({ letter, isCorrect, isGuessed }) =>
 			guessedLetter.toLowerCase() === letter.toLowerCase() && isCorrect && isGuessed ? true : false
 		)
 	}
@@ -22,8 +22,6 @@ export const WordToGuess = ({ cssModule, wordToGuess, isDone, letters }: Guessin
 							style={{
 								visibility: isReveal(letter) || isDone ? 'visible' : 'hidden',
 								color: isDone && !isReveal(letter) ? 'red' : 'currentColor',
-								animation: winner,
-								animationDelay: `${idx * 0.1}s`,
 							}}
 						>
 							{letter}

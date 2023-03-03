@@ -1,163 +1,170 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import styles from '../modules/HangMan.module.css'
+import cssModule from '../modules/HangMan.module.css'
 import { Drawing, WordToGuess, Keyboard, StatusMessage } from '.'
 import { TLetter, WordDefinition } from '../types/HangMan.type'
 import { getAlphabet, getRandom } from '../hangmanHelper'
-import { useFetchWordsAsync } from '../hooks/useFetchWordsAsync'
-import processingGif from '../assets/processing.gif'
-import requestConfig from '../request_config.json'
 import { Hint } from './Hint'
-
-const API_KEY = import.meta.env.VITE_API_KEY
-const URL = import.meta.env.VITE_API_URL
-
-const requestData = {
-	...requestConfig,
-	prompt: requestConfig.prompt.replace('<category here>', 'reactjs and javascript related terms'),
-}
-
-const options = {
-	method: 'POST',
-	headers: {
-		'Content-Type': 'application/json',
-		Authorization: `Bearer ${API_KEY}`,
-	},
-	body: JSON.stringify(requestData),
-}
+import { useFetchWordsAsync } from '../hooks/useFetchWordsAsync'
+import { Loader } from './Loader'
+import { Error } from './Error'
+import { Menu } from './Menu'
 
 const HangMan = () => {
-	const { main, stats } = styles
+	const { main, stats } = cssModule
 	const [words, setWords] = useState<Array<WordDefinition>>([])
-	const [letters, setKeyboard] = useState<TLetter[]>([])
+	const [keyboard, setKeyboard] = useState<TLetter[]>([])
 	const [wordToGuess, setWordToGuess] = useState<WordDefinition>({ id: 0, word: '', info: '' })
 	const [wrongGuessCounter, setWrongGuessCounter] = useState(0)
-	const isInit = useRef(true)
+	const isInit = useRef(false)
+	const isFetch = useRef(false)
+	const [category, setCategory] = useState({ category: 'pokemon names', itemCount: 10 })
+	const [catName, setCatName] = useState('')
+	const [isChangeCategory, setIsChangeCategory] = useState(true)
 
-	const { data, error, isLoading } = useFetchWordsAsync(URL, options)
+	const { fetchedWords, error, isDoneFetch, startFetch, clearFetchedWords } = useFetchWordsAsync({
+		options: category,
+	})
+
+	const isSuccessfulGuess = keyboard.length
+		? keyboard.filter(item => item.isCorrect).every(({ isGuessed }) => isGuessed)
+		: false
+
+	const isDone = isSuccessfulGuess || wrongGuessCounter >= 6
+
+	const keyboardEventHandler = (e: KeyboardEvent) => {
+		e.preventDefault()
+
+		if (e.key === 'Enter' && isDone) {
+			initGame()
+			fetchNewSetOfWords()
+			document.removeEventListener('keypress', keyboardEventHandler)
+		} else if (e.key.match(/^[A-Za-z]$/) && !isDone) checkGuessedLetter(e.key)
+	}
 
 	useEffect(() => {
-		if (!isLoading && data && words.length <= 0) {
-			const formattedWordDefinition = data.map(item => {
-				let formattedWord = item.word.toLowerCase()
+		if (isInit.current && words.length) initGame()
+
+		if (fetchedWords.length && isDoneFetch && !error && !words.length) {
+			console.info('[Success fetch!]')
+			const formattedWords = fetchedWords.map(({ id, word, info }) => {
+				let lowerCaseWord = word.toLowerCase()
 				return {
-					...item,
-					word: formattedWord,
-					info: item.info.toLowerCase().replace(formattedWord, ''),
+					id,
+					word: lowerCaseWord,
+					// make sure to remove "word to guess" on hints
+					info: info.toLowerCase().replace(lowerCaseWord, ''),
 				}
 			})
-			setWords(formattedWordDefinition)
+			setWords(formattedWords)
+			if (formattedWords.length) {
+				isInit.current = true
+				isFetch.current = true
+				clearFetchedWords()
+			}
 		}
 
-		if (isInit.current && !isLoading && words.length > 0 && !error) {
-			initGame()
-		}
+		if (!isChangeCategory) document.addEventListener('keypress', keyboardEventHandler)
 
-		const keyboardEventHandler = (e: KeyboardEvent) => {
-			e.preventDefault()
-
-			if (e.key === 'Enter' && isDone) initGame()
-			else if (e.key.match(/^[a-z]$/) && !isDone) checkGuessedLetter(e.key)
-		}
-		document.addEventListener('keypress', keyboardEventHandler)
+		if (isDone && !words.length) document.removeEventListener('keypress', keyboardEventHandler)
 
 		return () => {
 			document.removeEventListener('keypress', keyboardEventHandler)
 		}
-	}, [letters, isLoading, words])
+	}, [keyboard, words, isDoneFetch])
 
-	const initGame = () => {
-		isInit.current = false
-		setWrongGuessCounter(0)
-
-		// get random item from words and convert to lowercase
-		const initGuessingWord = getRandom(words)
-
-		// remove the word-to-guess from the words list
-		setWords(words.filter(item => item.word !== initGuessingWord.word))
-
-		const initLetters: TLetter[] = getAlphabet().map(letter => {
-			return {
-				letter: letter.toLowerCase(),
-				//mark the letters composing the word to guess
-				isCorrect: initGuessingWord.word.includes(letter.toLowerCase()),
-				isGuessed: false,
-			}
-		})
-		setKeyboard(initLetters)
-		setWordToGuess(initGuessingWord)
+	const fetchNewSetOfWords = () => {
+		if (isFetch.current && !fetchedWords.length && !words.length && isDone) {
+			setIsChangeCategory(true)
+			setKeyboard([])
+			startFetch.current = true
+			isFetch.current = false
+			setCategory({ category: catName, itemCount: 10 })
+		}
 	}
 
-	const isSuccessfulGuess = letters
-		.filter(item => item.isCorrect)
-		.every(({ isGuessed }) => isGuessed)
+	const fetchInitialGame = () => {
+		setIsChangeCategory(false)
+		setKeyboard([])
+		startFetch.current = true
+		isFetch.current = false
+		setCategory({ category: catName, itemCount: 10 })
+	}
 
-	const isDone = isSuccessfulGuess || wrongGuessCounter >= 6
+	const initGame = () => {
+		if (words.length) {
+			isInit.current = false
+			setWrongGuessCounter(0)
+			// get random item from words and convert to lowercase
+			const initGuessingWord = getRandom(words)
+
+			console.log(initGuessingWord)
+
+			// remove the word-to-guess from the words list
+			setWords(words.filter(item => item.word !== initGuessingWord.word))
+
+			const initLetters: TLetter[] = getAlphabet(true).map(letter => {
+				return {
+					letter: letter.toLowerCase(),
+					//mark the letters composing the word to guess
+					isCorrect: initGuessingWord.word.includes(letter.toLowerCase()),
+					isGuessed: false,
+				}
+			})
+			setKeyboard(initLetters)
+			setWordToGuess(initGuessingWord)
+		}
+	}
 
 	const checkGuessedLetter = useCallback(
 		(letter: string) => {
-			if (letters.some(itm => itm.letter === letter && itm.isGuessed)) return
-			const updatedLetters = letters.map(item => {
-				// mark the guessed letter
-				if (item.letter === letter) {
-					return {
-						...item,
-						isGuessed: true,
+			if (keyboard.some(itm => itm.letter === letter.toLowerCase() && itm.isGuessed)) return
+			setKeyboard(
+				keyboard.map(item => {
+					// mark the guessed letter
+					if (item.letter === letter.toLowerCase()) {
+						return {
+							...item,
+							isGuessed: true,
+						}
 					}
-				}
-				return item
-			})
-			setKeyboard(updatedLetters)
+					return item
+				})
+			)
 
 			const isWrongGuess = (letter: string) =>
 				!wordToGuess.word.split('').includes(letter.toLowerCase())
-			if (isWrongGuess(letter)) {
-				setWrongGuessCounter(prevCount => prevCount + 1)
-			}
+			if (isWrongGuess(letter)) setWrongGuessCounter(prevCount => prevCount + 1)
 		},
-		[letters]
+		[keyboard]
 	)
 
-	if (isLoading || (words && words.length <= 0)) {
-		return (
-			<div style={{ textAlign: 'center' }}>
-				<img
-					src={processingGif}
-					style={{ width: '50px', marginLeft: '40%', marginBottom: '20px' }}
-				/>
-				<p>Fetching random words from internet...</p>
-				<p>Give me a moment.</p>
-			</div>
-		)
-	} else if (!isLoading && error) {
-		return <p>{error.message}</p>
-	}
+	if (!isChangeCategory && !isDoneFetch && !words.length) return <Loader />
+	else if (error) return <Error message={error.message} />
 
 	return (
 		<div className={main}>
-			<div className={stats}>
-				<StatusMessage {...{ isSuccessfulGuess, wrongGuessCounter }} />
-				<button
-					style={{ visibility: isDone ? 'visible' : 'hidden' }}
-					onClick={() => initGame()}
-				>
-					play again?
-				</button>
-			</div>
 			<Drawing {...{ isDone, wrongGuessCounter }} />
+			<div className={stats}>
+				<StatusMessage {...{ cssModule, isSuccessfulGuess, wrongGuessCounter }} />
+			</div>
 			<WordToGuess
-				cssModule={styles}
 				wordToGuess={wordToGuess.word}
-				{...{ letters, isDone }}
+				{...{ cssModule, keyboard, isDone }}
 			/>
-			<Hint
-				cssModule={styles}
-				{...{ wordToGuess, wrongGuessCounter, isDone }}
-			/>
-			<Keyboard
-				disabled={isDone}
-				letters={letters}
-				handler={checkGuessedLetter}
-			/>
+			<Hint {...{ cssModule, category, wordToGuess, wrongGuessCounter, isDone }} />
+
+			{!isChangeCategory && !isDone ? (
+				<Keyboard
+					disabled={isDone}
+					letters={keyboard}
+					handler={checkGuessedLetter}
+				/>
+			) : (
+				<Menu
+					isDone={isDone && words.length ? true : false}
+					{...{ setCatName, cssModule, category, catName, fetchInitialGame, initGame }}
+				/>
+			)}
 		</div>
 	)
 }

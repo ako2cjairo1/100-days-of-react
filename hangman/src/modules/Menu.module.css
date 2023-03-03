@@ -1,0 +1,68 @@
+.menu {
+	display: flex;
+	flex-wrap: wrap;
+	place-items: center;
+	justify-content: center;
+	width: 100%;
+	max-width: 500px;
+	gap: 1rem;
+	font-size: 1rem;
+	text-align: center;
+}
+
+.capitalize {
+	text-transform: capitalize;
+}
+.label {
+	margin: 10px;
+	text-align: left;
+}
+.menu > button {
+	border-radius: 20px;
+	padding: 0.5rem;
+	font-size: small;
+	animation: pulse 1s infinite;
+}
+.menu > p > q {
+	text-shadow: 0px 0px 20px currentColor;
+	font-weight: bold;
+}
+.menu > cite {
+	font-size: x-small;
+}
+
+.newcat {
+	display: flex;
+	width: 80%;
+	margin-top: 20px;
+}
+.newcat > input {
+	padding: 0.5rem 1.2rem;
+	border: 1px solid rgba(47, 46, 46, 0.455);
+	border-radius: 25px 0px 0px 25px;
+	text-align: center;
+	width: 100%;
+	height: 40px;
+	font-weight: bolder;
+	font-size: large;
+	text-transform: capitalize;
+}
+.newcat > button {
+	border-top-right-radius: 20px;
+	border-bottom-right-radius: 20px;
+	text-transform: capitalize;
+	width: 50%;
+}
+
+@media (max-width: 500px) {
+	.newcat {
+		width: 100%;
+	}
+	.newcat > input {
+		padding: 0.5rem 1rem;
+	}
+	.newcat > button {
+		padding: 0.5rem;
+		font-size: 0.7rem;
+	}
+}

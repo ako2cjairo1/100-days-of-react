@@ -28,10 +28,10 @@ export const Drawing = ({ wrongGuessCounter, isDone }: DrawingProps) => {
 	const emoji = isHangMan
 		? hangEmoji
 		: isSaved
-		? smileyEmoji
-		: isWrongGuess >= 1
-		? sadEmoji
-		: smileyEmoji
+			? smileyEmoji
+			: isWrongGuess >= 1
+				? sadEmoji
+				: smileyEmoji
 
 	const bodyParts = [
 		<div
@@ -51,12 +51,10 @@ export const Drawing = ({ wrongGuessCounter, isDone }: DrawingProps) => {
 		<div
 			key="rightArm"
 			className={rightArm}
-			style={isHangMan ? { rotate: '60deg', right: '-90px' } : {}}
 		/>,
 		<div
 			key="leftArm"
 			className={leftArm}
-			style={isHangMan ? { rotate: '20deg', right: '4px' } : {}}
 		/>,
 		<div
 			key="rightLeg"
@@ -65,7 +63,6 @@ export const Drawing = ({ wrongGuessCounter, isDone }: DrawingProps) => {
 		<div
 			key="leftLeg"
 			className={leftLeg}
-			style={isHangMan ? { rotate: '-70deg' } : {}}
 		/>,
 	]
 

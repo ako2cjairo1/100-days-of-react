@@ -91,6 +91,17 @@
 	rotate: -60deg;
 	transform-origin: right bottom;
 }
+.hang > .rightArm {
+	rotate: 60deg;
+	right: -90px;
+}
+.hang > .leftArm {
+	rotate: 20deg;
+	right: 4px;
+}
+.hang > .leftLeg {
+	rotate: -23deg;
+}
 
 .rope {
 	height: 50px;
@@ -131,59 +142,94 @@
 	}
 }
 
-@media (max-width: 400px) {
+@media (max-width: 500px) {
 	.drawing {
 		left: -70px;
 	}
 	.normal {
-		position: relative;
 		top: 94px;
 		left: 57px;
 	}
 	.hang {
-		position: relative;
 		top: 45px;
 		left: 57px;
 	}
 	.pole {
-		height: 300px;
+		height: 220px;
 	}
 	.basePole {
 		width: 150px;
 		margin-left: 90px;
 	}
 
-	.rightArm,
+	.normal > .rightArm,
 	.leftArm,
 	.rightLeg,
 	.leftLeg {
-		width: 70px;
+		width: 40px;
 	}
-	.head {
-		width: 65px;
-		height: 65px;
-		top: 0px;
-		right: 30px;
+	.normal > .head {
+		width: 50px;
+		height: 50px;
+		top: -1px;
+		right: 37px;
 	}
-	.body {
-		top: 60px;
-		right: 55px;
-		height: 90px;
+	.normal > .body {
+		top: 49px;
+		right: 57px;
+		height: 50px;
 	}
-	.rightArm {
-		top: 90px;
-		right: -15px;
+	.normal > .rightArm {
+		top: 65px;
+		right: 19px;
 	}
-	.leftArm {
-		top: 90px;
-		right: 65px;
+	.normal > .leftArm {
+		top: 65px;
+		right: 67px;
 	}
-	.rightLeg {
-		top: 138px;
-		right: -6px;
+	.normal > .rightLeg {
+		top: 83px;
+		right: 28px;
 	}
+	.normal > .leftLeg {
+		top: 83px;
+		right: 56px;
+	}
+
+	.hang > .rightArm,
+	.leftArm,
+	.rightLeg,
 	.leftLeg {
-		top: 135px;
-		right: 55px;
+		width: 40px;
+	}
+	.hang > .head {
+		width: 50px;
+		height: 50px;
+		top: 1px;
+		right: 37px;
+	}
+	.hang > .body {
+		top: 49px;
+		right: 57px;
+		height: 50px;
+	}
+	.hang > .rightArm {
+		top: 65px;
+		right: 24px;
+		rotate: 49deg;
+	}
+	.hang > .leftArm {
+		top: 65px;
+		right: 67px;
+		rotate: 20deg;
+	}
+	.hang > .rightLeg {
+		top: 86px;
+		right: 28px;
+	}
+	.hang > .leftLeg {
+		top: 93px;
+		right: 61px;
+		rotate: -23deg;
 	}
 }

@@ -1,37 +1,49 @@
 import { useEffect, useRef, useState } from 'react'
 import { JSONResponse, WordDefinition } from '../types/HangMan.type'
+import { fetchOptions, URL } from './config'
 
-export const useFetchWordsAsync = <T extends { method: string; headers: any; body: any }>(
-	url: string,
-	config?: T
-) => {
-	const [data, setData] = useState<Array<WordDefinition>>([])
-	const [isLoading, setIsLoading] = useState<boolean>(false)
+type UseFetchAsync = {
+	url?: URL
+	options?: {
+		itemCount?: number
+		category?: string
+	}
+}
+
+export const useFetchWordsAsync = ({ url, options }: UseFetchAsync = {}) => {
+	const [fetchedWords, setFetchedWords] = useState<Array<WordDefinition>>([])
+	const [isDoneFetch, setIsDoneFetch] = useState<boolean>(false)
 	const [error, setError] = useState<Error | null>(null)
-	const isFetch = useRef(true)
+	const startFetch = useRef(false)
 	const [retryCount, setRetryCount] = useState(0)
 
 	const createError = (err: Error) => {
-		isFetch.current = false
+		startFetch.current = false
 		setError(err)
-		setIsLoading(false)
-		setData([])
+		setIsDoneFetch(true)
+		setFetchedWords([])
 	}
 
-	const fetchData = async () => {
-		isFetch.current = false
-		setIsLoading(true)
+	const clearFetchedWords = () => {
+		setFetchedWords([])
+		return [...fetchedWords]
+	}
 
-		const response = await fetch(url, config)
+	const fetchData = async ({ options }: UseFetchAsync) => {
+		console.log('[Start Fetching]')
+		startFetch.current = false
+		setIsDoneFetch(false)
+
+		const response = await fetch(url ? url : URL, fetchOptions(options))
 		const { choices, errors }: JSONResponse = await response.json()
 		if (response.ok) {
 			if (choices && choices.length > 0) {
 				try {
 					const words: WordDefinition[] = JSON.parse(choices[0].text) // parse JSON using custom type
 
-					setData(words)
+					setFetchedWords(words)
 					setError(null)
-					setIsLoading(false)
+					setIsDoneFetch(true)
 				} catch (error) {
 					const err = new Error(`Parsing failed! ${error} ${choices[0]}`)
 					createError(err)
@@ -47,20 +59,20 @@ export const useFetchWordsAsync = <T extends { method: string; headers: any; bod
 	}
 
 	useEffect(() => {
-		if (isFetch.current) {
-			fetchData()
+		if (startFetch.current) {
+			fetchData({ options })
 		}
 
 		if (error && retryCount <= 5) {
 			const timeoutId = setTimeout(() => {
 				setRetryCount(prev => prev + 1)
-				fetchData()
+				fetchData({ options })
 				clearTimeout(timeoutId)
 			}, 3000)
 		} else if (retryCount === 5) {
 			createError(new Error('Maximum retries reached. Sorry!'))
 		}
-	}, [isLoading, error])
+	}, [isDoneFetch, error, options])
 
-	return { data, isLoading, error }
+	return { fetchedWords, clearFetchedWords, isDoneFetch, startFetch, error }
 }
