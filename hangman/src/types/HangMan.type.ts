@@ -15,6 +15,12 @@ export type WordDefinition = {
 	info: string
 }
 
+export type TResult = 'Win' | 'Lose' | ''
+
+export type TWords = WordDefinition & {
+	result: TResult
+}
+
 type GuessCounter = {
 	wrongGuessCounter: number
 }
@@ -52,16 +58,22 @@ export type ErrorProps = {
 	message: string
 }
 
+export type TCategory = Partial<{
+	category?: string
+	itemCount?: number
+}>
+
 export type MenuProps = {
 	isDone: boolean
-	category: {
-		category: string
-		itemCount: number
-	}
-	initGame: () => void
-	catName: string
-	setCatName: (catName: string) => void
-	fetchInitialGame: () => void
+	category: TCategory
+	handleStartGame: () => void
+	categoryName: string
+	setCategoryName: (catName: string) => void
+	handleFetchWords: () => void
+}
+
+export type ProgressProps = CssModule & {
+	progressList: TWords[]
 }
 
 export type JSONResponse = {

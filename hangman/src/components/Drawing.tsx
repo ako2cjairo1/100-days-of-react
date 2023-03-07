@@ -28,10 +28,10 @@ export const Drawing = ({ wrongGuessCounter, isDone }: DrawingProps) => {
 	const emoji = isHangMan
 		? hangEmoji
 		: isSaved
-			? smileyEmoji
-			: isWrongGuess >= 1
-				? sadEmoji
-				: smileyEmoji
+		? smileyEmoji
+		: isWrongGuess >= 1
+		? sadEmoji
+		: smileyEmoji
 
 	const bodyParts = [
 		<div

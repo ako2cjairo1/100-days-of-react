@@ -1,15 +1,13 @@
 import requestConfig from '../request_config.json'
+import { TCategory } from '../types/HangMan.type'
 
 export const API_KEY = import.meta.env.VITE_API_KEY
 export const URL = import.meta.env.VITE_API_URL
 
-export const fetchOptions = ({
+export const fetchOptions = <T>({
 	itemCount,
 	category,
-}: {
-	itemCount?: number
-	category?: string
-} = {}) => ({
+}: T extends TCategory ? TCategory : any = {}) => ({
 	method: 'POST',
 	headers: {
 		'Content-Type': 'application/json',

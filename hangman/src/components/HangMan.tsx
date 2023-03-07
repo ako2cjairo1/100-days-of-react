@@ -1,13 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import cssModule from '../modules/HangMan.module.css'
-import { Drawing, WordToGuess, Keyboard, StatusMessage } from '.'
-import { TLetter, WordDefinition } from '../types/HangMan.type'
-import { getAlphabet, getRandom } from '../hangmanHelper'
-import { Hint } from './Hint'
+import { TCategory, TLetter, TWords, WordDefinition } from '../types/HangMan.type'
+import { formatFetchWords, getAlphabet, getRandom } from '../hangmanHelper'
 import { useFetchWordsAsync } from '../hooks/useFetchWordsAsync'
-import { Loader } from './Loader'
-import { Error } from './Error'
-import { Menu } from './Menu'
+import { Drawing, WordToGuess, Keyboard, StatusMessage, GameMenu, Hint, Progress } from '.'
+import { Error, Loader } from './common'
 
 const HangMan = () => {
 	const { main, stats } = cssModule
@@ -17,103 +14,39 @@ const HangMan = () => {
 	const [wrongGuessCounter, setWrongGuessCounter] = useState(0)
 	const isInit = useRef(false)
 	const isFetch = useRef(false)
-	const [category, setCategory] = useState({ category: 'pokemon names', itemCount: 10 })
-	const [catName, setCatName] = useState('')
+	const [category, setCategory] = useState<TCategory>({})
+	const [categoryName, setCategoryName] = useState('')
 	const [isChangeCategory, setIsChangeCategory] = useState(true)
+	const [progressList, setProgressList] = useState<TWords[]>([])
 
 	const { fetchedWords, error, isDoneFetch, startFetch, clearFetchedWords } = useFetchWordsAsync({
 		options: category,
 	})
 
-	const isSuccessfulGuess = keyboard.length
-		? keyboard.filter(item => item.isCorrect).every(({ isGuessed }) => isGuessed)
-		: false
-
-	const isDone = isSuccessfulGuess || wrongGuessCounter >= 6
-
-	const keyboardEventHandler = (e: KeyboardEvent) => {
-		e.preventDefault()
-
-		if (e.key === 'Enter' && isDone) {
-			initGame()
-			fetchNewSetOfWords()
-			document.removeEventListener('keypress', keyboardEventHandler)
-		} else if (e.key.match(/^[A-Za-z]$/) && !isDone) checkGuessedLetter(e.key)
-	}
-
 	useEffect(() => {
-		if (isInit.current && words.length) initGame()
-
-		if (fetchedWords.length && isDoneFetch && !error && !words.length) {
-			console.info('[Success fetch!]')
-			const formattedWords = fetchedWords.map(({ id, word, info }) => {
-				let lowerCaseWord = word.toLowerCase()
-				return {
-					id,
-					word: lowerCaseWord,
-					// make sure to remove "word to guess" on hints
-					info: info.toLowerCase().replace(lowerCaseWord, ''),
-				}
-			})
-			setWords(formattedWords)
-			if (formattedWords.length) {
-				isInit.current = true
-				isFetch.current = true
-				clearFetchedWords()
-			}
+		if (fetchedWords.length && isDoneFetch && !words.length) {
+			initFetchedWords()
+		} else if (isInit.current && words.length) {
+			handleStartGame()
 		}
 
-		if (!isChangeCategory) document.addEventListener('keypress', keyboardEventHandler)
+		// update progress every end of game
+		if (isDone) {
+			updateProgress()
+		}
 
-		if (isDone && !words.length) document.removeEventListener('keypress', keyboardEventHandler)
+		const keyboardEventHandler = handleKeyboardEvent()
 
 		return () => {
 			document.removeEventListener('keypress', keyboardEventHandler)
 		}
 	}, [keyboard, words, isDoneFetch])
 
-	const fetchNewSetOfWords = () => {
-		if (isFetch.current && !fetchedWords.length && !words.length && isDone) {
-			setIsChangeCategory(true)
-			setKeyboard([])
-			startFetch.current = true
-			isFetch.current = false
-			setCategory({ category: catName, itemCount: 10 })
-		}
-	}
+	const isSuccessfulGuess = keyboard.length
+		? keyboard.filter(item => item.isCorrect).every(({ isGuessed }) => isGuessed)
+		: false
 
-	const fetchInitialGame = () => {
-		setIsChangeCategory(false)
-		setKeyboard([])
-		startFetch.current = true
-		isFetch.current = false
-		setCategory({ category: catName, itemCount: 10 })
-	}
-
-	const initGame = () => {
-		if (words.length) {
-			isInit.current = false
-			setWrongGuessCounter(0)
-			// get random item from words and convert to lowercase
-			const initGuessingWord = getRandom(words)
-
-			console.log(initGuessingWord)
-
-			// remove the word-to-guess from the words list
-			setWords(words.filter(item => item.word !== initGuessingWord.word))
-
-			const initLetters: TLetter[] = getAlphabet(true).map(letter => {
-				return {
-					letter: letter.toLowerCase(),
-					//mark the letters composing the word to guess
-					isCorrect: initGuessingWord.word.includes(letter.toLowerCase()),
-					isGuessed: false,
-				}
-			})
-			setKeyboard(initLetters)
-			setWordToGuess(initGuessingWord)
-		}
-	}
+	const isDone = isSuccessfulGuess || wrongGuessCounter >= 6
 
 	const checkGuessedLetter = useCallback(
 		(letter: string) => {
@@ -138,34 +71,143 @@ const HangMan = () => {
 		[keyboard]
 	)
 
-	if (!isChangeCategory && !isDoneFetch && !words.length) return <Loader />
-	else if (error) return <Error message={error.message} />
+	const handleKeyboardEvent = () => {
+		const createKeyboardEvent = (e: KeyboardEvent) => {
+			e.preventDefault()
+
+			if (e.key === 'Enter' && isDone) {
+				handleStartGame()
+			} else if (e.key.match(/^[A-Za-z]$/) && !isDone) {
+				checkGuessedLetter(e.key)
+			}
+		}
+
+		if (!isChangeCategory) {
+			document.addEventListener('keypress', createKeyboardEvent)
+		}
+
+		// to allow inputting of category after end of game
+		if (isDone && !words.length) {
+			document.removeEventListener('keypress', createKeyboardEvent)
+		}
+		return createKeyboardEvent
+	}
+
+	const updateProgress = () => {
+		const addProgress: TWords = {
+			...wordToGuess,
+			result: isSuccessfulGuess ? 'Win' : 'Lose',
+		}
+
+		setProgressList(prev => {
+			const rest = [...prev.filter(itm => itm.id !== wordToGuess.id)]
+			// calculate index to put the new result record
+			let currentIdx = progressList.length - progressList.filter(itm => itm.result === '').length
+			let end = rest[currentIdx]
+			// swap values
+			rest[currentIdx] = addProgress
+			// return immediately if no value found
+			if (end === undefined) return rest
+			return [...rest, end]
+		})
+	}
+
+	const initFetchedWords = () => {
+		console.info('[Success fetch!]')
+		const formattedWords = formatFetchWords(fetchedWords)
+		setWords(formattedWords)
+		setProgressList(
+			formattedWords.map(item => {
+				return {
+					...item,
+					result: '',
+				}
+			})
+		)
+		clearFetchedWords()
+		isInit.current = true
+		isFetch.current = true
+	}
+
+	const handleFetchWords = () => {
+		setIsChangeCategory(false)
+		setKeyboard([])
+		startFetch.current = true
+		isFetch.current = false
+		setCategory({ category: categoryName, itemCount: 10 })
+	}
+
+	const handleStartGame = () => {
+		if (words.length) {
+			isInit.current = false
+			setWrongGuessCounter(0)
+			// get random item from words and convert to lowercase
+			const initGuessingWord = getRandom(words)
+			// remove the word-to-guess from the words list
+			setWords(words.filter(item => item.word !== initGuessingWord.word))
+			// initialize keyboard by marking the letters composing the word to guess
+			const initLetters: TLetter[] = getAlphabet(true).map(letter => {
+				return {
+					letter: letter.toLowerCase(),
+					// mark here
+					isCorrect: initGuessingWord.word.includes(letter.toLowerCase()),
+					isGuessed: false,
+				}
+			})
+			setKeyboard(initLetters)
+			setWordToGuess(initGuessingWord)
+		}
+	}
+
+	const isLoading = !isChangeCategory && !isDoneFetch && !words.length
 
 	return (
-		<div className={main}>
-			<Drawing {...{ isDone, wrongGuessCounter }} />
-			<div className={stats}>
-				<StatusMessage {...{ cssModule, isSuccessfulGuess, wrongGuessCounter }} />
-			</div>
-			<WordToGuess
-				wordToGuess={wordToGuess.word}
-				{...{ cssModule, keyboard, isDone }}
-			/>
-			<Hint {...{ cssModule, category, wordToGuess, wrongGuessCounter, isDone }} />
-
-			{!isChangeCategory && !isDone ? (
-				<Keyboard
-					disabled={isDone}
-					letters={keyboard}
-					handler={checkGuessedLetter}
-				/>
+		<>
+			{isLoading ? (
+				<Loader />
+			) : error ? (
+				<Error message={error.message} />
 			) : (
-				<Menu
-					isDone={isDone && words.length ? true : false}
-					{...{ setCatName, cssModule, category, catName, fetchInitialGame, initGame }}
-				/>
+				<div className={main}>
+					<Drawing {...{ isDone, wrongGuessCounter }} />
+					{!isChangeCategory && (
+						<>
+							<div className={stats}>
+								<StatusMessage {...{ cssModule, isSuccessfulGuess, wrongGuessCounter }} />
+							</div>
+							<WordToGuess
+								wordToGuess={wordToGuess.word}
+								{...{ cssModule, keyboard, isDone }}
+							/>
+							<Hint {...{ cssModule, category, wordToGuess, wrongGuessCounter, isDone }} />
+						</>
+					)}
+
+					{!isChangeCategory && !isDone ? (
+						<Keyboard
+							disabled={isDone}
+							letters={keyboard}
+							handler={checkGuessedLetter}
+						/>
+					) : (
+						<>
+							{!isChangeCategory && isDone && <Progress {...{ cssModule, progressList }} />}
+							<GameMenu
+								isDone={isDone && words.length ? true : false}
+								{...{
+									setCategoryName,
+									cssModule,
+									category,
+									categoryName,
+									handleFetchWords,
+									handleStartGame,
+								}}
+							/>
+						</>
+					)}
+				</div>
 			)}
-		</div>
+		</>
 	)
 }
 

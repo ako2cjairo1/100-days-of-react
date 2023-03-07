@@ -1,16 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
+import { executeAfterSomeTime } from '../hangmanHelper'
 import { JSONResponse, WordDefinition } from '../types/HangMan.type'
 import { fetchOptions, URL } from './config'
 
-type UseFetchAsync = {
+type UseFetchAsync<T> = {
 	url?: URL
-	options?: {
-		itemCount?: number
-		category?: string
-	}
+	options?: T
 }
 
-export const useFetchWordsAsync = ({ url, options }: UseFetchAsync = {}) => {
+export const useFetchWordsAsync = <T>({ url, options }: UseFetchAsync<T> = {}) => {
 	const [fetchedWords, setFetchedWords] = useState<Array<WordDefinition>>([])
 	const [isDoneFetch, setIsDoneFetch] = useState<boolean>(false)
 	const [error, setError] = useState<Error | null>(null)
@@ -29,7 +27,7 @@ export const useFetchWordsAsync = ({ url, options }: UseFetchAsync = {}) => {
 		return [...fetchedWords]
 	}
 
-	const fetchData = async ({ options }: UseFetchAsync) => {
+	const fetchData = async ({ options }: UseFetchAsync<T>) => {
 		console.log('[Start Fetching]')
 		startFetch.current = false
 		setIsDoneFetch(false)
@@ -45,16 +43,13 @@ export const useFetchWordsAsync = ({ url, options }: UseFetchAsync = {}) => {
 					setError(null)
 					setIsDoneFetch(true)
 				} catch (error) {
-					const err = new Error(`Parsing failed! ${error} ${choices[0]}`)
-					createError(err)
+					createError(new Error(`Parsing failed! ${error} ${choices[0]}`))
 				}
 			} else {
-				const err = new Error('Parsing failed! There are no available choices.')
-				createError(err)
+				createError(new Error('Parsing failed! There are no available choices.'))
 			}
 		} else {
-			const err = new Error(errors?.map(e => e.message).join('\n') ?? 'unknown')
-			createError(err)
+			createError(new Error(errors?.map(e => e.message).join('\n') ?? 'unknown'))
 		}
 	}
 
@@ -64,15 +59,14 @@ export const useFetchWordsAsync = ({ url, options }: UseFetchAsync = {}) => {
 		}
 
 		if (error && retryCount <= 5) {
-			const timeoutId = setTimeout(() => {
+			executeAfterSomeTime(() => {
 				setRetryCount(prev => prev + 1)
 				fetchData({ options })
-				clearTimeout(timeoutId)
-			}, 3000)
+			}, 3)
 		} else if (retryCount === 5) {
 			createError(new Error('Maximum retries reached. Sorry!'))
 		}
-	}, [isDoneFetch, error, options])
+	}, [error, options, startFetch.current])
 
 	return { fetchedWords, clearFetchedWords, isDoneFetch, startFetch, error }
 }
