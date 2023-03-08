@@ -67,9 +67,9 @@ export const useTicTacToe = (): ContextProps => {
 
 	useEffect(() => {
 		if (gameStatus === Playing) {
-			const winner = checkMove()
+			const { winner, isWinner } = checkMove()
 
-			if (winner) {
+			if (isWinner) {
 				// show confetti if Human player won
 				if (winner === players[Human]) {
 					confetti({
@@ -78,7 +78,7 @@ export const useTicTacToe = (): ContextProps => {
 					})
 				}
 				// game has ended, update the scores
-				updateScoreBoard(winner as keyof TScore)
+				updateScoreBoard(winner)
 				// start a new game after 3s
 				executeAfterSomeTime(newGame, 3)
 			} else {
@@ -87,25 +87,33 @@ export const useTicTacToe = (): ContextProps => {
 		}
 	}, [currentPawn, gameStatus])
 
-	const checkMove = (): string | null => {
+	const checkMove = (pawn?: TPawn): { winner: keyof TScore; isWinner: boolean } => {
+		let findPawn = pawn
 		const winningMatch = WIN_COMBINATIONS.find(combination => {
+			findPawn = pawn ? pawn : (boxes[combination[0]] as TPawn)
 			return (
 				// 1. 1st index is not null and..
-				boxes[combination[0]] !== null &&
+				findPawn !== null &&
 				// 2. value of 2nd index is equal to the 1st and..
-				boxes[combination[0]] === boxes[combination[1]] &&
+				findPawn === boxes[combination[1]] &&
 				// 3. value of 3rd index is equal to the 1st (or 2nd)
-				boxes[combination[0]] === boxes[combination[2]]
+				findPawn === boxes[combination[2]]
 			)
 		})
 
 		if (winningMatch) {
-			setWinningMatch(winningMatch.slice())
+			setWinningMatch(winningMatch)
 			// return the winning pawn
-			return boxes[winningMatch[0]]
+			return {
+				winner: boxes[winningMatch[0]] as TPawn,
+				isWinner: true,
+			}
 		}
 
-		return boxes.every(box => box !== null) ? 'draw' : ''
+		return {
+			winner: 'draw',
+			isWinner: boxes.every(box => box !== null) ? true : false,
+		}
 	}
 
 	const moveToPosition = (index: number) => {

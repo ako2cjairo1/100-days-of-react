@@ -1,7 +1,7 @@
 import { ScoreBoardProps } from '../../types'
 
 export const ScoreBoard = ({ styles, scores, players }: ScoreBoardProps) => {
-	const { scoreboard, menu, } = styles
+	const { scoreboard, menu, separator } = styles
 	const { Computer, Human } = players
 
 	return (
@@ -10,10 +10,14 @@ export const ScoreBoard = ({ styles, scores, players }: ScoreBoardProps) => {
 				You <a>{Human}</a>
 				<span>{scores[Human] === 0 ? '' : scores[Human]}</span>
 			</p>
-			{scores.draw === 0 ? null : (
-				<p className={menu}>
-					Tie<span>{scores.draw}</span>
-				</p>
+			{scores.draw === 0 ? <div className={separator}></div> : (
+				<>
+					<div className={separator}></div>
+					<p className={menu}>
+						Tie<span>{scores.draw}</span>
+					</p>
+					<div className={separator}></div>
+				</>
 			)}
 			<p className={menu}>
 				🤖 <a>{Computer}</a>

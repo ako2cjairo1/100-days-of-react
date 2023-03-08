@@ -10,41 +10,41 @@ export const GAME_ACTION = {
 
 export type ActionProps =
 	| {
-		type: typeof GAME_ACTION.InitializeGame
-		payload: {
-			players: TPlayers
-		}
-	}
+			type: typeof GAME_ACTION.InitializeGame
+			payload: {
+				players: TPlayers
+			}
+	  }
 	| {
-		type: typeof GAME_ACTION.NewGame
-	}
+			type: typeof GAME_ACTION.NewGame
+	  }
 	| {
-		type: typeof GAME_ACTION.MovePosition
-		payload: {
-			index: number
-		}
-	}
+			type: typeof GAME_ACTION.MovePosition
+			payload: {
+				index: number
+			}
+	  }
 	| {
-		type: typeof GAME_ACTION.SetWinningMatch
-		payload: {
-			combinations: number[]
-		}
-	}
+			type: typeof GAME_ACTION.SetWinningMatch
+			payload: {
+				combinations: number[]
+			}
+	  }
 	| {
-		type: typeof GAME_ACTION.UpdateScoreBoard
-		payload: {
-			winner: keyof TScore
-		}
-	}
+			type: typeof GAME_ACTION.UpdateScoreBoard
+			payload: {
+				winner: keyof TScore
+			}
+	  }
 	| {
-		type: typeof GAME_ACTION.ToggleCurrentPawn
-	}
+			type: typeof GAME_ACTION.ToggleCurrentPawn
+	  }
 	| {
-		type: typeof GAME_ACTION.Waiting
-		payload: {
-			isWaiting: boolean
-		}
-	}
+			type: typeof GAME_ACTION.Waiting
+			payload: {
+				isWaiting: boolean
+			}
+	  }
 
 export const PAWN = {
 	'❌': '❌',
@@ -84,13 +84,13 @@ export type StateProps = {
 
 export type TPlayers =
 	| {
-		[PLAYER.Human]: '❌'
-		[PLAYER.Computer]: '⚪️'
-	}
+			[PLAYER.Human]: '❌'
+			[PLAYER.Computer]: '⚪️'
+	  }
 	| {
-		[PLAYER.Human]: '⚪️'
-		[PLAYER.Computer]: '❌'
-	}
+			[PLAYER.Human]: '⚪️'
+			[PLAYER.Computer]: '❌'
+	  }
 
 export type ChildrenProps = {
 	children: React.ReactNode

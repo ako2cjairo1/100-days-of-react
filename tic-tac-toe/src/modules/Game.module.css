@@ -40,6 +40,7 @@ p {
 }
 .status {
 	height: 20px;
+	align-items: center;
 }
 
 .lower {
@@ -50,11 +51,19 @@ p {
 .scoreboard {
 	display: flex;
 	justify-content: space-around;
+	align-items: center;
+	height: 60px;
 }
 .hourglass {
 	display: inline-block;
 	font-size: 10px;
 	animation: spin 1s linear infinite;
+}
+
+.separator {
+	height: 40px;
+	border: 1px solid currentColor;
+	opacity: 10%;
 }
 
 span {
