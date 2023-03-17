@@ -1,0 +1,39 @@
+.background {
+	width: 430px;
+	height: 520px;
+	position: relative;
+	transform: translate(-50%, -50%);
+	animation: rotate 60s linear infinite;
+}
+.background .shape {
+	height: 200px;
+	width: 200px;
+	position: absolute;
+	border-radius: 50%;
+}
+.shape:first-child {
+	background: linear-gradient(#1845ad, #23a2f6);
+	left: -30px;
+	top: -40px;
+	animation: blobs 10s infinite alternate linear;
+}
+.shape:last-child {
+	background: linear-gradient(to right, #ff512f, #f09819);
+	right: -30px;
+	bottom: -40px;
+	animation: blobs 10s infinite alternate linear;
+}
+@keyframes blobs {
+	100% {
+		translate: 50%;
+	}
+}
+
+@keyframes rotate {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}

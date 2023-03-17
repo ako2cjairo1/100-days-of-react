@@ -1,6 +1,6 @@
 export const loginInitState = {
 	CREDENTIAL: {
-		username: '',
+		email: '',
 		password: '',
 		confirm: '',
 	},

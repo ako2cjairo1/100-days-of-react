@@ -1,9 +1,13 @@
-import { SetStateAction } from 'react'
+import { PasswordStatus } from '@/services/constants'
 
 export type TCredentials = {
-	username: string
+	email: string
 	password: string
 	confirm?: string
+}
+
+export type TInputFocus = {
+	[TKey in keyof TCredentials]: boolean
 }
 
 export type TStatus = Partial<{
@@ -11,14 +15,23 @@ export type TStatus = Partial<{
 	errMsg: string
 }>
 export type TValidation = {
-	username: boolean
-	password: boolean
+	isValidEmail: boolean
+	isValidPassword: boolean
 }
 export type TPassword = {
 	minLength: boolean
 	alphabet: boolean
 	number: boolean
 	symbol: boolean
+}
+export type TPasswordEval = {
+	password: string
+	regex?: RegExp
+}
+
+export type RTPasswordEval = {
+	status: (typeof PasswordStatus)[keyof typeof PasswordStatus]
+	score: number
 }
 
 export type TAuthProvider = TCredentials & {

@@ -1,33 +1,9 @@
-.background {
-	width: 430px;
-	height: 520px;
-	position: relative;
-	transform: translate(-50%, -50%);
-	animation: rotate 60s linear infinite;
-}
-.background .shape {
-	height: 200px;
-	width: 200px;
-	position: absolute;
-	border-radius: 50%;
-}
-.shape:first-child {
-	background: linear-gradient(#1845ad, #23a2f6);
-	left: -30px;
-	top: -40px;
-	animation: blobs 10s infinite alternate linear;
-}
-.shape:last-child {
-	background: linear-gradient(to right, #ff512f, #f09819);
-	right: -30px;
-	bottom: -40px;
-	animation: blobs 10s infinite alternate linear;
-}
 .container {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	width: 400px;
+	min-width: 400px;
 	background-color: rgba(255, 255, 255, 0.13);
 	transform: translate(-50%, -50%);
 	border-radius: 32px;
@@ -36,6 +12,8 @@
 	border: 2px solid rgba(255, 255, 255, 0.1);
 	box-shadow: 0px 0px 20px 1px #ffbb763f;
 	padding: 32px;
+	margin: 10px 0;
+	text-align: center;
 }
 form * {
 	color: currentColor;
@@ -66,15 +44,6 @@ input {
 	margin-top: 10px;
 	font-size: 14px;
 	font-weight: 300;
-	transition: all 500ms;
-}
-a {
-	margin-left: 5px;
-	color: #0070c9;
-	cursor: pointer;
-}
-a:hover {
-	text-decoration: underline;
 }
 
 input.valid:focus {
@@ -91,27 +60,9 @@ input.invalid:focus {
 .invalid {
 	border: 1px solid rgb(248, 120, 116);
 }
-header {
-	margin-bottom: 34px;
-}
 ::placeholder {
 	color: currentColor;
 	opacity: 50%;
-}
-
-@keyframes blobs {
-	100% {
-		translate: 50%;
-	}
-}
-
-@keyframes rotate {
-	0% {
-		transform: rotate(0deg);
-	}
-	100% {
-		transform: rotate(360deg);
-	}
 }
 
 @media (prefers-color-scheme: light) {
@@ -120,5 +71,10 @@ header {
 		border-color: transparent;
 		background-color: rgba(0, 0, 0, 0.5);
 		box-shadow: 0px 0px 30px 1px black;
+	}
+	input {
+		background-color: rgba(255, 255, 255, 0.27);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		color: currentColor;
 	}
 }
