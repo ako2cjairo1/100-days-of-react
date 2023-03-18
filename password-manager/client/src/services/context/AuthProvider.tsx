@@ -7,9 +7,9 @@ export const AuthContext = createContext<TAuthContext<TAuthProvider>>({
 })
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-	const [auth, setAuth] = useState({
+	const [auth, setAuth] = useState<TAuthProvider>({
 		accessToken: '',
-		username: '',
+		email: '',
 		password: '',
 	})
 

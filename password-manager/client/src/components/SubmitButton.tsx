@@ -3,6 +3,7 @@ type SubmitButtonProps = React.DetailedHTMLProps<
 	HTMLButtonElement
 > & {
 	text?: string
+	textStatus?: string
 	iconName?: string
 	submitted: boolean
 }
@@ -10,6 +11,7 @@ type SubmitButtonProps = React.DetailedHTMLProps<
 export const SubmitButton = ({
 	submitted = false,
 	text = 'Submit',
+	textStatus = 'Please standby...',
 	iconName,
 	...props
 }: SubmitButtonProps) => {

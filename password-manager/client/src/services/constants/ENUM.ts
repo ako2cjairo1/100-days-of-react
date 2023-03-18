@@ -1,8 +1,8 @@
 export const PasswordStatus = {
 	weak: 'weak',
-	moderate: 'moderate',
-	good: 'good',
+	mediocre: 'mediocre',
+	secure: 'secure',
 	strong: 'strong',
-	solid: 'solid',
+	unbreakable: 'unbreakable',
 	none: 'strength',
 } as const

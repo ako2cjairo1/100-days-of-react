@@ -3,7 +3,11 @@ import styles from '@/assets/modules/Login.module.css'
 import { AuthContext } from '@/services/context'
 import { TCredentials, TStatus, TPassword, TValidation } from '@/types/PasswordManager.type'
 import { registerInitState } from '@/services/constants/REGISTRATION'
-import { mergeRegExObj } from '@/services/Utils/passwordManagerHelper'
+import {
+	RunAfterSomeTime,
+	MergeRegExObj,
+	ExtractValFromRegEx,
+} from '@/services/Utils/passwordManagerHelper'
 import { useInput } from '@/hooks/useInput'
 import {
 	Header,
@@ -19,7 +23,7 @@ import {
 
 export const Registration = () => {
 	const { container } = styles
-	// destructure constants
+	// constants
 	const { CREDENTIALS, STATUS, INPUT_VALIDATION, VALID_PASSWORD, EMAIL_REGEX, PASSWORD_REGEX } =
 		registerInitState
 	const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
@@ -40,7 +44,6 @@ export const Registration = () => {
 
 	const [testPassword, setTestPassword] = useState<TPassword>(VALID_PASSWORD)
 	// destructure states
-	// const { alphabet, minLength, number, symbol } = testPassword
 
 	const emailRef = useRef<HTMLInputElement>(null)
 	const loginRef = useRef<HTMLAnchorElement>(null)
@@ -51,7 +54,7 @@ export const Registration = () => {
 	useEffect(() => {
 		if (!registrationStatus.success) emailRef.current?.focus()
 		else loginRef.current?.focus()
-	}, [registrationStatus.success])
+	}, [registrationStatus.success, submit])
 
 	useEffect(() => {
 		const validPassword = {
@@ -81,8 +84,7 @@ export const Registration = () => {
 
 		if (!submit) {
 			setSubmit(true)
-
-			const timeout = setTimeout(() => {
+			RunAfterSomeTime(() => {
 				if (Object.values(loginValidation).every(cred => cred === true)) {
 					// TODO: use custom API to handle registration
 					setAuth({ ...inputStates, accessToken: '' })
@@ -97,8 +99,7 @@ export const Registration = () => {
 				}
 
 				setSubmit(false)
-				clearTimeout(timeout)
-			}, 3000)
+			}, 3)
 		}
 	}
 
@@ -106,24 +107,20 @@ export const Registration = () => {
 		emailValidation: [{ isValid: isValidEmail, message: 'Input is not a valid email address.' }],
 		passwordValidation: [
 			{
-				isValid: testPassword.minLength,
-				message: `minimum of ${minLength.source.match(/\{(.*?)\}/g)} characters`,
-			},
-			{
 				isValid: testPassword.alphabet,
-				message: 'lower case and upper case letter',
+				message: 'a upper and a lower case letter',
 			},
 			{
 				isValid: testPassword.number,
-				message: 'contains a number',
+				message: 'a number',
+			},
+			{
+				isValid: testPassword.minLength,
+				message: `at least ${ExtractValFromRegEx(minLength.source)} characters`,
 			},
 			{
 				isValid: testPassword.symbol,
-				message: `contains special character:{' '}
-					${symbol.source
-						.match(/\[(.*?)\]/g)
-						?.toString()
-						.replace(/\[|\]/g, '')}`,
+				message: `a special character: ${ExtractValFromRegEx(symbol.source)}`,
 			},
 		],
 		confirmValidation: [
@@ -133,10 +130,6 @@ export const Registration = () => {
 			},
 		],
 	}
-
-	// useEffect(() => {
-	// 	console.log(focusEvents)
-	// }, [focusEvents])
 
 	return (
 		<section>
@@ -151,7 +144,7 @@ export const Registration = () => {
 						<LinkLabel
 							linkRef={loginRef}
 							routeTo="/login"
-							text="Proceed to"
+							preText="Proceed to"
 						>
 							login?
 						</LinkLabel>
@@ -160,7 +153,7 @@ export const Registration = () => {
 					<>
 						<Header
 							title="Create Account"
-							errMsg={errMsg}
+							status={registrationStatus}
 						/>
 
 						<form onSubmit={handleSubmit}>
@@ -197,7 +190,7 @@ export const Registration = () => {
 										label="Master Password"
 										isFulfilled={isValidPassword}
 									/>
-									<PasswordStrength {...{ password, regex: mergeRegExObj(PASSWORD_REGEX) }} />
+									<PasswordStrength {...{ password, regex: MergeRegExObj(PASSWORD_REGEX) }} />
 								</div>
 								<input
 									className={!focusEvents.password ? (isValidPassword ? 'valid' : 'invalid') : ''}
@@ -209,6 +202,7 @@ export const Registration = () => {
 									required
 								/>
 								<ValidationMessage
+									title="Your master password must contain:"
 									isVisible={!focusEvents.password && !isValidPassword}
 									validations={passwordValidation}
 								/>
@@ -254,7 +248,7 @@ export const Registration = () => {
 
 						<LinkLabel
 							routeTo="/login"
-							text="Already have an account?"
+							preText="Already have an account?"
 						>
 							Log in
 						</LinkLabel>

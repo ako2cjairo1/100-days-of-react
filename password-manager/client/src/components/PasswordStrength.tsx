@@ -32,46 +32,43 @@ const evaluatePassword = (password: string, regex?: RegExp): RTPasswordEval => {
 	else if (length >= 17 && length <= 24) score = 90
 	else score = 100
 
-	const { weak, moderate, good, strong, solid } = PasswordStatus
+	const { weak, mediocre, secure, strong, unbreakable } = PasswordStatus
 	return {
 		status:
 			score <= 30
 				? weak
 				: score <= 60
-				? moderate
+				? mediocre
 				: score <= 80
-				? good
+				? secure
 				: score <= 90
 				? strong
-				: solid,
+				: unbreakable,
 		score,
 	}
 }
 
 export const PasswordStrength = ({ password, regex }: TPasswordEval) => {
 	const { status, score } = evaluatePassword(password, regex)
-	const { none, weak, moderate, good, strong, solid } = PasswordStatus
+	const { none, weak, mediocre, secure, strong, unbreakable } = PasswordStatus
 
 	return (
 		<div className="password-strength">
-			<p
-				className="xsmall smooth"
-				style={{ opacity: password ? 1 : 0 }}
-			>
-				{status === none ? 'very strong' : status}
-			</p>
+			<p className={`xsmall smooth ${password ? 'show' : 'hidden'}`}>{status}</p>
 
 			{Object.values(PasswordStatus).map((strength, idx) => {
 				let customAnimation = ''
-				if (
-					(strength === weak && score < 10) ||
-					(strength === moderate && score <= 30) ||
-					(strength === good && score <= 60) ||
-					(strength === strong && score <= 80) ||
-					(strength === solid && score < 100)
+				if (password && strength === weak) customAnimation = `scaleup ${status}`
+				else if (
+					password &&
+					((strength === weak && score <= 10) ||
+						(strength === mediocre && score <= 30) ||
+						(strength === secure && score <= 60) ||
+						(strength === strong && score <= 80) ||
+						(strength === unbreakable && score < 100))
 				)
 					customAnimation = `scaledown ${none}`
-				else if (strength !== none && password.length) {
+				else if (password && strength !== none) {
 					customAnimation = `scaleup ${status}`
 				}
 

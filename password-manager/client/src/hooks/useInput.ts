@@ -1,15 +1,20 @@
 import { TCredentials, TInputFocus } from '@/types/PasswordManager.type'
 import { ChangeEvent, FocusEvent, useState } from 'react'
 
+const initFocus = {
+	email: true,
+	password: true,
+	confirm: true,
+}
+
 export const useInput = <TValue>(init: TValue) => {
 	const [inputStates, setInputStates] = useState<TValue>(init)
-	const [focusEvents, setFocusEvents] = useState<TInputFocus>({
-		email: true,
-		password: true,
-		confirm: true,
-	})
+	const [focusEvents, setFocusEvents] = useState<TInputFocus>(initFocus)
 
-	const resetInputState = () => setInputStates(init)
+	const resetInputState = () => {
+		setInputStates(init)
+		setFocusEvents(initFocus)
+	}
 
 	const inputAttributes = {
 		inputStates,

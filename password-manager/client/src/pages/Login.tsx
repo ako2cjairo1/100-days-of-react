@@ -13,6 +13,7 @@ import {
 	Socials,
 	SubmitButton,
 } from '@/components'
+import { ExtractValFromRegEx, RunAfterSomeTime } from '@/services/Utils/passwordManagerHelper'
 
 export const Login = () => {
 	const { container } = styles
@@ -31,6 +32,7 @@ export const Login = () => {
 
 	const emailRef = useRef<HTMLInputElement>(null)
 	const passwordRef = useRef<HTMLInputElement>(null)
+	const keychainRef = useRef<HTMLAnchorElement>(null)
 
 	const [isSubmitted, setIsSubmitted] = useState(false)
 	const [isInputEmail, setIsInputEmail] = useState(true)
@@ -38,6 +40,7 @@ export const Login = () => {
 
 	useEffect(() => {
 		if (isInputEmail) emailRef.current?.focus()
+		else if (success) keychainRef.current?.focus()
 		else passwordRef.current?.focus()
 	}, [isInputEmail, isSubmitted])
 
@@ -58,10 +61,10 @@ export const Login = () => {
 		}
 
 		setIsSubmitted(true)
-		const timeout = setTimeout(() => {
+		RunAfterSomeTime(() => {
 			try {
 				// TODO: fetch access token to custom authentication backend api
-				// throw new Error('test error!')
+				throw new Error('[TEST]: There is no Vercel account associated with this email address. Sign up?')
 				setAuth({ ...inputStates, accessToken: '' })
 				setLoginStatus({ success: true, errMsg: '' })
 				resetInputState()
@@ -71,26 +74,25 @@ export const Login = () => {
 				setIsSubmitted(false)
 				setLoginStatus({ success: false, errMsg: `${error}` })
 			}
+		}, 3)
+	}
 
-			clearTimeout(timeout)
-		}, 3000)
+	const handleChangeEmail = () => {
+		resetInputState()
+		setIsInputEmail(true)
 	}
 
 	const { emailValidation, passwordValidation } = {
-		emailValidation: [{ isValid: isValidEmail, message: 'Input is not a valid email.' }],
+		emailValidation: [{ isValid: isValidEmail, message: 'Input is not a valid email' }],
 		passwordValidation: [
 			{
 				isValid: isValidPassword,
 				message: `Input must be at least
-				${minLength.source.match(/\{(.*?)\}/g)}
+				${ExtractValFromRegEx(minLength.source)}
 				characters long.`,
 			},
 		],
 	}
-
-	// useEffect(() => {
-	// 	console.log(focusEvents)
-	// }, [focusEvents])
 
 	return (
 		<section>
@@ -102,8 +104,9 @@ export const Login = () => {
 							You are logged in! <i className="fa fa-check" />
 						</h1>
 						<LinkLabel
+							linkRef={keychainRef}
 							routeTo="/keychain"
-							text="Proceed to your secured"
+							preText="Proceed to your secured"
 						>
 							keychain
 						</LinkLabel>
@@ -113,7 +116,7 @@ export const Login = () => {
 						<Header
 							title="Welcome back"
 							subTitle="Log in or create a new account to access your keychain"
-							errMsg={errMsg}
+							status={loginStatus}
 						/>
 
 						<form onSubmit={handleSubmit}>
@@ -126,7 +129,8 @@ export const Login = () => {
 											className={!focusEvents.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
 											disabled={!isInputEmail || isSubmitted}
 											id="email"
-											type="email"
+											type="text"
+											inputMode="email"
 											autoComplete="email"
 											placeholder="Email"
 											value={email}
@@ -157,12 +161,12 @@ export const Login = () => {
 											isVisible={!focusEvents.password && !isValidPassword}
 											validations={passwordValidation}
 										/>
-										<LinkLabel
+										{/* <LinkLabel
 											routeTo="/reset"
 											text="Forgot master password?"
 										>
 											Reset
-										</LinkLabel>
+										</LinkLabel> */}
 									</>
 								)}
 							</div>
@@ -176,16 +180,26 @@ export const Login = () => {
 							/>
 						</form>
 
-						<LinkLabel
-							routeTo="/registration"
-							text="New around here?"
-						>
-							Create account
-						</LinkLabel>
+						{isInputEmail ? (
+							<LinkLabel
+								routeTo="/registration"
+								preText="New around here?"
+							>
+								Create account
+							</LinkLabel>
+						) : (
+							<LinkLabel
+								routeTo="/login"
+								preText={`Logging in as ${email}`}
+								onClick={handleChangeEmail}
+							>
+								Not you?
+							</LinkLabel>
+						)}
 
 						<Separator>OR</Separator>
 
-						<p className="small">Continue with...</p>
+						<p className="center small">Continue with...</p>
 
 						<footer>
 							<Socials />

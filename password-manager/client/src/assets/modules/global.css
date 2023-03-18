@@ -48,6 +48,11 @@ video {
 	display: block;
 	max-width: 100%;
 }
+h1 {
+	font-weight: 500;
+	line-height: 42px;
+	/* margin: 5px 0; */
+}
 a {
 	text-decoration: none;
 	margin-left: 5px;
@@ -86,13 +91,13 @@ i {
 	background: rgba(255, 255, 255, 0.2);
 }
 .strong,
-.solid {
+.unbreakable {
 	background: rgb(88, 182, 117);
 }
-.good {
+.secure {
 	background-color: rgb(23, 93, 220);
 }
-.moderate {
+.mediocre {
 	background-color: rgb(191, 126, 22);
 }
 .weak {
@@ -152,7 +157,16 @@ button:hover:not(:disabled) {
 	font-size: 10px;
 }
 .center {
+	display: flex;
+	place-content: center;
+	place-items: center;
 	text-align: center;
+}
+.fdc {
+	flex-direction: column;
+}
+.tal {
+	text-align: left;
 }
 .separator {
 	display: flex;
@@ -183,10 +197,15 @@ button:hover:not(:disabled) {
 }
 
 .scaleup {
-	animation: scaleupanimation 0.3s ease-in-out;
+	animation: scaleupanimation 0.3s forwards;
 }
+
 .scaledown {
-	animation: scaledownanimate 0.3s ease-in-out;
+	animation: scaledownanimate 0.3s forwards;
+}
+
+.fadein {
+	animation: fadeanimation 0.3s forwards;
 }
 
 @keyframes scaleupanimation {
@@ -211,6 +230,14 @@ button:hover:not(:disabled) {
 		transform: scale(1);
 	}
 }
+@keyframes fadeanimation {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
 
 .password-strength div {
 	border-radius: 50%;
@@ -229,6 +256,12 @@ button:hover:not(:disabled) {
 }
 .password-strength p {
 	margin-right: 5px;
+}
+.show {
+	opacity: 1;
+}
+.hidden {
+	opacity: 0;
 }
 
 .password-label {
