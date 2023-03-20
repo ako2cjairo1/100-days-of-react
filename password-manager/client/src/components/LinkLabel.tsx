@@ -1,24 +1,31 @@
-import { ReactNode, Ref } from 'react'
+import { FCProps, ILinkLabel } from '@/types'
 import { Link } from 'react-router-dom'
 
-type LinkLabelProps = Omit<
-	React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>,
-	'ref'
-> & {
-	children?: ReactNode
-	linkRef?: Ref<HTMLAnchorElement>
-	routeTo: string
-	preText: string
-}
+/**
+ * This is a LinkLabel component that displays a link with preText.
+ *
+ * @param {Ref<HTMLAnchorElement>} linkRef - A ref to handle focus from parent component
+ * @param {string} routeTo - The route to navigate to when the link is clicked
+ * @param {string} preText - The text to display before the link
+ *
+ * @returns {JSX.Element} A Custom LinkLabel component
+ */
 
-export const LinkLabel = ({ children, linkRef, routeTo, preText, ...rest }: LinkLabelProps) => {
+export const LinkLabel: FCProps<ILinkLabel> = ({
+	children,
+	linkRef,
+	routeTo,
+	preText,
+	className,
+	onClick,
+}) => {
 	return (
-		<div className={rest.className ? rest.className : 'center small'}>
+		<div className={`center small ${className}`}>
 			<p className="small">{preText} </p>
 			<Link
-				ref={linkRef}
+				ref={linkRef} // to handle focus from parent component
 				to={routeTo}
-				onClick={rest.onClick}
+				onClick={onClick}
 			>
 				{children}
 			</Link>

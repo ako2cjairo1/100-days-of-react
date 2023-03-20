@@ -1,21 +1,25 @@
-import { TStatus } from '@/types/PasswordManager.type'
-import { ReactNode } from 'react'
+import { FCProps, IHeaderProps } from '@/types'
 
-type HeaderProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-	children?: ReactNode
-	title?: string
-	subTitle?: string
-	status?: TStatus
-}
+/** 
+The `Header` component is a React functional component that renders a header element with optional title, subtitle, and status.
 
-export const Header = ({ children, title, subTitle, status, ...props }: HeaderProps) => {
+* @parameter `children?: ReactNode`: Optional children to be rendered inside the header element.
+* @parameter `title?: string`: Optional title to be rendered as an h1 element inside the header element.
+* @parameter `subTitle?: string`: Optional subtitle to be rendered as a p element inside the header element.
+* @parameter `status?: TStatus`: Optional status object with properties `success` and `errMsg`. 
+*			If `status.success` is true, an icon with class "fa fa-check" will be rendered. 
+* 			If `status.success` is false and `status.errMsg` is defined, an icon with class "fa fa-exclamation-triangle" 
+* 			and a p element containing the error message will be rendered.
+*/
+
+export const Header: FCProps<IHeaderProps> = ({ children, title, subTitle, status, ...rest }) => {
 	return (
-		<header {...props}>
+		<header {...rest}>
 			{title && <h1>{title}</h1>}
 			{subTitle && <p className="center">{subTitle}</p>}
 
-			{status ? (
-				status.success ? (
+			{status &&
+				(status.success ? (
 					<i className="fa fa-check" />
 				) : (
 					status.errMsg && (
@@ -24,10 +28,8 @@ export const Header = ({ children, title, subTitle, status, ...props }: HeaderPr
 							<p className="center smooth fadein">{status && status.errMsg}</p>
 						</div>
 					)
-				)
-			) : (
-				children
-			)}
+				))}
+			{children}
 		</header>
 	)
 }

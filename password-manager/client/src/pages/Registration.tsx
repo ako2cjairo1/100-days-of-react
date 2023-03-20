@@ -1,13 +1,13 @@
 import { FormEvent, useEffect, useRef, useState, useContext } from 'react'
 import styles from '@/assets/modules/Login.module.css'
 import { AuthContext } from '@/services/context'
-import { TCredentials, TStatus, TPassword, TValidation } from '@/types/PasswordManager.type'
-import { registerInitState } from '@/services/constants/REGISTRATION'
+import { TCredentials, TStatus, TPassword, TValidInput } from '@/types/global.type'
+import { registerInitState } from '@/services/constants/Registration.constant'
 import {
 	RunAfterSomeTime,
 	MergeRegExObj,
 	ExtractValFromRegEx,
-} from '@/services/Utils/passwordManagerHelper'
+} from '@/services/Utils/password-manager.helper'
 import { useInput } from '@/hooks/useInput'
 import {
 	Header,
@@ -16,7 +16,7 @@ import {
 	PasswordStrength,
 	RotatingBackdrop,
 	Separator,
-	Socials,
+	AuthProviderSection,
 	SubmitButton,
 	RequiredLabel,
 } from '@/components'
@@ -31,14 +31,14 @@ export const Registration = () => {
 	// form controlled inputs
 	const { resetInputState, inputAttributes } = useInput<TCredentials>(CREDENTIALS)
 	// destructure
-	const { inputStates, onChange, onFocus, onBlur, focusEvents } = inputAttributes
+	const { inputStates, onChange, onFocus, onBlur, inputFocus } = inputAttributes
 	const { password, email, confirm } = inputStates
 
 	const [registrationStatus, setRegistrationStatus] = useState<TStatus>(STATUS)
 	// destructure
 	const { success, errMsg } = registrationStatus
 
-	const [loginValidation, setLoginValidation] = useState<TValidation>(INPUT_VALIDATION)
+	const [loginValidation, setLoginValidation] = useState<TValidInput>(INPUT_VALIDATION)
 	// destructure
 	const { isValidEmail, isValidPassword } = loginValidation
 
@@ -87,9 +87,9 @@ export const Registration = () => {
 			RunAfterSomeTime(() => {
 				if (Object.values(loginValidation).every(cred => cred === true)) {
 					// TODO: use custom API to handle registration
+
 					setAuth({ ...inputStates, accessToken: '' })
 					resetRegistration()
-					alert('TODO: Implement registration')
 					setRegistrationStatus({ success: true, errMsg: '' })
 				} else {
 					setRegistrationStatus({
@@ -108,7 +108,7 @@ export const Registration = () => {
 		passwordValidation: [
 			{
 				isValid: testPassword.alphabet,
-				message: 'a upper and a lower case letter',
+				message: 'an upper and a lower case letter',
 			},
 			{
 				isValid: testPassword.number,
@@ -139,7 +139,7 @@ export const Registration = () => {
 				{success ? (
 					<Header>
 						<h1>
-							Registration completed! <i className="fa fa-check" />
+							Registration completed! <i className="fa fa-check scaleup" />
 						</h1>
 						<LinkLabel
 							linkRef={loginRef}
@@ -164,21 +164,21 @@ export const Registration = () => {
 									isFulfilled={isValidEmail}
 								/>
 								<input
-									className={!focusEvents.email ? (isValidEmail ? 'valid' : 'invalid') : ''}
-									disabled={submit}
-									ref={emailRef}
+									required
 									id="email"
-									type="text"
+									type="email"
 									inputMode="email"
 									autoComplete="email"
 									autoCapitalize="none"
 									placeholder="sample@email.com"
-									{...{ onChange, onFocus, onBlur }}
+									disabled={submit}
 									value={email}
-									required
+									ref={emailRef}
+									className={!inputFocus.email ? (isValidEmail ? 'valid' : 'invalid') : ''}
+									{...{ onChange, onFocus, onBlur }}
 								/>
 								<ValidationMessage
-									isVisible={!focusEvents.email && !isValidEmail}
+									isVisible={!inputFocus.email && !isValidEmail}
 									validations={emailValidation}
 								/>
 							</div>
@@ -193,17 +193,18 @@ export const Registration = () => {
 									<PasswordStrength {...{ password, regex: MergeRegExObj(PASSWORD_REGEX) }} />
 								</div>
 								<input
-									className={!focusEvents.password ? (isValidPassword ? 'valid' : 'invalid') : ''}
-									disabled={submit}
+									required
 									id="password"
 									type="password"
-									{...{ onChange, onFocus, onBlur }}
+									placeholder="Password"
+									disabled={submit}
 									value={password}
-									required
+									className={!inputFocus.password ? (isValidPassword ? 'valid' : 'invalid') : ''}
+									{...{ onChange, onFocus, onBlur }}
 								/>
 								<ValidationMessage
 									title="Your master password must contain:"
-									isVisible={!focusEvents.password && !isValidPassword}
+									isVisible={!inputFocus.password && !isValidPassword}
 									validations={passwordValidation}
 								/>
 							</div>
@@ -215,8 +216,14 @@ export const Registration = () => {
 									isFulfilled={isValidPassword && password === confirm}
 								/>
 								<input
+									id="confirm"
+									type="password"
+									disabled={submit}
+									value={confirm}
+									required
+									{...{ onChange, onFocus, onBlur }}
 									className={
-										!focusEvents.confirm
+										!inputFocus.confirm
 											? password === confirm
 												? password.length > 0 && (password ? password.length > 0 : false)
 													? 'valid'
@@ -224,26 +231,21 @@ export const Registration = () => {
 												: 'invalid'
 											: ''
 									}
-									disabled={submit}
-									id="confirm"
-									type="password"
-									{...{ onChange, onFocus, onBlur }}
-									value={confirm}
-									required
 								/>
 								<ValidationMessage
-									isVisible={!focusEvents.confirm && !(password === confirm)}
+									isVisible={!inputFocus.confirm && !(password === confirm)}
 									validations={confirmValidation}
 								/>
 							</div>
 
 							<SubmitButton
-								text="Create account"
 								iconName="fa-user-plus"
 								submitted={submit}
 								disabled={!isValidEmail || !isValidPassword || password !== confirm}
 								onClick={() => console.log('Submit button triggered!')}
-							/>
+							>
+								Create account
+							</SubmitButton>
 						</form>
 
 						<LinkLabel
@@ -258,7 +260,7 @@ export const Registration = () => {
 						<p className="center small">Continue with...</p>
 
 						<footer>
-							<Socials />
+							<AuthProviderSection />
 						</footer>
 					</>
 				)}

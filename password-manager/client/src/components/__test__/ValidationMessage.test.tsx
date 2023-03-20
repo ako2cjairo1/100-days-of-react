@@ -1,0 +1,82 @@
+import { ValidationMessage } from '@/components'
+import { render } from '@/services/Utils/test.util'
+
+describe('ValidationMessage', () => {
+	it('should render title when isVisible is true', () => {
+		const { getByText } = render(
+			<ValidationMessage
+				isVisible={true}
+				title="Test Title"
+				validations={[]}
+			/>
+		)
+		expect(getByText('Test Title')).toBeInTheDocument()
+	})
+
+	it('should not render title when isVisible is false', () => {
+		const { queryByText } = render(
+			<ValidationMessage
+				isVisible={false}
+				title="Test Title"
+				validations={[]}
+			/>
+		)
+		expect(queryByText('Test Title')).not.toBeInTheDocument()
+	})
+
+	it('should render validation messages when isVisible is true', () => {
+		const validations = [
+			{ isValid: true, message: 'Valid Message' },
+			{ isValid: false, message: 'Invalid Message' },
+		]
+		const { getByText } = render(
+			<ValidationMessage
+				isVisible={true}
+				title=""
+				validations={validations}
+			/>
+		)
+		expect(getByText('Valid Message')).toBeInTheDocument()
+		expect(getByText('Invalid Message')).toBeInTheDocument()
+	})
+
+	it('should not render validation messages when isVisible is false', () => {
+		const validations = [
+			{ isValid: true, message: 'Valid Message' },
+			{ isValid: false, message: 'Invalid Message' },
+		]
+		const { queryByText } = render(
+			<ValidationMessage
+				isVisible={false}
+				title=""
+				validations={validations}
+			/>
+		)
+		expect(queryByText('Valid Message')).not.toBeInTheDocument()
+		expect(queryByText('Invalid Message')).not.toBeInTheDocument()
+	})
+
+	it('should render a check icon for valid validations', () => {
+		const validations = [{ isValid: true, message: 'Valid Message' }]
+		const { container } = render(
+			<ValidationMessage
+				isVisible={true}
+				title=""
+				validations={validations}
+			/>
+		)
+		expect(container.querySelector('.fa-check')).toBeInTheDocument()
+	})
+
+	it('should render an exclamation icon for invalid validations', () => {
+		const validations = [{ isValid: false, message: 'Invalid Message' }]
+		const { container } = render(
+			<ValidationMessage
+				isVisible={true}
+				title=""
+				validations={validations}
+			/>
+		)
+		expect(container.querySelector('.fa-exclamation-circle')).toBeInTheDocument()
+	})
+})

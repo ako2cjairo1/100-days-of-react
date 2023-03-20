@@ -1,17 +1,19 @@
-import { TAuthContext, TAuthProvider } from '@/types/PasswordManager.type'
-import { createContext, ReactNode, useState } from 'react'
+import { TAuthContext, TAuthProvider, FCChildProp } from '@/types'
+import { createContext, useState } from 'react'
+import { authProviderInitState } from '../constants'
 
 export const AuthContext = createContext<TAuthContext<TAuthProvider>>({
-	auth: { email: '', password: '', accessToken: '' },
-	setAuth: () => undefined,
+	auth: authProviderInitState,
+	setAuth: () => {},
 })
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-	const [auth, setAuth] = useState<TAuthProvider>({
-		accessToken: '',
-		email: '',
-		password: '',
-	})
+/**
+ * AuthProvider component provides authentication context to its children components.
+ * @param {ReactNode} children - The child components that will have access to the authentication context.
+ * @returns {JSX.Element} The AuthContext provider with the given children components.
+ */
+export const AuthProvider: FCChildProp = ({ children }) => {
+	const [auth, setAuth] = useState<TAuthProvider>(authProviderInitState)
 
 	return <AuthContext.Provider value={{ auth, setAuth }}>{children}</AuthContext.Provider>
 }

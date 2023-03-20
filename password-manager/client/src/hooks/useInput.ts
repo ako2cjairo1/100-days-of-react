@@ -1,31 +1,38 @@
-import { TCredentials, TInputFocus } from '@/types/PasswordManager.type'
 import { ChangeEvent, FocusEvent, useState } from 'react'
+import { TInputFocus } from '@/types'
 
 const initFocus = {
 	email: true,
 	password: true,
 	confirm: true,
-}
+} satisfies TInputFocus
 
-export const useInput = <TValue>(init: TValue) => {
-	const [inputStates, setInputStates] = useState<TValue>(init)
-	const [focusEvents, setFocusEvents] = useState<TInputFocus>(initFocus)
+/**
+ * Custom hook to manage input states and focus events
+ * @param {T} initState - Initial value for inputStates
+ * @returns {Object} - Object containing resetInputState function and inputAttributes object
+ */
 
+export const useInput = <T>(initState: T) => {
+	const [inputStates, setInputStates] = useState<T>(initState)
+	const [inputFocus, setInputFocus] = useState<TInputFocus>(initFocus)
+
+	// Resets inputStates and focusEvents to their initial values
 	const resetInputState = () => {
-		setInputStates(init)
-		setFocusEvents(initFocus)
+		setInputStates(initState)
+		setInputFocus(initFocus)
 	}
 
+	// Object containing inputStates, focusEvents and event handlers for onFocus, onBlur and onChange events
 	const inputAttributes = {
 		inputStates,
-		focusEvents,
+		inputFocus,
 		onFocus: (e: FocusEvent<HTMLInputElement>) => null,
-		// setFocusEvents(prev => ({ ...prev, [e.target.id]: false })),
 		onBlur: (e: FocusEvent<HTMLInputElement>) =>
-			setFocusEvents(prev => ({ ...prev, [e.target.id]: false })),
+			setInputFocus(prev => ({ ...prev, [e.target.id]: false })),
 		onChange: (e: ChangeEvent<HTMLInputElement>) => {
 			setInputStates(prev => ({ ...prev, [e.target.id]: e.target.value }))
-			setFocusEvents(prev => ({ ...prev, [e.target.id]: false }))
+			setInputFocus(prev => ({ ...prev, [e.target.id]: false }))
 		},
 	}
 

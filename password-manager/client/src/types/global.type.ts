@@ -1,4 +1,5 @@
 import { PasswordStatus } from '@/services/constants'
+import { TKeysToStringUnion, TMapKeyValuesOf } from '@/types'
 
 export type TCredentials = {
 	email: string
@@ -6,31 +7,32 @@ export type TCredentials = {
 	confirm?: string
 }
 
-export type TInputFocus = {
-	[TKey in keyof TCredentials]: boolean
-}
+export type TInputFocus = TMapKeyValuesOf<TCredentials, boolean>
 
 export type TStatus = Partial<{
 	success: boolean
 	errMsg: string
 }>
-export type TValidation = {
+
+export type TValidInput = {
 	isValidEmail: boolean
 	isValidPassword: boolean
 }
+
+export type TValidation = {
+	isValid: boolean
+	message: string
+}
+
 export type TPassword = {
 	minLength: boolean
 	alphabet: boolean
 	number: boolean
 	symbol: boolean
 }
-export type TPasswordEval = {
-	password: string
-	regex?: RegExp
-}
 
-export type RTPasswordEval = {
-	status: (typeof PasswordStatus)[keyof typeof PasswordStatus]
+export type EvaluatedPassword = {
+	status: TKeysToStringUnion<typeof PasswordStatus>
 	score: number
 }
 

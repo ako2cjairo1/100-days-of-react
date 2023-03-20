@@ -181,7 +181,7 @@ button:hover:not(:disabled) {
 }
 .spinner {
 	position: relative;
-	left: 50%;
+	left: -7%;
 	width: 24px;
 	height: 24px;
 	margin: -10px;

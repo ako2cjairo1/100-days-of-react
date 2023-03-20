@@ -48,20 +48,18 @@ export const RunAfterSomeTime = (
 
 export const ExtractValFromRegEx = (regex: string) => {
 	if (regex.includes('{')) {
-		return regex
-			.match(/\{(.*?)\}/g)
-			?.toString()
-			.replace(/\{|\}/g, '')
+		return (
+			regex
+				.match(/\{(.*?)\}/g)
+				?.toString()
+				.replace(/\{|\}/g, '') ?? ''
+		)
 	} else if (regex.includes('[')) {
-		return regex
-			.match(/\[(.*?)\]/g)
-			?.toString()
-			.replace(/\[|\]/g, '')
-	} else {
-		return regex
-			.match(/\{(.*?)\}+\[(.*?)\]/g)
-			?.toString()
-			.replace(/\[|\]/g, '')
-			.replace(/\{|\}/g, '')
+		return (
+			regex
+				.match(/\[(.*?)\]/g)
+				?.toString()
+				.replace(/\[|\]/g, '') ?? ''
+		)
 	}
 }

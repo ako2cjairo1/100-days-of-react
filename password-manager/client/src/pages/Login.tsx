@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useRef, useState, useContext } from 'react'
 import styles from '@/assets/modules/Login.module.css'
-import { TCredentials, TInputFocus, TStatus } from '@/types/PasswordManager.type'
+import { TCredentials, TStatus } from '@/types/global.type'
 import { AuthContext } from '@/services/context'
 import { useInput } from '@/hooks/useInput'
 import { loginInitState, registerInitState } from '@/services/constants'
@@ -10,10 +10,10 @@ import {
 	LinkLabel,
 	RotatingBackdrop,
 	Separator,
-	Socials,
+	AuthProviderSection,
 	SubmitButton,
 } from '@/components'
-import { ExtractValFromRegEx, RunAfterSomeTime } from '@/services/Utils/passwordManagerHelper'
+import { ExtractValFromRegEx, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
 
 export const Login = () => {
 	const { container } = styles
@@ -23,7 +23,7 @@ export const Login = () => {
 	// custom form input hook
 	const { inputAttributes, resetInputState } = useInput<TCredentials>(CREDENTIAL)
 	// destructure
-	const { inputStates, onChange, onFocus, onBlur, focusEvents } = inputAttributes
+	const { inputStates, inputFocus, onChange, onFocus, onBlur } = inputAttributes
 	const { email, password } = inputStates
 
 	const [loginStatus, setLoginStatus] = useState<TStatus>(STATUS)
@@ -64,7 +64,10 @@ export const Login = () => {
 		RunAfterSomeTime(() => {
 			try {
 				// TODO: fetch access token to custom authentication backend api
-				throw new Error('[TEST]: There is no Vercel account associated with this email address. Sign up?')
+				// throw new Error(
+				// 	'[TEST]: There is no Vercel account associated with this email address. Sign up?'
+				// )
+
 				setAuth({ ...inputStates, accessToken: '' })
 				setLoginStatus({ success: true, errMsg: '' })
 				resetInputState()
@@ -101,7 +104,7 @@ export const Login = () => {
 				{success ? (
 					<Header>
 						<h1>
-							You are logged in! <i className="fa fa-check" />
+							You are logged in! <i className="fa fa-check scaleup" />
 						</h1>
 						<LinkLabel
 							linkRef={keychainRef}
@@ -122,11 +125,10 @@ export const Login = () => {
 						<form onSubmit={handleSubmit}>
 							<div className="input-row">
 								{isInputEmail ? (
-									// <i class="fa fa-envelope" aria-hidden="true"></i>
 									<>
 										<input
 											ref={emailRef}
-											className={!focusEvents.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
+											className={!inputFocus.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
 											disabled={!isInputEmail || isSubmitted}
 											id="email"
 											type="text"
@@ -138,7 +140,7 @@ export const Login = () => {
 											{...{ onChange, onFocus, onBlur }}
 										/>
 										<ValidationMessage
-											isVisible={!focusEvents.email && !isValidEmail}
+											isVisible={!inputFocus.email && !isValidEmail}
 											validations={emailValidation}
 										/>
 									</>
@@ -147,7 +149,7 @@ export const Login = () => {
 										<input
 											ref={passwordRef}
 											className={
-												!focusEvents.password && (errMsg || !isValidPassword) ? 'invalid' : ''
+												!inputFocus.password && (errMsg || !isValidPassword) ? 'invalid' : ''
 											}
 											disabled={isSubmitted}
 											id="password"
@@ -158,12 +160,12 @@ export const Login = () => {
 											{...{ onChange, onFocus, onBlur }}
 										/>
 										<ValidationMessage
-											isVisible={!focusEvents.password && !isValidPassword}
+											isVisible={!inputFocus.password && !isValidPassword}
 											validations={passwordValidation}
 										/>
 										{/* <LinkLabel
 											routeTo="/reset"
-											text="Forgot master password?"
+											preText="Forgot master password?"
 										>
 											Reset
 										</LinkLabel> */}
@@ -172,12 +174,13 @@ export const Login = () => {
 							</div>
 
 							<SubmitButton
-								text={isInputEmail ? 'Continue' : 'Log in with Master Password'}
 								iconName={isInputEmail ? '' : 'fa-sign-in'}
 								submitted={isSubmitted}
 								disabled={isInputEmail ? !isValidEmail : !(isValidEmail && isValidPassword)}
 								onClick={() => console.log('Submit button triggered!')}
-							/>
+							>
+								{isInputEmail ? 'Continue' : 'Log in with Master Password'}
+							</SubmitButton>
 						</form>
 
 						{isInputEmail ? (
@@ -202,7 +205,7 @@ export const Login = () => {
 						<p className="center small">Continue with...</p>
 
 						<footer>
-							<Socials />
+							<AuthProviderSection />
 						</footer>
 					</>
 				)}
