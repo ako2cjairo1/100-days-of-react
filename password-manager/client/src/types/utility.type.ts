@@ -4,7 +4,7 @@
  * @template T - The type of the object to map.
  * @template VType - The value type to use for all properties in the resulting object.
  */
-export type TMapKeyValuesOf<T, VType extends any> = {
+export type TConvertKeysOf<T, VType extends any> = {
 	[TKey in keyof T]: VType
 }
 
@@ -13,4 +13,4 @@ export type TMapKeyValuesOf<T, VType extends any> = {
  *
  * @template T - The type of the constant object. i.e.: typeof MyObject
  */
-export type TKeysToStringUnion<T> = keyof T
+export type TConvertToStringUnion<T> = keyof T

@@ -6,7 +6,7 @@ import { FCProps, IValidationMessage, TValidation } from '@/types'
  * @param {Array<Object>} validations - An array of validation objects containing an isValid property and a message property.
  * @returns {JSX.Element} A React component that displays the title and list of validation messages.
  */
-export const ValidationMessage: FCProps<IValidationMessage<TValidation>> = ({
+export const ValidationMessage: FCProps<IValidationMessage> = ({
 	isVisible,
 	title,
 	validations,
@@ -21,7 +21,7 @@ export const ValidationMessage: FCProps<IValidationMessage<TValidation>> = ({
 								<i
 									style={{ animationDelay: `${idx * 0.1}s` }}
 									className={`smooth small fa-li fa ${
-										isValid ? 'fa-check scaledown' : 'fa-exclamation-circle scaleup'
+										isValid ? 'fa-check scaledown' : 'fa-close scaleup'
 									}`}
 								/>
 								{message}

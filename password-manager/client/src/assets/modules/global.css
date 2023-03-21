@@ -82,6 +82,8 @@ i {
 }
 
 .error,
+.fa-close,
+.fa-exclamation,
 .fa-info-circle,
 .fa-exclamation-circle {
 	color: rgb(248, 120, 116);
@@ -255,7 +257,10 @@ button:hover:not(:disabled) {
 	gap: 3px;
 }
 .password-strength p {
-	margin-right: 5px;
+	margin: 0 5px 0 0;
+	/* padding: 1px 5px;
+	border: 1px solid;
+	border-radius: 10px; */
 }
 .show {
 	opacity: 1;

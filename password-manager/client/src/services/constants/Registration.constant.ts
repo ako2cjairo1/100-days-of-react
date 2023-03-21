@@ -1,13 +1,6 @@
-import { TCredentials, TMapKeyValuesOf, TPassword, TStatus, TValidInput } from '@/types'
+import { TCredentials, TConvertKeysOf, TPassword, TStatus, TInputValidation } from '@/types'
 
-export const registerInitState: {
-	CREDENTIALS: TCredentials
-	STATUS: TStatus
-	INPUT_VALIDATION: TValidInput
-	VALID_PASSWORD: TPassword
-	EMAIL_REGEX: RegExp
-	PASSWORD_REGEX: TMapKeyValuesOf<TPassword, RegExp>
-} = {
+export const REGISTER_STATE = {
 	CREDENTIALS: { email: '', password: '', confirm: '' },
 	STATUS: { success: false, errMsg: '' },
 	INPUT_VALIDATION: {
@@ -28,4 +21,9 @@ export const registerInitState: {
 		number: /(?=.*[0-9])/,
 		symbol: /(?=.*[-!@.#$,%^_&*])/,
 	},
-}
+} satisfies Record<'CREDENTIALS', TCredentials> &
+	Record<'STATUS', TStatus> &
+	Record<'INPUT_VALIDATION', TInputValidation> &
+	Record<'VALID_PASSWORD', TPassword> &
+	Record<'EMAIL_REGEX', RegExp> &
+	Record<'PASSWORD_REGEX', TConvertKeysOf<TPassword, RegExp>>

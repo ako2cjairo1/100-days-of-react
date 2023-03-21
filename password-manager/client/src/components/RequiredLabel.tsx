@@ -1,5 +1,4 @@
 import { FCProps, IRequiredLabelProps } from '@/types'
-
 /**
  * This function returns a label element with the given properties.
  * @param {string} labelFor - The id of the form element that the label is bound to.

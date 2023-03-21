@@ -1,5 +1,4 @@
 import { FCProps, ISubmitButton } from '@/types'
-
 /**
  * This is a SubmitButton component that renders a button with text and an optional icon.
  * Note: "type" attribute was omitted, most of the button attrs are omitted
@@ -8,7 +7,6 @@ import { FCProps, ISubmitButton } from '@/types'
  * @param {string} [textStatus='Processing...'] - The text to display when the button is in a submitted state.
  * @param {string} [iconName] - The name of the icon to display on the button (optional).
  */
-
 export const SubmitButton: FCProps<ISubmitButton> = ({
 	children,
 	className,

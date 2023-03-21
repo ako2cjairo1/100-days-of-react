@@ -1,9 +1,9 @@
 import { TAuthContext, TAuthProvider, FCChildProp } from '@/types'
 import { createContext, useState } from 'react'
-import { authProviderInitState } from '../constants'
+import { AUTH_PROVIDER } from '../constants'
 
 export const AuthContext = createContext<TAuthContext<TAuthProvider>>({
-	auth: authProviderInitState,
+	auth: AUTH_PROVIDER,
 	setAuth: () => {},
 })
 
@@ -13,7 +13,7 @@ export const AuthContext = createContext<TAuthContext<TAuthProvider>>({
  * @returns {JSX.Element} The AuthContext provider with the given children components.
  */
 export const AuthProvider: FCChildProp = ({ children }) => {
-	const [auth, setAuth] = useState<TAuthProvider>(authProviderInitState)
+	const [auth, setAuth] = useState<TAuthProvider>(AUTH_PROVIDER)
 
 	return <AuthContext.Provider value={{ auth, setAuth }}>{children}</AuthContext.Provider>
 }

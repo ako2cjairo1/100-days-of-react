@@ -56,7 +56,7 @@ describe('ValidationMessage', () => {
 		expect(queryByText('Invalid Message')).not.toBeInTheDocument()
 	})
 
-	it('should render a check icon for valid validations', () => {
+	it('should render a success icon for valid validations', () => {
 		const validations = [{ isValid: true, message: 'Valid Message' }]
 		const { container } = render(
 			<ValidationMessage
@@ -68,7 +68,7 @@ describe('ValidationMessage', () => {
 		expect(container.querySelector('.fa-check')).toBeInTheDocument()
 	})
 
-	it('should render an exclamation icon for invalid validations', () => {
+	it('should render an error icon for invalid validations', () => {
 		const validations = [{ isValid: false, message: 'Invalid Message' }]
 		const { container } = render(
 			<ValidationMessage
@@ -77,6 +77,6 @@ describe('ValidationMessage', () => {
 				validations={validations}
 			/>
 		)
-		expect(container.querySelector('.fa-exclamation-circle')).toBeInTheDocument()
+		expect(container.querySelector('.fa-close')).toBeInTheDocument()
 	})
 })

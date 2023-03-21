@@ -1,25 +1,35 @@
 import { ChangeEvent, FocusEvent, useState } from 'react'
-import { TInputFocus } from '@/types'
+import { TConvertKeysOf, TCredentials } from '@/types'
 
 const initFocus = {
 	email: true,
 	password: true,
 	confirm: true,
-} satisfies TInputFocus
+} satisfies TConvertKeysOf<TCredentials, boolean>
 
 /**
- * Custom hook to manage input states and focus events
- * @param {T} initState - Initial value for inputStates
- * @returns {Object} - Object containing resetInputState function and inputAttributes object
+ * A custom hook that manages input states and focus events.
+ *
+ * @param {T} initState - The initial state of the input fields.
+ *
+ * @returns {Object} An object containing the `resetInputState` function and `inputAttributes` object.
+ * The `resetInputState` function resets the input states and focus events to their initial values.
+ * The `inputAttributes` object contains the current input states, focus events and event handlers for onFocus, onBlur and onChange events.
  */
-
-export const useInput = <T>(initState: T) => {
+export const useInput = <T extends TCredentials>(initState: T) => {
 	const [inputStates, setInputStates] = useState<T>(initState)
-	const [inputFocus, setInputFocus] = useState<TInputFocus>(initFocus)
+	const [inputFocus, setInputFocus] = useState<
+		{ [key: string]: boolean } | TConvertKeysOf<T, boolean>
+	>(initFocus)
 
 	// Resets inputStates and focusEvents to their initial values
-	const resetInputState = () => {
-		setInputStates(initState)
+	const resetInputState = (id?: string) => {
+		let newInputState = initState
+		if (id) {
+			// reset the specific state using id arg
+			newInputState = { ...inputStates, [id]: '' }
+		}
+		setInputStates(newInputState)
 		setInputFocus(initFocus)
 	}
 
@@ -27,7 +37,7 @@ export const useInput = <T>(initState: T) => {
 	const inputAttributes = {
 		inputStates,
 		inputFocus,
-		onFocus: (e: FocusEvent<HTMLInputElement>) => null,
+		onFocus: (e: FocusEvent<HTMLInputElement>) => console.log(`"${e.target.id}" focused`),
 		onBlur: (e: FocusEvent<HTMLInputElement>) =>
 			setInputFocus(prev => ({ ...prev, [e.target.id]: false })),
 		onChange: (e: ChangeEvent<HTMLInputElement>) => {

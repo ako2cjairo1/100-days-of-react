@@ -1,3 +1,7 @@
 import { TAuthProvider } from '@/types'
 
-export const authProviderInitState: TAuthProvider = { email: '', password: '', accessToken: '' }
+export const AUTH_PROVIDER = {
+	email: '',
+	password: '',
+	accessToken: '',
+} satisfies TAuthProvider

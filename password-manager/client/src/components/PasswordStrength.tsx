@@ -1,4 +1,4 @@
-import { FCProps, EvaluatedPassword, IPasswordStrength } from '@/types'
+import { FCProps, TEvaluatedPassword, IPasswordStrength } from '@/types'
 import { PasswordStatus } from '@/services/constants'
 /**
  * Evaluates the strength of a password based on its length and whether it meets certain requirements.
@@ -10,7 +10,7 @@ import { PasswordStatus } from '@/services/constants'
  * 		status (a string representing the strength of the password) and
  * 		score (a number representing the score of the password).
  */
-export const evaluatePassword = ({ password, regex }: IPasswordStrength): EvaluatedPassword => {
+export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvaluatedPassword => {
 	if (!regex) {
 		regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/
 	}
@@ -43,8 +43,8 @@ export const evaluatePassword = ({ password, regex }: IPasswordStrength): Evalua
 /**
  * Renders a password strength meter based on the given password and regex.
  *
- * @param {string} props.password - The password being evaluated.
- * @param {RegExp} props.regex - The regular expression used to evaluate the password.
+ * @param {string} password - The password being evaluated.
+ * @param {RegExp} regex - The regular expression used to evaluate the password.
  *
  * @returns {FCProps} A Custom Password Strength indicator component
  */

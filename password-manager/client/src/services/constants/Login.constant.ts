@@ -1,13 +1,13 @@
 import { TCredentials, TStatus } from '@/types'
 
-export const loginInitState: { CREDENTIAL: TCredentials; STATUS: TStatus } = {
-	CREDENTIAL: {
+export const LOGIN_STATE = {
+	Credential: {
 		email: '',
 		password: '',
 		confirm: '',
 	},
-	STATUS: {
+	Status: {
 		success: false,
 		errMsg: '',
 	},
-}
+} satisfies Record<'Credential', TCredentials> & Record<'Status', TStatus>

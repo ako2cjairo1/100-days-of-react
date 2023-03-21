@@ -1,36 +1,47 @@
-// Combines multiple regular expressions into a single regular expression.
-// Parameters: regexobject (object containing key-value pairs of strings and regular expressions).
-// Return value: a single regular expression.
-export const MergeRegExObj = (regexObject: { [key: string]: RegExp }): RegExp => {
-	let mergedRegexString = ''
-
-	for (const key in regexObject) {
-		mergedRegexString += regexObject[key].source
-	}
-	return new RegExp(mergedRegexString)
-}
-
-// Returns a random item from a given list.
-// Parameters: list (array of items).
-// Return value: a random item from the list.
-export const GetRandomItem = <T>(list: T[]) => {
-	const idx = Math.floor(Math.random() * list.length)
-
-	return list.at(idx) ?? list?.[idx]
-}
+import { IRegExObj, TConvertToStringUnion } from '@/types'
+import { ChangeEvent, FocusEvent } from 'react'
 
 const TimerType = {
 	timeout: 'timeout',
 	interval: 'interval',
 } as const
 
-// Executes a callback function after a specified amount of time, with an optional timer type.
-// Parameters: callbackfn (function to be executed), seconds (time in seconds), timertype (timeout or interval).
-// Return value: timerid (ID of the timer)
+/**
+ * Combines multiple regular expressions into a single regular expression.
+ * Parameters: regExObj (object containing key-value pairs of strings and regular expressions).
+ * Return value: a single regular expression.
+ */
+export const MergeRegExObj = (regExObj: IRegExObj): RegExp => {
+	let mergedRegexString = ''
+
+	for (const key in regExObj) {
+		mergedRegexString += regExObj[key].source
+	}
+	return new RegExp(mergedRegexString)
+}
+
+/**
+ * Returns a random item from a given list.
+ *
+ * Parameters: list (array of items).
+ * Return value: a random item from the list.
+ */
+export const GetRandomItem = <T>(list: T[]): T => {
+	const idx = Math.floor(Math.random() * list.length)
+
+	return list.at(idx) ?? list?.[idx]
+}
+
+/**
+ * Executes a callback function after a specified amount of time, with an optional timer type.
+ *
+ * Parameters: callbackfn (function to be executed), seconds (time in seconds), timer type (timeout or interval).
+ * Return value: timerId (ID of the timer)
+ */
 export const RunAfterSomeTime = (
 	callbackFn: () => void,
 	seconds: number,
-	timerType: (typeof TimerType)[keyof typeof TimerType] = TimerType.timeout
+	timerType: TConvertToStringUnion<typeof TimerType> = TimerType.timeout
 ) => {
 	const { timeout } = TimerType
 	let timerId: NodeJS.Timeout
@@ -43,23 +54,54 @@ export const RunAfterSomeTime = (
 	} else {
 		timerId = setInterval(() => callbackFn(), seconds * 1000)
 	}
-	return timerId
+	return () => timerId
 }
 
+/**
+ * Extracts value from a regular expression string.
+ *
+ * param {string} regex - The regular expression string to extract value from.
+ * returns {string} The extracted value from the regular expression string.
+ */
 export const ExtractValFromRegEx = (regex: string) => {
+	let extractedValues = ''
 	if (regex.includes('{')) {
-		return (
+		extractedValues =
 			regex
 				.match(/\{(.*?)\}/g)
 				?.toString()
 				.replace(/\{|\}/g, '') ?? ''
-		)
-	} else if (regex.includes('[')) {
-		return (
+	}
+	if (regex.includes('[')) {
+		extractedValues +=
 			regex
 				.match(/\[(.*?)\]/g)
 				?.toString()
 				.replace(/\[|\]/g, '') ?? ''
-		)
+	}
+	return extractedValues
+}
+
+/**
+ * Overrides the target properties "id" and "value" of an Event instance.
+ *
+ * template T - The type of Event instance to override. Can be ChangeEvent or FocusEvent.
+ * template TObj - The type of object containing the target properties to override. Must have "id" and "value" properties.
+ * param {TObj} eventTargetProps - The object containing the target properties to override.
+ * returns {T} The overridden Event instance with updated target properties.
+ */
+export const OverrideEventTarget = <
+	T extends ChangeEvent<HTMLInputElement> extends infer Evt ? Evt : FocusEvent<HTMLInputElement>,
+	TObj = { id: string; value: string | boolean }
+>(
+	eventTargetProps: TObj
+) => {
+	// create an instance of Event by assertion (ChangeEvent, FocusEvent)
+	const sourceEvent = {} as T
+
+	// override the target properties "id" and "value" of Event
+	return {
+		...sourceEvent,
+		target: { ...sourceEvent.target, ...eventTargetProps },
 	}
 }

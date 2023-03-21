@@ -3,7 +3,8 @@ import styles from '@/assets/modules/Login.module.css'
 import { TCredentials, TStatus } from '@/types/global.type'
 import { AuthContext } from '@/services/context'
 import { useInput } from '@/hooks/useInput'
-import { loginInitState, registerInitState } from '@/services/constants'
+import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
+import { ExtractValFromRegEx, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
 import {
 	Header,
 	ValidationMessage,
@@ -13,43 +14,38 @@ import {
 	AuthProviderSection,
 	SubmitButton,
 } from '@/components'
-import { ExtractValFromRegEx, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
 
 export const Login = () => {
 	const { container } = styles
 	// constants
-	const { CREDENTIAL, STATUS } = loginInitState
-	const { minLength } = registerInitState.PASSWORD_REGEX
+	const { minLength } = REGISTER_STATE.PASSWORD_REGEX
 	// custom form input hook
-	const { inputAttributes, resetInputState } = useInput<TCredentials>(CREDENTIAL)
+	const { inputAttributes, resetInputState } = useInput<TCredentials>(LOGIN_STATE.Credential)
 	// destructure
 	const { inputStates, inputFocus, onChange, onFocus, onBlur } = inputAttributes
 	const { email, password } = inputStates
 
-	const [loginStatus, setLoginStatus] = useState<TStatus>(STATUS)
+	const [loginStatus, setLoginStatus] = useState<TStatus>(LOGIN_STATE.Status)
 	// destructure states
 	const { success, errMsg } = loginStatus
 
-	const emailRef = useRef<HTMLInputElement>(null)
-	const passwordRef = useRef<HTMLInputElement>(null)
-	const keychainRef = useRef<HTMLAnchorElement>(null)
+	const emailInputRef = useRef<HTMLInputElement>(null)
+	const passwordInputRef = useRef<HTMLInputElement>(null)
+	const vaultLinkRef = useRef<HTMLAnchorElement>(null)
 
 	const [isSubmitted, setIsSubmitted] = useState(false)
 	const [isInputEmail, setIsInputEmail] = useState(true)
 	const { auth, setAuth } = useContext(AuthContext)
 
 	useEffect(() => {
-		if (isInputEmail) emailRef.current?.focus()
-		else if (success) keychainRef.current?.focus()
-		else passwordRef.current?.focus()
+		if (isInputEmail) emailInputRef.current?.focus()
+		else if (success) vaultLinkRef.current?.focus()
+		else passwordInputRef.current?.focus()
 	}, [isInputEmail, isSubmitted])
 
 	useEffect(() => {
 		setLoginStatus(prev => ({ ...prev, errMsg: '' }))
 	}, [inputStates])
-
-	const isValidPassword = minLength.test(password)
-	const isValidEmail = registerInitState.EMAIL_REGEX.test(email)
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault()
@@ -81,15 +77,18 @@ export const Login = () => {
 	}
 
 	const handleChangeEmail = () => {
-		resetInputState()
+		resetInputState('password')
 		setIsInputEmail(true)
 	}
+
+	const isMinLength = minLength.test(password)
+	const isValidEmail = REGISTER_STATE.EMAIL_REGEX.test(email)
 
 	const { emailValidation, passwordValidation } = {
 		emailValidation: [{ isValid: isValidEmail, message: 'Input is not a valid email' }],
 		passwordValidation: [
 			{
-				isValid: isValidPassword,
+				isValid: isMinLength,
 				message: `Input must be at least
 				${ExtractValFromRegEx(minLength.source)}
 				characters long.`,
@@ -104,21 +103,21 @@ export const Login = () => {
 				{success ? (
 					<Header>
 						<h1>
-							You are logged in! <i className="fa fa-check scaleup" />
+							You are logged in! <i className="fa fa-check-circle scaleup" />
 						</h1>
 						<LinkLabel
-							linkRef={keychainRef}
-							routeTo="/keychain"
+							linkRef={vaultLinkRef}
+							routeTo="/secure-vault"
 							preText="Proceed to your secured"
 						>
-							keychain
+							password vault
 						</LinkLabel>
 					</Header>
 				) : (
 					<>
 						<Header
 							title="Welcome back"
-							subTitle="Log in or create a new account to access your keychain"
+							subTitle="Log in or create a new account to access your secured vault"
 							status={loginStatus}
 						/>
 
@@ -127,16 +126,16 @@ export const Login = () => {
 								{isInputEmail ? (
 									<>
 										<input
-											ref={emailRef}
-											className={!inputFocus.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
-											disabled={!isInputEmail || isSubmitted}
 											id="email"
 											type="text"
 											inputMode="email"
 											autoComplete="email"
 											placeholder="Email"
 											value={email}
+											ref={emailInputRef}
+											disabled={!isInputEmail || isSubmitted}
 											required
+											className={!inputFocus.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
 											{...{ onChange, onFocus, onBlur }}
 										/>
 										<ValidationMessage
@@ -147,20 +146,17 @@ export const Login = () => {
 								) : (
 									<>
 										<input
-											ref={passwordRef}
-											className={
-												!inputFocus.password && (errMsg || !isValidPassword) ? 'invalid' : ''
-											}
-											disabled={isSubmitted}
 											id="password"
 											type="password"
-											placeholder="Password"
+											ref={passwordInputRef}
+											disabled={isSubmitted}
 											value={password}
 											required
+											className={!inputFocus.password && (errMsg || !isMinLength) ? 'invalid' : ''}
 											{...{ onChange, onFocus, onBlur }}
 										/>
 										<ValidationMessage
-											isVisible={!inputFocus.password && !isValidPassword}
+											isVisible={!inputFocus.password && !isMinLength}
 											validations={passwordValidation}
 										/>
 										{/* <LinkLabel
@@ -176,7 +172,7 @@ export const Login = () => {
 							<SubmitButton
 								iconName={isInputEmail ? '' : 'fa-sign-in'}
 								submitted={isSubmitted}
-								disabled={isInputEmail ? !isValidEmail : !(isValidEmail && isValidPassword)}
+								disabled={isInputEmail ? !isValidEmail : !(isValidEmail && isMinLength)}
 								onClick={() => console.log('Submit button triggered!')}
 							>
 								{isInputEmail ? 'Continue' : 'Log in with Master Password'}

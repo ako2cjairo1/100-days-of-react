@@ -1,4 +1,4 @@
-import { TStatus } from './global.type'
+import { TStatus, TValidation } from './global.type'
 
 // Component Interfaces
 type TDetailedHTMLProps<T = HTMLElement> = React.DetailedHTMLProps<React.HTMLAttributes<T>, T>
@@ -31,7 +31,7 @@ export interface ISubmitButton extends Omit<TButtonAttrs, 'type' | 'disabled'> {
 	iconName?: string
 }
 
-export interface IValidationMessage<T> {
+export interface IValidationMessage<T = TValidation> {
 	isVisible: boolean
 	title?: string
 	validations: Array<T>
@@ -41,4 +41,8 @@ export interface IValidationMessage<T> {
 export interface IPasswordStrength {
 	password: string
 	regex?: RegExp
+}
+
+export interface IRegExObj {
+	[key: string]: RegExp
 }

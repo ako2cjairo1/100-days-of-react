@@ -10,7 +10,7 @@ export interface IChildren<TNode = React.ReactNode> {
 /**
  * Extends the `FC` type with a `children` property of type `IChildren`.
  */
-export type FCChildProp = React.FC<IChildren>
+export type FCChildProp<IProps = {}> = React.FC<IChildren & IProps>
 
 /**
  * Extends the `FC` type with generic properties.

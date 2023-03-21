@@ -1,5 +1,5 @@
 import { PasswordStrength, evaluatePassword } from '@/components'
-import { PasswordStatus, registerInitState } from '@/services/constants'
+import { PasswordStatus, REGISTER_STATE } from '@/services/constants'
 import { MergeRegExObj } from '@/services/Utils/password-manager.helper'
 import { render } from '@/services/Utils/test.util'
 import { IPasswordStrength } from '@/types'
@@ -7,7 +7,7 @@ import { IPasswordStrength } from '@/types'
 const { weak, mediocre, secure, strong, unbreakable } = PasswordStatus
 const evaluateObject: IPasswordStrength = {
 	password: '1234567',
-	regex: MergeRegExObj(registerInitState.PASSWORD_REGEX),
+	regex: MergeRegExObj(REGISTER_STATE.PASSWORD_REGEX),
 }
 
 describe('evaluatePassword', () => {

@@ -1,8 +1,8 @@
 import { FormEvent, useEffect, useRef, useState, useContext } from 'react'
 import styles from '@/assets/modules/Login.module.css'
 import { AuthContext } from '@/services/context'
-import { TCredentials, TStatus, TPassword, TValidInput } from '@/types/global.type'
-import { registerInitState } from '@/services/constants/Registration.constant'
+import { TCredentials, TStatus, TPassword, TInputValidation } from '@/types/global.type'
+import { REGISTER_STATE } from '@/services/constants/Registration.constant'
 import {
 	RunAfterSomeTime,
 	MergeRegExObj,
@@ -25,7 +25,7 @@ export const Registration = () => {
 	const { container } = styles
 	// constants
 	const { CREDENTIALS, STATUS, INPUT_VALIDATION, VALID_PASSWORD, EMAIL_REGEX, PASSWORD_REGEX } =
-		registerInitState
+		REGISTER_STATE
 	const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
 
 	// form controlled inputs
@@ -38,7 +38,7 @@ export const Registration = () => {
 	// destructure
 	const { success, errMsg } = registrationStatus
 
-	const [loginValidation, setLoginValidation] = useState<TValidInput>(INPUT_VALIDATION)
+	const [loginValidation, setLoginValidation] = useState<TInputValidation>(INPUT_VALIDATION)
 	// destructure
 	const { isValidEmail, isValidPassword } = loginValidation
 
@@ -139,7 +139,7 @@ export const Registration = () => {
 				{success ? (
 					<Header>
 						<h1>
-							Registration completed! <i className="fa fa-check scaleup" />
+							Registration completed! <i className="fa fa-check-circle scaleup" />
 						</h1>
 						<LinkLabel
 							linkRef={loginRef}
@@ -164,16 +164,16 @@ export const Registration = () => {
 									isFulfilled={isValidEmail}
 								/>
 								<input
-									required
 									id="email"
 									type="email"
 									inputMode="email"
 									autoComplete="email"
 									autoCapitalize="none"
 									placeholder="sample@email.com"
-									disabled={submit}
 									value={email}
 									ref={emailRef}
+									disabled={submit}
+									required
 									className={!inputFocus.email ? (isValidEmail ? 'valid' : 'invalid') : ''}
 									{...{ onChange, onFocus, onBlur }}
 								/>
@@ -193,14 +193,13 @@ export const Registration = () => {
 									<PasswordStrength {...{ password, regex: MergeRegExObj(PASSWORD_REGEX) }} />
 								</div>
 								<input
-									required
 									id="password"
 									type="password"
-									placeholder="Password"
-									disabled={submit}
 									value={password}
-									className={!inputFocus.password ? (isValidPassword ? 'valid' : 'invalid') : ''}
+									disabled={submit}
+									required
 									{...{ onChange, onFocus, onBlur }}
+									className={!inputFocus.password ? (isValidPassword ? 'valid' : 'invalid') : ''}
 								/>
 								<ValidationMessage
 									title="Your master password must contain:"
@@ -218,8 +217,8 @@ export const Registration = () => {
 								<input
 									id="confirm"
 									type="password"
-									disabled={submit}
 									value={confirm}
+									disabled={submit}
 									required
 									{...{ onChange, onFocus, onBlur }}
 									className={
