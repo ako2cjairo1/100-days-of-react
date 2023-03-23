@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import { TStatus, TValidation } from './global.type'
 
 // Component Interfaces
@@ -16,8 +17,8 @@ export interface ILinkLabel extends Pick<TDetailedHTMLProps, 'className' | 'onCl
 
 type TLabelAttrs = TDetailedHTMLProps<HTMLLabelElement>
 export interface IRequiredLabelProps extends Omit<TLabelAttrs, 'htmlFor' | 'form'> {
-	labelFor: string // overrides "htmlFor" attribute
-	label: string
+	labelFor?: string // overrides "htmlFor" attribute
+	label?: string
 	subLabel?: string
 	isFulfilled?: boolean
 	isOptional?: boolean
@@ -35,6 +36,21 @@ export interface IValidationMessage<T = TValidation> {
 	isVisible: boolean
 	title?: string
 	validations: Array<T>
+}
+
+export interface IFormInput
+	extends Omit<
+		React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
+		'ref' | 'itemRef'
+	> {
+	id: string
+	type: string
+	linkRef?: React.Ref<HTMLInputElement>
+	LabelComponent?: ReactNode
+	havePasswordMeter?: boolean
+	isValid?: boolean
+	isFocused?: boolean
+	validations?: TValidation[]
 }
 
 // Helper function interfaces

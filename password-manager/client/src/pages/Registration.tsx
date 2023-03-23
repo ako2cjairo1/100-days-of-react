@@ -1,24 +1,18 @@
-import { FormEvent, useEffect, useRef, useState, useContext } from 'react'
+import { FormEvent, useEffect, useRef, useState, useContext, useCallback } from 'react'
 import styles from '@/assets/modules/Login.module.css'
 import { AuthContext } from '@/services/context'
 import { TCredentials, TStatus, TPassword, TInputValidation } from '@/types/global.type'
 import { REGISTER_STATE } from '@/services/constants/Registration.constant'
-import {
-	RunAfterSomeTime,
-	MergeRegExObj,
-	ExtractValFromRegEx,
-} from '@/services/Utils/password-manager.helper'
-import { useInput } from '@/hooks/useInput'
+import { RunAfterSomeTime, ExtractValFromRegEx } from '@/services/Utils/password-manager.helper'
+import { useInput } from '@/hooks'
 import {
 	Header,
-	ValidationMessage,
 	LinkLabel,
-	PasswordStrength,
 	RotatingBackdrop,
 	Separator,
 	AuthProviderSection,
 	SubmitButton,
-	RequiredLabel,
+	FormInput,
 } from '@/components'
 
 export const Registration = () => {
@@ -27,36 +21,25 @@ export const Registration = () => {
 	const { CREDENTIALS, STATUS, INPUT_VALIDATION, VALID_PASSWORD, EMAIL_REGEX, PASSWORD_REGEX } =
 		REGISTER_STATE
 	const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
-
 	// form controlled inputs
 	const { resetInputState, inputAttributes } = useInput<TCredentials>(CREDENTIALS)
 	// destructure
 	const { inputStates, onChange, onFocus, onBlur, inputFocus } = inputAttributes
 	const { password, email, confirm } = inputStates
-
 	const [registrationStatus, setRegistrationStatus] = useState<TStatus>(STATUS)
 	// destructure
 	const { success, errMsg } = registrationStatus
-
 	const [loginValidation, setLoginValidation] = useState<TInputValidation>(INPUT_VALIDATION)
 	// destructure
 	const { isValidEmail, isValidPassword } = loginValidation
-
 	const [testPassword, setTestPassword] = useState<TPassword>(VALID_PASSWORD)
 	// destructure states
-
 	const emailRef = useRef<HTMLInputElement>(null)
 	const loginRef = useRef<HTMLAnchorElement>(null)
-
 	const [submit, setSubmit] = useState(false)
-	const { auth, setAuth } = useContext(AuthContext)
+	const { auth, updateAuthCb } = useContext(AuthContext)
 
-	useEffect(() => {
-		if (!registrationStatus.success) emailRef.current?.focus()
-		else loginRef.current?.focus()
-	}, [registrationStatus.success, submit])
-
-	useEffect(() => {
+	const inputValidationCb = useCallback(() => {
 		const validPassword = {
 			minLength: minLength.test(password),
 			alphabet: alphabet.test(password),
@@ -69,6 +52,16 @@ export const Registration = () => {
 			isValidEmail: EMAIL_REGEX.test(email),
 			isValidPassword: Object.values(validPassword).every(validation => validation === true),
 		})
+	}, [inputStates])
+
+	useEffect(() => {
+		if (!registrationStatus.success) emailRef.current?.focus()
+		else loginRef.current?.focus()
+	}, [registrationStatus.success, submit])
+
+	useEffect(() => {
+		inputValidationCb()
+
 		setRegistrationStatus(prev => ({ ...prev, errMsg: '' }))
 	}, [inputStates])
 
@@ -83,12 +76,13 @@ export const Registration = () => {
 		e.preventDefault()
 
 		if (!submit) {
+			setRegistrationStatus(prev => ({ ...prev, errMsg: '' }))
 			setSubmit(true)
 			RunAfterSomeTime(() => {
 				if (Object.values(loginValidation).every(cred => cred === true)) {
 					// TODO: use custom API to handle registration
 
-					setAuth({ ...inputStates, accessToken: '' })
+					updateAuthCb({ ...inputStates, accessToken: 'fakeToken' })
 					resetRegistration()
 					setRegistrationStatus({ success: true, errMsg: '' })
 				} else {
@@ -103,9 +97,9 @@ export const Registration = () => {
 		}
 	}
 
-	const { emailValidation, passwordValidation, confirmValidation } = {
-		emailValidation: [{ isValid: isValidEmail, message: 'Input is not a valid email address.' }],
-		passwordValidation: [
+	const { emailReq, passwordReq, confirmReq } = {
+		emailReq: [{ isValid: isValidEmail, message: 'Input is not a valid email address.' }],
+		passwordReq: [
 			{
 				isValid: testPassword.alphabet,
 				message: 'an upper and a lower case letter',
@@ -123,7 +117,7 @@ export const Registration = () => {
 				message: `a special character: ${ExtractValFromRegEx(symbol.source)}`,
 			},
 		],
-		confirmValidation: [
+		confirmReq: [
 			{
 				isValid: isValidPassword && password === confirm,
 				message: 'Master password confirmation does not match.',
@@ -158,12 +152,7 @@ export const Registration = () => {
 
 						<form onSubmit={handleSubmit}>
 							<div className="input-row">
-								<RequiredLabel
-									labelFor="email"
-									label="Email Address"
-									isFulfilled={isValidEmail}
-								/>
-								<input
+								<FormInput
 									id="email"
 									type="email"
 									inputMode="email"
@@ -171,76 +160,64 @@ export const Registration = () => {
 									autoCapitalize="none"
 									placeholder="sample@email.com"
 									value={email}
-									ref={emailRef}
+									linkRef={emailRef}
 									disabled={submit}
 									required
-									className={!inputFocus.email ? (isValidEmail ? 'valid' : 'invalid') : ''}
+									label="Email Address"
+									isFocused={inputFocus.email}
+									isValid={isValidEmail && !errMsg}
+									validations={emailReq}
+									className={inputFocus.email ? '' : isValidEmail ? 'valid' : 'invalid'}
 									{...{ onChange, onFocus, onBlur }}
-								/>
-								<ValidationMessage
-									isVisible={!inputFocus.email && !isValidEmail}
-									validations={emailValidation}
 								/>
 							</div>
 
 							<div className="input-row">
-								<div className="password-label">
-									<RequiredLabel
-										labelFor="password"
-										label="Master Password"
-										isFulfilled={isValidPassword}
-									/>
-									<PasswordStrength {...{ password, regex: MergeRegExObj(PASSWORD_REGEX) }} />
-								</div>
-								<input
+								<FormInput
 									id="password"
 									type="password"
 									value={password}
 									disabled={submit}
 									required
-									{...{ onChange, onFocus, onBlur }}
-									className={!inputFocus.password ? (isValidPassword ? 'valid' : 'invalid') : ''}
-								/>
-								<ValidationMessage
+									havePasswordMeter={true}
+									label="Master Password"
+									isFocused={inputFocus.password}
+									isValid={isValidPassword && !errMsg}
+									validations={passwordReq}
 									title="Your master password must contain:"
-									isVisible={!inputFocus.password && !isValidPassword}
-									validations={passwordValidation}
+									{...{ onChange, onFocus, onBlur }}
+									className={inputFocus.password ? '' : isValidPassword ? 'valid' : 'invalid'}
 								/>
 							</div>
 
 							<div className="input-row">
-								<RequiredLabel
-									labelFor="confirm"
-									label="Confirm Master Password"
-									isFulfilled={isValidPassword && password === confirm}
-								/>
-								<input
+								<FormInput
 									id="confirm"
 									type="password"
 									value={confirm}
 									disabled={submit}
 									required
+									label="Confirm Master Password"
+									isFocused={inputFocus.confirm}
+									isValid={!inputFocus.confirm && password === confirm}
+									validations={confirmReq}
 									{...{ onChange, onFocus, onBlur }}
 									className={
-										!inputFocus.confirm
-											? password === confirm
-												? password.length > 0 && (password ? password.length > 0 : false)
-													? 'valid'
-													: ''
-												: 'invalid'
-											: ''
+										inputFocus.confirm
+											? ''
+											: password === confirm
+											? password.length > 0 && (password ? password.length > 0 : false)
+												? 'valid'
+												: ''
+											: 'invalid'
 									}
-								/>
-								<ValidationMessage
-									isVisible={!inputFocus.confirm && !(password === confirm)}
-									validations={confirmValidation}
 								/>
 							</div>
 
 							<SubmitButton
 								iconName="fa-user-plus"
 								submitted={submit}
-								disabled={!isValidEmail || !isValidPassword || password !== confirm}
+								disabled={submit || !isValidEmail || !isValidPassword || password !== confirm}
 								onClick={() => console.log('Submit button triggered!')}
 							>
 								Create account

@@ -23,9 +23,12 @@ export const Header: FCProps<IHeaderProps> = ({ children, title, subTitle, statu
 					<i className="fa fa-check" />
 				) : (
 					status.errMsg && (
-						<div className="center fdc">
-							<i className="fa fa-exclamation-triangle smooth scaleup error" />
-							<p className="center smooth fadein">{status && status.errMsg}</p>
+						<div
+							className={`center fdc ${status.errMsg ? 'fadein' : ''}`}
+							style={{ opacity: `${status.errMsg ? 1 : 0}` }}
+						>
+							<i className="fa fa-exclamation-triangle pulse error" />
+							<p className="center xsmall smooth fadein error">{status.errMsg}</p>
 						</div>
 					)
 				))}

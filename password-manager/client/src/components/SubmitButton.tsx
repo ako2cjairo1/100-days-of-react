@@ -27,10 +27,15 @@ export const SubmitButton: FCProps<ISubmitButton> = ({
 		>
 			{submitted ? (
 				<div className="center">
-					<div
+					{/* <div
 						data-testid="spinner"
 						className="spinner"
-					/>
+					/> */}
+					<i
+						className="fa fa-spinner spinner"
+						data-testid="spinner"
+						aria-hidden="true"
+					></i>
 					{textStatus}
 				</div>
 			) : (

@@ -1,10 +1,10 @@
 import { TAuthContext, TAuthProvider, FCChildProp } from '@/types'
 import { createContext, useState } from 'react'
-import { AUTH_PROVIDER } from '../constants'
+import { AUTH_PROVIDER } from '@/services/constants'
 
 export const AuthContext = createContext<TAuthContext<TAuthProvider>>({
 	auth: AUTH_PROVIDER,
-	setAuth: () => {},
+	updateAuthCb: () => null,
 })
 
 /**
@@ -15,5 +15,7 @@ export const AuthContext = createContext<TAuthContext<TAuthProvider>>({
 export const AuthProvider: FCChildProp = ({ children }) => {
 	const [auth, setAuth] = useState<TAuthProvider>(AUTH_PROVIDER)
 
-	return <AuthContext.Provider value={{ auth, setAuth }}>{children}</AuthContext.Provider>
+	const updateAuthCb = (auth: TAuthProvider) => setAuth(auth)
+
+	return <AuthContext.Provider value={{ auth, updateAuthCb }}>{children}</AuthContext.Provider>
 }

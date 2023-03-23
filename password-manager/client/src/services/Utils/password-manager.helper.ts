@@ -92,7 +92,7 @@ export const ExtractValFromRegEx = (regex: string) => {
  */
 export const OverrideEventTarget = <
 	T extends ChangeEvent<HTMLInputElement> extends infer Evt ? Evt : FocusEvent<HTMLInputElement>,
-	TObj = { id: string; value: string | boolean }
+	TObj = Record<string, string | boolean> //{ id: string; value: string | boolean }
 >(
 	eventTargetProps: TObj
 ) => {
@@ -104,4 +104,47 @@ export const OverrideEventTarget = <
 		...sourceEvent,
 		target: { ...sourceEvent.target, ...eventTargetProps },
 	}
+}
+
+/**
+ * This function takes in an object and an optional initial value and returns a new object with the same keys as the input object and boolean values.
+ * param targetObj - The input object whose keys will be used to create the new object.
+ * param initVal - An optional initial value for all the boolean values in the new object. Defaults to true.
+ * returns A new object with the same keys as the input object and boolean values.
+ */
+export const ConvertPropsToBool = <T>(targetObj: T, initVal: boolean = true) => {
+	const resultObj = {} as Record<TConvertToStringUnion<T>, boolean>
+	// type TCOnv =
+
+	// use same property names as targetObj
+	for (let key in targetObj) {
+		resultObj[key] = initVal
+	}
+
+	return resultObj
+}
+
+/**
+ * This function takes in an error object of type unknown and returns a string representation of the error message.
+ * If the error object is an instance of the Error class, it returns the value of its message property.
+ * If the error object is an object with a message property, it returns the value of its message property.
+ * Otherwise, it logs a warning to the console and returns a default error message.
+ *
+ * @param {unknown} error - The error object to be processed
+ * @returns {string} The string representation of the error message
+ */
+export const CreateErrorObj = (error: unknown) => {
+	let result = 'An unknown error occurred.'
+
+	if (error instanceof Error) {
+		// error is an instance of Error
+		result = error.message
+	} else if (typeof error === 'object' && error !== null && 'message' in error) {
+		// error is an object with a message property
+		result = (error as { message: string }).message
+	} else {
+		// error is not an instance of Error and does not have a message property
+		console.warn(`${result} ${error}`)
+	}
+	return result
 }

@@ -16,7 +16,7 @@ export const REGISTER_STATE = {
 	EMAIL_REGEX:
 		/^[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-]?[a-zA-Z0-9]+)*(\.[a-zA-Z]{2,4})+$/,
 	PASSWORD_REGEX: {
-		minLength: /^(?=.{12})/,
+		minLength: /^(?=.{8})/,
 		alphabet: /(?=.*[A-Z])(?=.*[a-z])/,
 		number: /(?=.*[0-9])/,
 		symbol: /(?=.*[-!@.#$,%^_&*])/,

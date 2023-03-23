@@ -1,4 +1,6 @@
 import {
+	ConvertPropsToBool,
+	CreateErrorObj,
 	ExtractValFromRegEx,
 	GetRandomItem,
 	MergeRegExObj,
@@ -119,5 +121,36 @@ describe('OverrideEventTarget', () => {
 		})
 		expect(event.target.id).toBe('email')
 		expect(event.target.value).toBe(false)
+	})
+})
+
+describe('ConvertPropsToBool', () => {
+	it('should return an object with the same keys as the input object and boolean values', () => {
+		const inputObj = { a: 1, b: 2 }
+		const result = ConvertPropsToBool(inputObj)
+		expect(result).toEqual({ a: true, b: true })
+	})
+
+	it('should use the initVal parameter as the initial value for all boolean values in the new object', () => {
+		const inputObj = { a: 1, b: 2 }
+		const result = ConvertPropsToBool(inputObj, false)
+		expect(result).toEqual({ a: false, b: false })
+	})
+})
+
+describe('CreateErrorObj', () => {
+	it('should return the message property of an Error instance', () => {
+		const error = new Error('Test error message')
+		expect(CreateErrorObj(error)).toBe('Test error message')
+	})
+
+	it('should return the message property of an object with a message property', () => {
+		const error = { message: 'Test error message' }
+		expect(CreateErrorObj(error)).toBe('Test error message')
+	})
+
+	it('should return a default error message for other types of errors', () => {
+		const error = 'Test error'
+		expect(CreateErrorObj(error)).toBe('An unknown error occurred.')
 	})
 })

@@ -40,5 +40,5 @@ export type TAuthProvider = TCredentials & {
 
 export type TAuthContext<T> = {
 	auth: T
-	setAuth: React.Dispatch<React.SetStateAction<T>>
+	updateAuthCb: (authentication: T) => void
 }

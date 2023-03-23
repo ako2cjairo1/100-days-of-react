@@ -2,13 +2,17 @@ import { FormEvent, useEffect, useRef, useState, useContext } from 'react'
 import styles from '@/assets/modules/Login.module.css'
 import { TCredentials, TStatus } from '@/types/global.type'
 import { AuthContext } from '@/services/context'
-import { useInput } from '@/hooks/useInput'
+import { useInput } from '@/hooks'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
-import { ExtractValFromRegEx, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
+import {
+	CreateErrorObj,
+	ExtractValFromRegEx,
+	RunAfterSomeTime,
+} from '@/services/Utils/password-manager.helper'
 import {
 	Header,
-	ValidationMessage,
 	LinkLabel,
+	FormInput,
 	RotatingBackdrop,
 	Separator,
 	AuthProviderSection,
@@ -24,24 +28,21 @@ export const Login = () => {
 	// destructure
 	const { inputStates, inputFocus, onChange, onFocus, onBlur } = inputAttributes
 	const { email, password } = inputStates
-
 	const [loginStatus, setLoginStatus] = useState<TStatus>(LOGIN_STATE.Status)
 	// destructure states
 	const { success, errMsg } = loginStatus
-
 	const emailInputRef = useRef<HTMLInputElement>(null)
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const vaultLinkRef = useRef<HTMLAnchorElement>(null)
-
 	const [isSubmitted, setIsSubmitted] = useState(false)
 	const [isInputEmail, setIsInputEmail] = useState(true)
-	const { auth, setAuth } = useContext(AuthContext)
+	const { auth, updateAuthCb } = useContext(AuthContext)
 
 	useEffect(() => {
 		if (isInputEmail) emailInputRef.current?.focus()
 		else if (success) vaultLinkRef.current?.focus()
 		else passwordInputRef.current?.focus()
-	}, [isInputEmail, isSubmitted])
+	}, [loginStatus, isInputEmail, isSubmitted])
 
 	useEffect(() => {
 		setLoginStatus(prev => ({ ...prev, errMsg: '' }))
@@ -53,27 +54,33 @@ export const Login = () => {
 		setLoginStatus(prev => ({ ...prev, errMsg: '' }))
 		if (isInputEmail) {
 			setIsInputEmail(false)
-			return
+			return true
 		}
 
-		setIsSubmitted(true)
-		RunAfterSomeTime(() => {
-			try {
-				// TODO: fetch access token to custom authentication backend api
-				// throw new Error(
-				// 	'[TEST]: There is no Vercel account associated with this email address. Sign up?'
-				// )
+		if (!isSubmitted) {
+			setIsSubmitted(true)
+			RunAfterSomeTime(() => {
+				try {
+					// TODO: fetch access token to custom authentication backend api
+					throw new Error(
+						// '[TEST]: There is no Vercel account associated with this email address. Sign up?'
+						'[TEST]: An error has occurred. E-mail or Password is incorrect. Try again'
+					)
 
-				setAuth({ ...inputStates, accessToken: '' })
-				setLoginStatus({ success: true, errMsg: '' })
-				resetInputState()
+					updateAuthCb({ ...inputStates, accessToken: '' })
+					setLoginStatus({ success: true, errMsg: '' })
+					resetInputState()
 
-				setIsSubmitted(false)
-			} catch (error) {
-				setIsSubmitted(false)
-				setLoginStatus({ success: false, errMsg: `${error}` })
-			}
-		}, 3)
+					setIsSubmitted(false)
+				} catch (error) {
+					setIsSubmitted(false)
+					setLoginStatus({ success: false, errMsg: CreateErrorObj(error) })
+					return false
+				}
+			}, 3)
+		}
+
+		return true
 	}
 
 	const handleChangeEmail = () => {
@@ -95,7 +102,6 @@ export const Login = () => {
 			},
 		],
 	}
-
 	return (
 		<section>
 			<RotatingBackdrop />
@@ -124,40 +130,39 @@ export const Login = () => {
 						<form onSubmit={handleSubmit}>
 							<div className="input-row">
 								{isInputEmail ? (
-									<>
-										<input
-											id="email"
-											type="text"
-											inputMode="email"
-											autoComplete="email"
-											placeholder="Email"
-											value={email}
-											ref={emailInputRef}
-											disabled={!isInputEmail || isSubmitted}
-											required
-											className={!inputFocus.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
-											{...{ onChange, onFocus, onBlur }}
-										/>
-										<ValidationMessage
-											isVisible={!inputFocus.email && !isValidEmail}
-											validations={emailValidation}
-										/>
-									</>
+									<FormInput
+										id="email"
+										type="text"
+										inputMode="email"
+										autoComplete="email"
+										placeholder="Email"
+										required
+										value={email}
+										linkRef={emailInputRef}
+										disabled={!isInputEmail || isSubmitted}
+										label="Email Address"
+										isFocused={inputFocus.email}
+										isValid={isValidEmail && !errMsg}
+										validations={!errMsg ? emailValidation : []}
+										className={!inputFocus.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
+										{...{ onChange, onFocus, onBlur }}
+									/>
 								) : (
 									<>
-										<input
+										<FormInput
 											id="password"
 											type="password"
-											ref={passwordInputRef}
-											disabled={isSubmitted}
-											value={password}
+											placeholder="Password"
 											required
+											value={password}
+											linkRef={passwordInputRef}
+											disabled={isSubmitted}
+											label="Master Password"
+											isFocused={inputFocus.password}
+											isValid={isMinLength && !errMsg}
+											validations={!errMsg ? passwordValidation : []}
 											className={!inputFocus.password && (errMsg || !isMinLength) ? 'invalid' : ''}
 											{...{ onChange, onFocus, onBlur }}
-										/>
-										<ValidationMessage
-											isVisible={!inputFocus.password && !isMinLength}
-											validations={passwordValidation}
 										/>
 										{/* <LinkLabel
 											routeTo="/reset"
@@ -172,7 +177,9 @@ export const Login = () => {
 							<SubmitButton
 								iconName={isInputEmail ? '' : 'fa-sign-in'}
 								submitted={isSubmitted}
-								disabled={isInputEmail ? !isValidEmail : !(isValidEmail && isMinLength)}
+								disabled={
+									isSubmitted || (isInputEmail ? !isValidEmail : !(isValidEmail && isMinLength))
+								}
 								onClick={() => console.log('Submit button triggered!')}
 							>
 								{isInputEmail ? 'Continue' : 'Log in with Master Password'}

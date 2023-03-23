@@ -9,8 +9,8 @@ export type TConvertKeysOf<T, VType extends any> = {
 }
 
 /**
- * Use this utility to create the keys of a constant object to a union of string literals.
+ * Use this utility to create the keys of an object to a union of string literals.
  *
- * @template T - The type of the constant object. i.e.: typeof MyObject
+ * @template T - The type of object you intend to convert. i.e.: typeof MyObject
  */
 export type TConvertToStringUnion<T> = keyof T
