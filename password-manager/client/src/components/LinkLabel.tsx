@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom'
 /**
  * This is a LinkLabel component that displays a link with preText.
  *
- * @param {Ref<HTMLAnchorElement>} linkRef - A ref to handle focus from parent component
- * @param {string} routeTo - The route to navigate to when the link is clicked
- * @param {string} preText - The text to display before the link
+ * param {Ref<HTMLAnchorElement>} linkRef - A ref to handle focus from parent component
+ * param {string} routeTo - The route to navigate to when the link is clicked
+ * param {string} preText - The text to display before the link
  *
- * @returns {JSX.Element} A Custom LinkLabel component
+ * returns {JSX.Element} A Custom LinkLabel component
  */
 
 export const LinkLabel: FCProps<ILinkLabel> = ({
@@ -20,7 +20,7 @@ export const LinkLabel: FCProps<ILinkLabel> = ({
 	onClick,
 }) => {
 	return (
-		<div className={`center small ${className}`}>
+		<div className={`${className} center small`}>
 			<p className="small">
 				{preText}{' '}
 				<Link

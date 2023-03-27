@@ -11,6 +11,7 @@ import { ConvertPropsToBool } from '@/services/Utils/password-manager.helper'
  * The `inputAttributes` object contains the current input states, focus events and event handlers for onFocus, onBlur and onChange events.
  */
 type TUseInputFocus<T> = Record<keyof T, boolean> | { [key: string]: boolean }
+type TInputEvent = FocusEvent<HTMLInputElement> | ChangeEvent<HTMLInputElement>
 
 export const useInput = <T>(initState: T) => {
 	const [inputStates, setInputStates] = useState<T>(initState)
@@ -32,19 +33,24 @@ export const useInput = <T>(initState: T) => {
 		setInputFocus(ConvertPropsToBool(initState, true)) // initialize focus states to true
 	}
 
+	const handleChange = <T extends TInputEvent>(e: T) => {
+		// set the input state using id as key to set a value
+		if (e.target.type === 'checkbox') {
+			setInputStates(prev => ({ ...prev, [e.target.id]: e.target.checked }))
+		} else setInputStates(prev => ({ ...prev, [e.target.id]: e.target.value }))
+
+		// set the focus to false to trigger input validations
+		setInputFocus(prev => ({ ...prev, [e.target.id]: false }))
+	}
+
 	// Object containing inputStates, focusEvents and event handlers for onFocus, onBlur and onChange events
 	const inputAttributes = {
 		inputStates,
 		inputFocus,
-		onFocus: (e: FocusEvent<HTMLInputElement>) => console.log(`"${e.target.id}" focused`),
-		onBlur: (e: FocusEvent<HTMLInputElement>) =>
-			setInputFocus(prev => ({ ...prev, [e.target.id]: false })),
-		onChange: (e: ChangeEvent<HTMLInputElement>) => {
-			// set the input state using id as key to set a value
-			setInputStates(prev => ({ ...prev, [e.target.id]: e.target.value }))
-			// set the focus to false to trigger input validations
-			setInputFocus(prev => ({ ...prev, [e.target.id]: false }))
-		},
+		setInputStates,
+		onChange: handleChange,
+		onFocus: (e: TInputEvent) => {}, //console.log(`"${e.target.id}" focused`),
+		onBlur: (e: TInputEvent) => setInputFocus(prev => ({ ...prev, [e.target.id]: false })),
 	}
 
 	return { resetInputState, inputAttributes }

@@ -1,0 +1,33 @@
+{
+	"root": true,
+	"extends": [
+		"eslint:recommended",
+		"plugin:react/recommended",
+		"plugin:react-hooks/recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"prettier"
+	],
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	},
+	"rules": {
+		"react/prop-types": 0,
+		"@typescript-eslint/strict-boolean-expressions": [
+			2,
+			{
+				"allowString": false,
+				"allowNumber": false
+			}
+		]
+	},
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"project": ["**/tsconfig.json"],
+		"tsconfigRootDir": "./src"
+	},
+	"plugins": ["@typescript-eslint"],
+	"ignorePatterns": ["src/**/*.test.tsx", "vite*.*"]
+}

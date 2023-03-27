@@ -1,8 +1,9 @@
 import {
 	ConvertPropsToBool,
-	CreateErrorObj,
+	CreateError,
 	ExtractValFromRegEx,
 	GetRandomItem,
+	MapUnknownObj,
 	MergeRegExObj,
 	OverrideEventTarget,
 	RunAfterSomeTime,
@@ -138,19 +139,70 @@ describe('ConvertPropsToBool', () => {
 	})
 })
 
-describe('CreateErrorObj', () => {
-	it('should return the message property of an Error instance', () => {
-		const error = new Error('Test error message')
-		expect(CreateErrorObj(error)).toBe('Test error message')
+describe('CreateError', () => {
+	it('should return a default error object when given an unknown error', () => {
+		const input = 'unknown error'
+		const output = CreateError(input)
+		expect(output).toEqual({
+			code: -1,
+			name: 'An error has occurred.',
+			message: 'An unknown error occurred.',
+			unknownError: input,
+		})
 	})
 
-	it('should return the message property of an object with a message property', () => {
-		const error = { message: 'Test error message' }
-		expect(CreateErrorObj(error)).toBe('Test error message')
+	it('should return an error object with the message property when given an instance of Error', () => {
+		const input = new Error('test error message')
+		const output = CreateError(input)
+		expect(output).toEqual({
+			code: -1,
+			name: 'Error',
+			message: 'test error message',
+			unknownError: input,
+		})
 	})
 
-	it('should return a default error message for other types of errors', () => {
-		const error = 'Test error'
-		expect(CreateErrorObj(error)).toBe('An unknown error occurred.')
+	it('should return an error object with the code and name properties when given an object with those properties', () => {
+		const input = { code: 123, name: 'test name' }
+		const output = CreateError(input)
+		expect(output).toEqual({
+			code: 123,
+			name: 'test name',
+			message: 'An unknown error occurred.',
+			unknownError: input,
+		})
+	})
+
+	it('should return an error object with the code, name, and message properties when given an object with those properties', () => {
+		const input = { code: 123, name: 'test name', message: 'test message' }
+		const output = CreateError(input)
+		expect(output).toEqual({
+			code: 123,
+			name: 'test name',
+			message: 'test message',
+			unknownError: input,
+		})
+	})
+
+	it('should return an error object with the unknownError property when given a non-object and non-Error input', () => {
+		const input = 123
+		const output = CreateError(input)
+		expect(output).toEqual({
+			code: -1,
+			name: 'An error has occurred.',
+			message: 'An unknown error occurred.',
+			unknownError: input,
+		})
+	})
+
+	it('should return an error object with the unknownError property when given a null input', () => {
+		const input = null
+		const output = CreateError(input)
+		expect(output).toEqual({
+			code: -1,
+			name: 'An error has occurred.',
+			message: 'An unknown error occurred.',
+			unknownError: input,
+		})
 	})
 })

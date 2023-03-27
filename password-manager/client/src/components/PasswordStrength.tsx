@@ -51,16 +51,28 @@ export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvalu
 export const PasswordStrength: FCProps<IPasswordStrength> = ({ password, regex }) => {
 	const { status, score } = evaluatePassword({ password, regex })
 
+	const passwordStatuses = Object.values(PasswordStatus)
 	return (
 		<div className="password-strength">
 			<p className={`xsmall smooth ${password ? 'show' : 'hidden'}`}>{status}</p>
 
-			{Object.values(PasswordStatus).map((strength, idx) => {
+			{passwordStatuses.map((strength, idx) => {
 				// Do not render the default status
 				if (strength === PasswordStatus.none) return null
+				let statusIndex = idx + 1
 
+				let opacity =
+					passwordStatuses.length === statusIndex
+						? 1
+						: statusIndex === 1
+						? 0.3
+						: statusIndex === 2
+						? 0.5
+						: statusIndex === 3
+						? 0.7
+						: 0.9
 				let customAnimation = `scaledown ${PasswordStatus.none}`
-				if (password && idx + 1 <= score) customAnimation = `scaleup ${status}`
+				if (password && statusIndex <= score) customAnimation = `scaleup ${status}`
 
 				// Renders all the strength except 'none'
 				// should only render exactly 5 bullets (or divs)
@@ -68,7 +80,7 @@ export const PasswordStrength: FCProps<IPasswordStrength> = ({ password, regex }
 					<div
 						key={idx}
 						id="bullet"
-						style={{ animationDelay: `${idx * 0.1}s` }}
+						style={{ opacity, animationDelay: `${idx * 0.1}s` }}
 						className={`smooth ${customAnimation}`}
 					></div>
 				)

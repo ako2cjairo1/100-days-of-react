@@ -1,4 +1,4 @@
-import { FCChildProp } from '@/types'
+import { FCWithChildren } from '@/types'
 
 /**
  * Renders a separator with an optional `children` prop.
@@ -8,7 +8,7 @@ import { FCChildProp } from '@/types'
  * @returns A `div` element with the class `separator small` containing two `div` elements with the class `line`,
  * separated by the content of the `children` prop (if provided).
  */
-export const Separator: FCChildProp = ({ children }) => {
+export const Separator: FCWithChildren = ({ children }) => {
 	return (
 		<div className="separator small">
 			<div className="line"></div>

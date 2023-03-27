@@ -1,6 +1,5 @@
-import { FormEvent, useEffect, useRef, useState, useContext, useCallback } from 'react'
+import { FormEvent, useEffect, useRef, useState, useCallback } from 'react'
 import styles from '@/assets/modules/Login.module.css'
-import { AuthContext } from '@/services/context'
 import { TCredentials, TStatus, TPassword, TInputValidation } from '@/types/global.type'
 import { REGISTER_STATE } from '@/services/constants/Registration.constant'
 import { RunAfterSomeTime, ExtractValFromRegEx } from '@/services/Utils/password-manager.helper'
@@ -14,6 +13,7 @@ import {
 	SubmitButton,
 	FormInput,
 } from '@/components'
+import useAuthContext from '@/hooks/useAuthContext'
 
 export const Registration = () => {
 	const { container } = styles
@@ -37,7 +37,7 @@ export const Registration = () => {
 	const emailRef = useRef<HTMLInputElement>(null)
 	const loginRef = useRef<HTMLAnchorElement>(null)
 	const [submit, setSubmit] = useState(false)
-	const { auth, updateAuthCb } = useContext(AuthContext)
+	const { auth, updateAuthCb } = useAuthContext()
 
 	const inputValidationCb = useCallback(() => {
 		const validPassword = {
@@ -190,7 +190,7 @@ export const Registration = () => {
 								/>
 							</div>
 
-							<div className="input-row">
+							<div className="input-row vr">
 								<FormInput
 									id="confirm"
 									type="password"
@@ -199,16 +199,14 @@ export const Registration = () => {
 									required
 									label="Confirm Master Password"
 									isFocused={inputFocus.confirm}
-									isValid={!inputFocus.confirm && password === confirm}
+									isValid={!inputFocus.confirm && isValidPassword && password === confirm}
 									validations={confirmReq}
 									{...{ onChange, onFocus, onBlur }}
 									className={
 										inputFocus.confirm
 											? ''
-											: password === confirm
-											? password.length > 0 && (password ? password.length > 0 : false)
-												? 'valid'
-												: ''
+											: isValidPassword && password === confirm
+											? 'valid'
 											: 'invalid'
 									}
 								/>
@@ -236,7 +234,14 @@ export const Registration = () => {
 						<p className="center small">Continue with...</p>
 
 						<footer>
-							<AuthProviderSection />
+							<AuthProviderSection
+								cb={() =>
+									setRegistrationStatus(prev => ({
+										...prev,
+										errMsg: 'TODO: Implement external authentication.',
+									}))
+								}
+							/>
 						</footer>
 					</>
 				)}

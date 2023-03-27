@@ -1,6 +1,6 @@
 import { REGISTER_STATE } from '@/services/constants'
 import { MergeRegExObj } from '@/services/Utils/password-manager.helper'
-import { FCProps, IFormInput, IRequiredLabelProps, IValidationMessage } from '@/types'
+import { FCProps, IFormInput } from '@/types'
 import { ValidationMessage, RequiredLabel, PasswordStrength } from '.'
 
 /**
@@ -14,25 +14,29 @@ import { ValidationMessage, RequiredLabel, PasswordStrength } from '.'
  */
 const { PASSWORD_REGEX } = REGISTER_STATE
 
-export const FormInput: FCProps<
-	IFormInput &
-		Pick<IRequiredLabelProps, 'label' | 'subLabel' | 'isOptional'> &
-		Pick<IValidationMessage, 'title' | 'validations'>
-> = ({ isFocused, isValid, linkRef, validations, havePasswordMeter, ...rest }) => {
+export const FormInput: FCProps<IFormInput> = ({
+	isFocused,
+	isValid,
+	linkRef,
+	validations,
+	havePasswordMeter,
+	...inputProps
+}) => {
+	const { id, title, value, label, subLabel, isOptional, placeholder } = inputProps
 	return (
 		<>
-			{rest.label && (
+			{label && (
 				<div className="password-label">
 					<RequiredLabel
-						label={rest.label}
-						labelFor={rest.id}
-						subLabel={rest.subLabel}
-						isOptional={rest.isOptional}
+						label={label}
+						labelFor={id}
+						subLabel={subLabel}
+						isOptional={isOptional}
 						isFulfilled={isValid}
 					/>
 					{havePasswordMeter ? (
 						<PasswordStrength
-							password={rest.value as string}
+							password={value as string}
 							regex={MergeRegExObj(PASSWORD_REGEX)}
 						/>
 					) : null}
@@ -40,15 +44,15 @@ export const FormInput: FCProps<
 			)}
 
 			<input
-				{...rest}
-				placeholder={rest.placeholder ? rest.placeholder : rest.label}
+				{...inputProps}
+				placeholder={placeholder ? placeholder : label}
 				ref={linkRef}
 				autoFocus={false}
 			/>
 
 			{validations && (
 				<ValidationMessage
-					title={rest.title}
+					title={title}
 					isVisible={!isFocused && !isValid}
 					validations={validations}
 				/>

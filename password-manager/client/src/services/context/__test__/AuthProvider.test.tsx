@@ -9,7 +9,7 @@ describe('AuthContext', () => {
 	it('provides initial auth state to its children', () => {
 		let result = {}
 		const TestSubscriberComponent = () => {
-			const { auth } = useContext(AuthContext)
+			const { auth } = useContext(AuthContext)!
 			result = auth // capture auth from context to test with
 			return <pre>{JSON.stringify(auth)}</pre>
 		}
@@ -29,7 +29,7 @@ describe('AuthContext', () => {
 		const authState = { email: 'test@example.com', password: 'password', accessToken: 'token' }
 
 		const TestUpdateComponent = () => {
-			const { auth } = useContext(AuthContext)
+			const { auth } = useContext(AuthContext)!
 			resultState = auth // capture auth from context to test with
 
 			const handleClick = () => mockSetAuth(authState)

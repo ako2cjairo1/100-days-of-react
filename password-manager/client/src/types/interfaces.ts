@@ -31,7 +31,13 @@ export interface ISubmitButton extends Omit<TButtonAttrs, 'type' | 'disabled'> {
 	textStatus?: string
 	iconName?: string
 }
-
+export interface IInputElement
+	extends Omit<
+		React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
+		'type' | 'id' | 'ref' | 'itemRef'
+	> {
+	id: string // override id as required
+}
 export interface IValidationMessage<T = TValidation> {
 	isVisible: boolean
 	title?: string
@@ -39,18 +45,17 @@ export interface IValidationMessage<T = TValidation> {
 }
 
 export interface IFormInput
-	extends Omit<
-		React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
-		'ref' | 'itemRef'
-	> {
+	extends IInputElement,
+		Pick<IRequiredLabelProps, 'label' | 'subLabel' | 'isOptional'>,
+		Partial<Pick<IValidationMessage, 'title' | 'validations'>> {
 	id: string
-	type: string
+	type: React.HTMLInputTypeAttribute
 	linkRef?: React.Ref<HTMLInputElement>
 	LabelComponent?: ReactNode
 	havePasswordMeter?: boolean
 	isValid?: boolean
 	isFocused?: boolean
-	validations?: TValidation[]
+	validations?: Array<TValidation>
 }
 
 // Helper function interfaces
@@ -62,3 +67,11 @@ export interface IPasswordStrength {
 export interface IRegExObj {
 	[key: string]: RegExp
 }
+
+// import { Header } from '@/components'
+// import { render, cleanup } from '@/services/Utils/test-utils'
+// afterEach(() => cleanup())
+// 1. Generate function comments (/** * short description here... * param ... * param ... * returns ... */)
+// 2. Generate automated tests (react-testing i.e.: describe, it, expected tobe, etc.), create test cases for all possible input parameters (required and optional)
+// describe('Simple working test', () => {
+// it('the title is visible', () => { // render(<App />) // expect(screen.getByText(/Hello Vite \+ React!/i)).toBeInTheDocument() // }) // it('should increment count on click', async () => { // render(<App />) // userEvent.click(screen.getByRole('button')) // expect(await screen.findByText(/count is: 1/i)).toBeInTheDocument() // }) // it('uses flexbox in app header', async () => { // render(<App />) // const element = screen.getByRole('banner') // expect(element.className).toEqual('App-header') // expect(getComputed

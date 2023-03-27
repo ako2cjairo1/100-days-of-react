@@ -5,6 +5,7 @@ export type TCredentials = {
 	email: string
 	password: string
 	confirm?: string
+	isRemember?: boolean
 }
 
 export type TStatus = Partial<{

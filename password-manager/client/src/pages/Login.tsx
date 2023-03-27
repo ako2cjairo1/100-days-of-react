@@ -1,12 +1,12 @@
 import { FormEvent, useEffect, useRef, useState, useContext } from 'react'
 import styles from '@/assets/modules/Login.module.css'
 import { TCredentials, TStatus } from '@/types/global.type'
-import { AuthContext } from '@/services/context'
 import { useInput } from '@/hooks'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
 import {
-	CreateErrorObj,
+	CreateError,
 	ExtractValFromRegEx,
+	LocalStorage,
 	RunAfterSomeTime,
 } from '@/services/Utils/password-manager.helper'
 import {
@@ -17,7 +17,9 @@ import {
 	Separator,
 	AuthProviderSection,
 	SubmitButton,
+	Toggle,
 } from '@/components'
+import useAuthContext from '@/hooks/useAuthContext'
 
 export const Login = () => {
 	const { container } = styles
@@ -26,8 +28,8 @@ export const Login = () => {
 	// custom form input hook
 	const { inputAttributes, resetInputState } = useInput<TCredentials>(LOGIN_STATE.Credential)
 	// destructure
-	const { inputStates, inputFocus, onChange, onFocus, onBlur } = inputAttributes
-	const { email, password } = inputStates
+	const { inputStates, inputFocus, onChange, onFocus, onBlur, setInputStates } = inputAttributes
+	const { email, password, isRemember } = inputStates
 	const [loginStatus, setLoginStatus] = useState<TStatus>(LOGIN_STATE.Status)
 	// destructure states
 	const { success, errMsg } = loginStatus
@@ -36,7 +38,13 @@ export const Login = () => {
 	const vaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const [isSubmitted, setIsSubmitted] = useState(false)
 	const [isInputEmail, setIsInputEmail] = useState(true)
-	const { auth, updateAuthCb } = useContext(AuthContext)
+	const { auth, updateAuthCb } = useAuthContext()
+
+	useEffect(() => {
+		console.log(LocalStorage.get('password_manager_email'))
+		const cachedEmail = LocalStorage.get('password_manager_email') ?? ''
+		setInputStates({ ...inputStates, email: cachedEmail, isRemember: cachedEmail ? true : false })
+	}, [])
 
 	useEffect(() => {
 		if (isInputEmail) emailInputRef.current?.focus()
@@ -46,6 +54,7 @@ export const Login = () => {
 
 	useEffect(() => {
 		setLoginStatus(prev => ({ ...prev, errMsg: '' }))
+		// console.log(inputStates)
 	}, [inputStates])
 
 	const handleSubmit = async (e: FormEvent) => {
@@ -54,6 +63,9 @@ export const Login = () => {
 		setLoginStatus(prev => ({ ...prev, errMsg: '' }))
 		if (isInputEmail) {
 			setIsInputEmail(false)
+			if (isRemember) LocalStorage.set('password_manager_email', email)
+			else LocalStorage.remove('password_manager_email')
+
 			return true
 		}
 
@@ -74,7 +86,7 @@ export const Login = () => {
 					setIsSubmitted(false)
 				} catch (error) {
 					setIsSubmitted(false)
-					setLoginStatus({ success: false, errMsg: CreateErrorObj(error) })
+					setLoginStatus({ success: false, errMsg: CreateError(error).message })
 					return false
 				}
 			}, 3)
@@ -102,6 +114,7 @@ export const Login = () => {
 			},
 		],
 	}
+
 	return (
 		<section>
 			<RotatingBackdrop />
@@ -128,8 +141,8 @@ export const Login = () => {
 						/>
 
 						<form onSubmit={handleSubmit}>
-							<div className="input-row">
-								{isInputEmail ? (
+							{isInputEmail ? (
+								<div className="input-row">
 									<FormInput
 										id="email"
 										type="text"
@@ -147,32 +160,52 @@ export const Login = () => {
 										className={!inputFocus.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
-								) : (
-									<>
-										<FormInput
-											id="password"
-											type="password"
-											placeholder="Password"
-											required
-											value={password}
-											linkRef={passwordInputRef}
-											disabled={isSubmitted}
-											label="Master Password"
-											isFocused={inputFocus.password}
-											isValid={isMinLength && !errMsg}
-											validations={!errMsg ? passwordValidation : []}
-											className={!inputFocus.password && (errMsg || !isMinLength) ? 'invalid' : ''}
-											{...{ onChange, onFocus, onBlur }}
-										/>
-										{/* <LinkLabel
-											routeTo="/reset"
-											preText="Forgot master password?"
+								</div>
+							) : (
+								<div className={`${!isInputEmail ? 'input-row descend vr' : ''} vr`}>
+									<FormInput
+										id="password"
+										type="password"
+										placeholder="Password"
+										required
+										value={password}
+										linkRef={passwordInputRef}
+										disabled={isSubmitted}
+										label="Master Password"
+										isFocused={inputFocus.password}
+										isValid={isMinLength && !errMsg}
+										validations={!errMsg ? passwordValidation : []}
+										className={!inputFocus.password && (errMsg || !isMinLength) ? 'invalid' : ''}
+										{...{ onChange, onFocus, onBlur }}
+									/>
+								</div>
+							)}
+
+							{isInputEmail && (
+								<Toggle
+									id="isRemember"
+									checked={isRemember}
+									// disabled={!(email.length > 0) && !isValidEmail}
+									{...{ onChange, onFocus, onBlur }}
+								>
+									<Toggle.Label>
+										<span
+											className={`toggle-description ${
+												isRemember ? 'toggle-description-active' : ''
+											}`}
 										>
-											Reset
-										</LinkLabel> */}
-									</>
-								)}
-							</div>
+											Remember email?
+										</span>
+										<span
+											className={`toggle-description ${
+												isRemember ? '' : 'toggle-description-active'
+											}`}
+										>
+											Ok, we'll remember your email.
+										</span>
+									</Toggle.Label>
+								</Toggle>
+							)}
 
 							<SubmitButton
 								iconName={isInputEmail ? '' : 'fa-sign-in'}
@@ -180,7 +213,9 @@ export const Login = () => {
 								disabled={
 									isSubmitted || (isInputEmail ? !isValidEmail : !(isValidEmail && isMinLength))
 								}
-								onClick={() => console.log('Submit button triggered!')}
+								onClick={() => {
+									console.log('Submit button triggered!')
+								}}
 							>
 								{isInputEmail ? 'Continue' : 'Log in with Master Password'}
 							</SubmitButton>
@@ -208,7 +243,14 @@ export const Login = () => {
 						<p className="center small">Continue with...</p>
 
 						<footer>
-							<AuthProviderSection />
+							<AuthProviderSection
+								cb={() =>
+									setLoginStatus(prev => ({
+										...prev,
+										errMsg: 'TODO: Implement external authentication.',
+									}))
+								}
+							/>
 						</footer>
 					</>
 				)}

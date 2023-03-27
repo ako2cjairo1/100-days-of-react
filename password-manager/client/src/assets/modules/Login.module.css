@@ -7,8 +7,8 @@
 	background-color: rgba(255, 255, 255, 0.13);
 	transform: translate(-50%, -50%);
 	border-radius: 32px;
-	backdrop-filter: blur(15px);
-	-webkit-backdrop-filter: blur(15px);
+	backdrop-filter: blur(50px);
+	-webkit-backdrop-filter: blur(50px);
 	border: 2px solid rgba(255, 255, 255, 0.1);
 	box-shadow: 0px 0px 20px 1px #ffbb763f;
 	padding: 32px;
@@ -87,10 +87,6 @@ form > div:nth-child(2) {
 
 form > div:nth-child(3) {
 	animation-delay: 0.5s;
-}
-
-.descend {
-	animation: descendopacity 0.3s ease-in;
 }
 
 @keyframes descendopacity {

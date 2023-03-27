@@ -5,6 +5,7 @@ export const LOGIN_STATE = {
 		email: '',
 		password: '',
 		confirm: '',
+		isRemember: false,
 	},
 	Status: {
 		success: false,

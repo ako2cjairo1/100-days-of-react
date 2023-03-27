@@ -1,6 +1,10 @@
 import { IRegExObj, TConvertToStringUnion } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
 
+export const LogValue = <T>(Obj: T) => {
+	console.log(Obj)
+}
+
 const TimerType = {
 	timeout: 'timeout',
 	interval: 'interval',
@@ -15,7 +19,7 @@ export const MergeRegExObj = (regExObj: IRegExObj): RegExp => {
 	let mergedRegexString = ''
 
 	for (const key in regExObj) {
-		mergedRegexString += regExObj[key].source
+		mergedRegexString += regExObj[key]?.source
 	}
 	return new RegExp(mergedRegexString)
 }
@@ -26,10 +30,10 @@ export const MergeRegExObj = (regExObj: IRegExObj): RegExp => {
  * Parameters: list (array of items).
  * Return value: a random item from the list.
  */
-export const GetRandomItem = <T>(list: T[]): T => {
+export const GetRandomItem = <T>(list: T[]): T | undefined => {
 	const idx = Math.floor(Math.random() * list.length)
 
-	return list.at(idx) ?? list?.[idx]
+	return list.at(idx) ?? list[0]
 }
 
 /**
@@ -125,26 +129,89 @@ export const ConvertPropsToBool = <T>(targetObj: T, initVal: boolean = true) => 
 }
 
 /**
- * This function takes in an error object of type unknown and returns a string representation of the error message.
- * If the error object is an instance of the Error class, it returns the value of its message property.
- * If the error object is an object with a message property, it returns the value of its message property.
- * Otherwise, it logs a warning to the console and returns a default error message.
+ * This function takes in an object and returns a traversed property object.
  *
- * @param {unknown} error - The error object to be processed
- * @returns {string} The string representation of the error message
+ * param {object} obj - The object to be mapped.
+ * returns {TraversedProperty} - The traversed property object.
  */
-export const CreateErrorObj = (error: unknown) => {
-	let result = 'An unknown error occurred.'
+type TraversedProperty<T = {}> = Partial<{
+	key: string
+	value: any
+	type: any
+}>
 
-	if (error instanceof Error) {
-		// error is an instance of Error
-		result = error.message
-	} else if (typeof error === 'object' && error !== null && 'message' in error) {
-		// error is an object with a message property
-		result = (error as { message: string }).message
-	} else {
-		// error is not an instance of Error and does not have a message property
-		console.warn(`${result} ${error}`)
+export const MapUnknownObj = (obj: object): TraversedProperty => {
+	let result: TraversedProperty = {}
+
+	console.log()
+	for (let [key, value] of Object.entries(obj)) {
+		if (typeof value === 'object' && value !== null) {
+			const nestedProperties = MapUnknownObj(value)
+			result = { ...nestedProperties, value: MapUnknownObj(nestedProperties.value ?? {}) }
+		} else {
+			result = {
+				key,
+				value,
+				type: typeof value,
+			}
+		}
 	}
 	return result
+}
+
+/**
+ * This function takes in an unknown error and returns an IPasswordMangerError object.
+ *
+ * param {unknown} error - The error to be processed.
+ * returns {IPasswordMangerError} - The processed error object.
+ */
+type PasswordMangerError = Error & {
+	code: number | string
+	unknownError?: unknown
+}
+export const CreateError = (error: unknown) => {
+	let result: PasswordMangerError = {
+		code: -1,
+		name: 'An error has occurred.',
+		message: 'An unknown error occurred.',
+	}
+
+	// console.log('DITO PA >>> ', typeof error === 'object')
+	if (error instanceof Error) {
+		// error is an instance of Error
+		result.message = error.message
+	}
+
+	if (typeof error === 'object' && error !== null) {
+		// error is an object cast to interface with a name, message or code properties
+		const unknownError = error as PasswordMangerError
+
+		if (unknownError) {
+			const { code, name, message } = unknownError
+
+			result = {
+				code: code ? code : result.code,
+				name: name ? name : result.name,
+				message: message ? message : result.message,
+				unknownError: error,
+			}
+		}
+	} else {
+		// error is not an instance of Error and does not have a message property
+		result.unknownError = error
+		console.warn(`${result} ${error}`)
+	}
+
+	return result
+}
+
+interface ILocalStorage {
+	set: (key: string, value: any) => void
+	get: (key: string) => any extends infer T ? T : never
+	remove: (key: string) => void
+}
+export const LocalStorage: ILocalStorage = {
+	set: (key, value) => localStorage.setItem(key, value),
+	get: key => localStorage.getItem(key),
+	remove: key => localStorage.removeItem(key),
 }
