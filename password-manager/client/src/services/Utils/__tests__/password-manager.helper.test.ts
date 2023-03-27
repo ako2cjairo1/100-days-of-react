@@ -3,7 +3,6 @@ import {
 	CreateError,
 	ExtractValFromRegEx,
 	GetRandomItem,
-	MapUnknownObj,
 	MergeRegExObj,
 	OverrideEventTarget,
 	RunAfterSomeTime,

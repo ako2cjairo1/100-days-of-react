@@ -1,7 +1,7 @@
 import { TCredentials, TConvertKeysOf, TPassword, TStatus, TInputValidation } from '@/types'
 
 export const REGISTER_STATE = {
-	CREDENTIALS: { email: '', password: '', confirm: '' },
+	CREDENTIALS: { email: '', password: '', confirm: '', isTermsAgreed: false },
 	STATUS: { success: false, errMsg: '' },
 	INPUT_VALIDATION: {
 		isValidEmail: false,

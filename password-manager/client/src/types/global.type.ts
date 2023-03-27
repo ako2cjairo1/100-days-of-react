@@ -1,11 +1,12 @@
 import { PasswordStatus } from '@/services/constants'
-import { TConvertToStringUnion, TConvertKeysOf } from '@/types'
+import { TConvertToStringUnion } from '@/types'
 
 export type TCredentials = {
 	email: string
 	password: string
 	confirm?: string
 	isRemember?: boolean
+	isTermsAgreed?: boolean
 }
 
 export type TStatus = Partial<{
@@ -40,6 +41,6 @@ export type TAuthProvider = TCredentials & {
 }
 
 export type TAuthContext<T> = {
-	auth: T
-	updateAuthCb: (authentication: T) => void
+	authInfo: T
+	updateAuthInfo: (authInfo: T) => void
 }

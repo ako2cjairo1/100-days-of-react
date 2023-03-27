@@ -12,7 +12,7 @@ import { PasswordStatus } from '@/services/constants'
  */
 export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvaluatedPassword => {
 	if (!regex) {
-		regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/
+		regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/
 	}
 
 	const { weak, mediocre, secure, strong, unbreakable } = PasswordStatus
@@ -54,14 +54,14 @@ export const PasswordStrength: FCProps<IPasswordStrength> = ({ password, regex }
 	const passwordStatuses = Object.values(PasswordStatus)
 	return (
 		<div className="password-strength">
-			<p className={`xsmall smooth ${password ? 'show' : 'hidden'}`}>{status}</p>
+			<p className={`x-small smooth ${password ? 'show' : 'hidden'}`}>{status}</p>
 
 			{passwordStatuses.map((strength, idx) => {
 				// Do not render the default status
 				if (strength === PasswordStatus.none) return null
-				let statusIndex = idx + 1
+				const statusIndex = idx + 1
 
-				let opacity =
+				const opacity =
 					passwordStatuses.length === statusIndex
 						? 1
 						: statusIndex === 1
@@ -71,11 +71,11 @@ export const PasswordStrength: FCProps<IPasswordStrength> = ({ password, regex }
 						: statusIndex === 3
 						? 0.7
 						: 0.9
-				let customAnimation = `scaledown ${PasswordStatus.none}`
-				if (password && statusIndex <= score) customAnimation = `scaleup ${status}`
+				let customAnimation = `scale-down ${PasswordStatus.none}`
+				if (password && statusIndex <= score) customAnimation = `scale-up ${status}`
 
 				// Renders all the strength except 'none'
-				// should only render exactly 5 bullets (or divs)
+				// should only render exactly 5 bullets (or div)
 				return (
 					<div
 						key={idx}

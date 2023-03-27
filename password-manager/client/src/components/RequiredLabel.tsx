@@ -26,7 +26,7 @@ export const RequiredLabel: FCProps<IRequiredLabelProps> = ({
 		>
 			{`${label} `}
 			{!isOptional ? (
-				<i className={`${isFulfilled ? 'fa fa-check scaleup' : 'xsmall'}`}>
+				<i className={`${isFulfilled ? 'fa fa-check scale-up' : 'x-small'}`}>
 					{subLabel}
 					{!isFulfilled && ' (required)'}
 				</i>

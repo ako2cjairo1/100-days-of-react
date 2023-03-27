@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent, useEffect, useState } from 'react'
+import { ChangeEvent, FocusEvent, useCallback, useEffect, useState } from 'react'
 import { ConvertPropsToBool } from '@/services/Utils/password-manager.helper'
 
 /**
@@ -17,21 +17,18 @@ export const useInput = <T>(initState: T) => {
 	const [inputStates, setInputStates] = useState<T>(initState)
 	const [inputFocus, setInputFocus] = useState<TUseInputFocus<T>>({})
 
-	useEffect(() => {
-		// used to create and initialize focus states to "true"
-		resetInputState()
-	}, [])
-
 	// Resets inputStates and focusEvents to their initial values
-	const resetInputState = (id?: string) => {
-		let newInputState = initState
-		if (id) {
-			// reset the specific state using id arg
-			newInputState = { ...inputStates, [id]: '' }
-		}
-		setInputStates(newInputState)
-		setInputFocus(ConvertPropsToBool(initState, true)) // initialize focus states to true
-	}
+	const resetInputState = useCallback(
+		(id?: string) => {
+			// reset specific state using id arg
+			if (id) setInputStates(prev => ({ ...prev, [id]: '' }))
+			// reset all input state
+			else setInputStates(initState)
+
+			setInputFocus(ConvertPropsToBool(initState, true)) // initialize focus states to true
+		},
+		[initState]
+	)
 
 	const handleChange = <T extends TInputEvent>(e: T) => {
 		// set the input state using id as key to set a value
@@ -43,13 +40,18 @@ export const useInput = <T>(initState: T) => {
 		setInputFocus(prev => ({ ...prev, [e.target.id]: false }))
 	}
 
+	useEffect(() => {
+		// used to create and initialize focus states to "true"
+		resetInputState()
+	}, [resetInputState])
+
 	// Object containing inputStates, focusEvents and event handlers for onFocus, onBlur and onChange events
 	const inputAttributes = {
 		inputStates,
 		inputFocus,
 		setInputStates,
 		onChange: handleChange,
-		onFocus: (e: TInputEvent) => {}, //console.log(`"${e.target.id}" focused`),
+		onFocus: (e: TInputEvent) => console.log(`"${e.target.id}" focused`),
 		onBlur: (e: TInputEvent) => setInputFocus(prev => ({ ...prev, [e.target.id]: false })),
 	}
 

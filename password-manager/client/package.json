@@ -7,11 +7,11 @@
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview",
-		"test": "vitest",
-		"coverage": "vitest run --coverage",
 		"format": "prettier --write .",
 		"lint:format": "prettier --check .",
-		"lint": "eslint \"src/**/*.{ts,tsx}\""
+		"lint": "eslint \"./src/**/*.{ts,tsx}\" --fix",
+		"test": "yarn format && yarn lint && yarn lint:format && vitest",
+		"coverage": "vitest run --coverage"
 	},
 	"dependencies": {
 		"react": "^18.2.0",

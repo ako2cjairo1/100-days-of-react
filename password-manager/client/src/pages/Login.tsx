@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState, useContext } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import styles from '@/assets/modules/Login.module.css'
 import { TCredentials, TStatus } from '@/types/global.type'
 import { useInput } from '@/hooks'
@@ -38,23 +38,25 @@ export const Login = () => {
 	const vaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const [isSubmitted, setIsSubmitted] = useState(false)
 	const [isInputEmail, setIsInputEmail] = useState(true)
-	const { auth, updateAuthCb } = useAuthContext()
+	const { authInfo, updateAuthInfo } = useAuthContext()
 
 	useEffect(() => {
-		console.log(LocalStorage.get('password_manager_email'))
 		const cachedEmail = LocalStorage.get('password_manager_email') ?? ''
-		setInputStates({ ...inputStates, email: cachedEmail, isRemember: cachedEmail ? true : false })
-	}, [])
+		setInputStates(prev => ({
+			...prev,
+			email: cachedEmail,
+			isRemember: cachedEmail ? true : false,
+		}))
+	}, [setInputStates])
 
 	useEffect(() => {
 		if (isInputEmail) emailInputRef.current?.focus()
 		else if (success) vaultLinkRef.current?.focus()
 		else passwordInputRef.current?.focus()
-	}, [loginStatus, isInputEmail, isSubmitted])
+	}, [success, isInputEmail, isSubmitted])
 
 	useEffect(() => {
 		setLoginStatus(prev => ({ ...prev, errMsg: '' }))
-		// console.log(inputStates)
 	}, [inputStates])
 
 	const handleSubmit = async (e: FormEvent) => {
@@ -74,12 +76,12 @@ export const Login = () => {
 			RunAfterSomeTime(() => {
 				try {
 					// TODO: fetch access token to custom authentication backend api
-					throw new Error(
-						// '[TEST]: There is no Vercel account associated with this email address. Sign up?'
-						'[TEST]: An error has occurred. E-mail or Password is incorrect. Try again'
-					)
+					// throw new Error(
+					// 	// '[TEST]: There is no Vercel account associated with this email address. Sign up?'
+					// 	'[TEST]: An error has occurred. E-mail or Password is incorrect. Try again'
+					// )
 
-					updateAuthCb({ ...inputStates, accessToken: '' })
+					updateAuthInfo({ ...inputStates, accessToken: '' })
 					setLoginStatus({ success: true, errMsg: '' })
 					resetInputState()
 
@@ -98,6 +100,7 @@ export const Login = () => {
 	const handleChangeEmail = () => {
 		resetInputState('password')
 		setIsInputEmail(true)
+		console.log(authInfo)
 	}
 
 	const isMinLength = minLength.test(password)
@@ -122,7 +125,7 @@ export const Login = () => {
 				{success ? (
 					<Header>
 						<h1>
-							You are logged in! <i className="fa fa-check-circle scaleup" />
+							You are logged in! <i className="fa fa-check-circle scale-up" />
 						</h1>
 						<LinkLabel
 							linkRef={vaultLinkRef}
@@ -142,7 +145,7 @@ export const Login = () => {
 
 						<form onSubmit={handleSubmit}>
 							{isInputEmail ? (
-								<div className="input-row">
+								<div className="input-row vr">
 									<FormInput
 										id="email"
 										type="text"
@@ -188,22 +191,10 @@ export const Login = () => {
 									// disabled={!(email.length > 0) && !isValidEmail}
 									{...{ onChange, onFocus, onBlur }}
 								>
-									<Toggle.Label>
-										<span
-											className={`toggle-description ${
-												isRemember ? 'toggle-description-active' : ''
-											}`}
-										>
-											Remember email?
-										</span>
-										<span
-											className={`toggle-description ${
-												isRemember ? '' : 'toggle-description-active'
-											}`}
-										>
-											Ok, we'll remember your email.
-										</span>
-									</Toggle.Label>
+									<Toggle.Description checked={isRemember}>Remember email?</Toggle.Description>
+									<Toggle.Description checked={!isRemember}>
+										Ok, we`ll remember your email.
+									</Toggle.Description>
 								</Toggle>
 							)}
 
@@ -213,9 +204,6 @@ export const Login = () => {
 								disabled={
 									isSubmitted || (isInputEmail ? !isValidEmail : !(isValidEmail && isMinLength))
 								}
-								onClick={() => {
-									console.log('Submit button triggered!')
-								}}
 							>
 								{isInputEmail ? 'Continue' : 'Log in with Master Password'}
 							</SubmitButton>

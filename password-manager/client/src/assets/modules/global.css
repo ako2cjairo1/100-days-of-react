@@ -50,10 +50,10 @@ header {
 	margin-bottom: 34px;
 }
 
-header p {
+/* header p {
 	margin-top: 0;
 	margin-bottom: 20px;
-}
+} */
 
 img,
 picture,
@@ -80,6 +80,7 @@ a:hover {
 p {
 	font-size: 0.9rem;
 	margin: 10px 0;
+	line-height: 20px;
 }
 i {
 	margin-right: 10px;
@@ -102,9 +103,6 @@ i {
 .fa-info-circle,
 .fa-exclamation-circle {
 	color: rgb(248, 120, 116);
-}
-.fa-exclamation-triangle {
-	margin-bottom: 10px;
 }
 
 .strength {
@@ -177,7 +175,7 @@ button:hover:not(:disabled) {
 .small {
 	font-size: 12px;
 }
-.xsmall {
+.x-small {
 	font-size: 10px;
 }
 .center {
@@ -237,22 +235,22 @@ button:hover:not(:disabled) {
 	}
 }
 
-.scaleup {
-	animation: scaleupanimation 0.3s forwards;
+.scale-up {
+	animation: scale-up 0.3s forwards;
 }
 
-.scaledown {
-	animation: scaledownanimate 0.3s forwards;
+.scale-down {
+	animation: scale-down 0.3s forwards;
 }
 
-.fadein {
-	animation: fadeanimation 1s forwards;
+.fade-in {
+	animation: fade-in 1s forwards;
 }
 .spins {
 	animation: spins 0.3s forwards;
 }
 
-@keyframes scaleupanimation {
+@keyframes scale-up {
 	0% {
 		transform: scale(0.5);
 	}
@@ -263,7 +261,7 @@ button:hover:not(:disabled) {
 		transform: scale(1);
 	}
 }
-@keyframes scaledownanimate {
+@keyframes scale-down {
 	0% {
 		transform: scale(1);
 	}
@@ -282,7 +280,7 @@ button:hover:not(:disabled) {
 		rotate: 0deg;
 	}
 }
-@keyframes fadeanimation {
+@keyframes fade-in {
 	0% {
 		opacity: 0;
 	}
@@ -297,13 +295,18 @@ button:hover:not(:disabled) {
 }
 
 .descend {
-	animation: descendopacity 0.3s ease-in;
+	animation: descend-opacity 0.3s ease-in forwards;
 }
 
-@keyframes descendopacity {
+@keyframes descend-opacity {
 	0% {
 		opacity: 0;
 		transform: translateY(-20px);
+	}
+	50% {
+		opacity: 0.5;
+		transition-delay: 0.3s;
+		transform: translateY(10px);
 	}
 	100% {
 		opacity: 1;

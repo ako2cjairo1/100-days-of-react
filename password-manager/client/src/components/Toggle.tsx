@@ -1,27 +1,28 @@
 import { FCWithChildren, IChildren, IInputElement } from '@/types'
 import '@/assets/modules/Toggle.css'
 
-const Label: FCWithChildren = ({ children }) => {
-	return <div className="toggle-description-container small">{children}</div>
+const Description: FCWithChildren<{ checked?: boolean }> = ({ children, checked }) => {
+	return <span className={`description ${checked ? 'description-active' : ''}`}>{children}</span>
 }
 
 export const Toggle = ({ children, ...inputProps }: IInputElement & IChildren) => {
 	return (
-		<div className="toggle-container">
+		<div className="container">
 			<input
 				type="checkbox"
-				className="toggle-input"
+				className="input"
 				{...inputProps}
 			/>
 			<label
 				htmlFor={inputProps.id}
-				className="toggle-label"
+				className="label"
 			>
-				<span className="toggle-button" />
+				<span className="button" />
 			</label>
-			{children}
+
+			<div className="description-container small">{children}</div>
 		</div>
 	)
 }
 
-Toggle.Label = Label
+Toggle.Description = Description

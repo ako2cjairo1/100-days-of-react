@@ -3,5 +3,5 @@ import { TAuthContext, TAuthProvider } from '@/types'
 import { useContext } from 'react'
 
 export default function useAuthContext(): TAuthContext<TAuthProvider> {
-	return useContext(AuthContext)!
+	return useContext(AuthContext)
 }

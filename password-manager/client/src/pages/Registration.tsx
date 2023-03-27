@@ -12,6 +12,7 @@ import {
 	AuthProviderSection,
 	SubmitButton,
 	FormInput,
+	Toggle,
 } from '@/components'
 import useAuthContext from '@/hooks/useAuthContext'
 
@@ -25,7 +26,7 @@ export const Registration = () => {
 	const { resetInputState, inputAttributes } = useInput<TCredentials>(CREDENTIALS)
 	// destructure
 	const { inputStates, onChange, onFocus, onBlur, inputFocus } = inputAttributes
-	const { password, email, confirm } = inputStates
+	const { password, email, confirm, isTermsAgreed } = inputStates
 	const [registrationStatus, setRegistrationStatus] = useState<TStatus>(STATUS)
 	// destructure
 	const { success, errMsg } = registrationStatus
@@ -37,7 +38,7 @@ export const Registration = () => {
 	const emailRef = useRef<HTMLInputElement>(null)
 	const loginRef = useRef<HTMLAnchorElement>(null)
 	const [submit, setSubmit] = useState(false)
-	const { auth, updateAuthCb } = useAuthContext()
+	const { authInfo, updateAuthInfo } = useAuthContext()
 
 	const inputValidationCb = useCallback(() => {
 		const validPassword = {
@@ -52,7 +53,7 @@ export const Registration = () => {
 			isValidEmail: EMAIL_REGEX.test(email),
 			isValidPassword: Object.values(validPassword).every(validation => validation === true),
 		})
-	}, [inputStates])
+	}, [EMAIL_REGEX, alphabet, email, minLength, number, password, symbol])
 
 	useEffect(() => {
 		if (!registrationStatus.success) emailRef.current?.focus()
@@ -63,13 +64,14 @@ export const Registration = () => {
 		inputValidationCb()
 
 		setRegistrationStatus(prev => ({ ...prev, errMsg: '' }))
-	}, [inputStates])
+	}, [inputValidationCb])
 
 	const resetRegistration = () => {
 		resetInputState()
 		setRegistrationStatus(STATUS)
 		setLoginValidation(INPUT_VALIDATION)
 		setTestPassword(VALID_PASSWORD)
+		console.log(authInfo)
 	}
 
 	const handleSubmit = async (e: FormEvent) => {
@@ -82,7 +84,7 @@ export const Registration = () => {
 				if (Object.values(loginValidation).every(cred => cred === true)) {
 					// TODO: use custom API to handle registration
 
-					updateAuthCb({ ...inputStates, accessToken: 'fakeToken' })
+					updateAuthInfo({ ...inputStates, accessToken: 'fakeToken' })
 					resetRegistration()
 					setRegistrationStatus({ success: true, errMsg: '' })
 				} else {
@@ -133,7 +135,7 @@ export const Registration = () => {
 				{success ? (
 					<Header>
 						<h1>
-							Registration completed! <i className="fa fa-check-circle scaleup" />
+							Registration completed! <i className="fa fa-check-circle scale-up" />
 						</h1>
 						<LinkLabel
 							linkRef={loginRef}
@@ -212,10 +214,33 @@ export const Registration = () => {
 								/>
 							</div>
 
+							<Toggle
+								id="isTermsAgreed"
+								checked={isTermsAgreed}
+								{...{ onChange, onFocus, onBlur }}
+							>
+								<div className="offset-toggle">
+									<LinkLabel
+										preText="By selecting this option you agree to the following:"
+										className="tal"
+										routeTo="/terms"
+									>
+										<br />
+										Terms of Service, Privacy Policy
+									</LinkLabel>
+								</div>
+							</Toggle>
+
 							<SubmitButton
 								iconName="fa-user-plus"
 								submitted={submit}
-								disabled={submit || !isValidEmail || !isValidPassword || password !== confirm}
+								disabled={
+									!isTermsAgreed ||
+									submit ||
+									!isValidEmail ||
+									!isValidPassword ||
+									password !== confirm
+								}
 								onClick={() => console.log('Submit button triggered!')}
 							>
 								Create account

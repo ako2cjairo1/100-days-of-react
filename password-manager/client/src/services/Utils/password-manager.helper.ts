@@ -116,12 +116,12 @@ export const OverrideEventTarget = <
  * param initVal - An optional initial value for all the boolean values in the new object. Defaults to true.
  * returns A new object with the same keys as the input object and boolean values.
  */
-export const ConvertPropsToBool = <T>(targetObj: T, initVal: boolean = true) => {
+export const ConvertPropsToBool = <T>(targetObj: T, initVal = true) => {
 	const resultObj = {} as Record<TConvertToStringUnion<T>, boolean>
 	// type TCOnv =
 
 	// use same property names as targetObj
-	for (let key in targetObj) {
+	for (const key in targetObj) {
 		resultObj[key] = initVal
 	}
 
@@ -134,17 +134,17 @@ export const ConvertPropsToBool = <T>(targetObj: T, initVal: boolean = true) => 
  * param {object} obj - The object to be mapped.
  * returns {TraversedProperty} - The traversed property object.
  */
-type TraversedProperty<T = {}> = Partial<{
+type TraversedProperty = Partial<{
 	key: string
-	value: any
-	type: any
+	value: unknown
+	type: unknown
 }>
 
 export const MapUnknownObj = (obj: object): TraversedProperty => {
 	let result: TraversedProperty = {}
 
 	console.log()
-	for (let [key, value] of Object.entries(obj)) {
+	for (const [key, value] of Object.entries(obj)) {
 		if (typeof value === 'object' && value !== null) {
 			const nestedProperties = MapUnknownObj(value)
 			result = { ...nestedProperties, value: MapUnknownObj(nestedProperties.value ?? {}) }
@@ -176,7 +176,6 @@ export const CreateError = (error: unknown) => {
 		message: 'An unknown error occurred.',
 	}
 
-	// console.log('DITO PA >>> ', typeof error === 'object')
 	if (error instanceof Error) {
 		// error is an instance of Error
 		result.message = error.message
@@ -206,8 +205,8 @@ export const CreateError = (error: unknown) => {
 }
 
 interface ILocalStorage {
-	set: (key: string, value: any) => void
-	get: (key: string) => any extends infer T ? T : never
+	set: (key: string, value: string) => void
+	get: (key: string) => string | null extends infer T ? T : never
 	remove: (key: string) => void
 }
 export const LocalStorage: ILocalStorage = {

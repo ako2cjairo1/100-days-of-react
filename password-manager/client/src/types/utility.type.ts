@@ -4,7 +4,7 @@
  * @template T - The type of the object to map.
  * @template VType - The value type to use for all properties in the resulting object.
  */
-export type TConvertKeysOf<T, VType extends any> = {
+export type TConvertKeysOf<T, VType> = {
 	[TKey in keyof T]: VType
 }
 

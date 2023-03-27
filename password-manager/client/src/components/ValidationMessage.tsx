@@ -14,14 +14,14 @@ export const ValidationMessage: FCProps<IValidationMessage> = ({
 	return (
 		<div>
 			{title && isVisible && <span className="small">{title}</span>}
-			<ul className="xsmall fa-ul">
+			<ul className="x-small fa-ul">
 				{validations && isVisible
 					? validations.map(({ message, isValid }, idx) => (
 							<li key={idx}>
 								<i
 									style={{ animationDelay: `${idx * 0.1}s` }}
 									className={`smooth small fa-li fa ${
-										isValid ? 'fa-check scaleup' : 'fa-close scaledown spins'
+										isValid ? 'fa-check scale-up' : 'fa-close scale-down spins'
 									}`}
 								/>
 								{message}
