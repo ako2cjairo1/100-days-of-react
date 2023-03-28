@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useRef, useState, useCallback } from 'react'
-import styles from '@/assets/modules/Login.module.css'
+import '@/assets/modules/Login.css'
 import { TCredentials, TStatus, TPassword, TInputValidation } from '@/types/global.type'
 import { REGISTER_STATE } from '@/services/constants/Registration.constant'
 import { RunAfterSomeTime, ExtractValFromRegEx } from '@/services/Utils/password-manager.helper'
@@ -17,7 +17,6 @@ import {
 import useAuthContext from '@/hooks/useAuthContext'
 
 export const Registration = () => {
-	const { container } = styles
 	// constants
 	const { CREDENTIALS, STATUS, INPUT_VALIDATION, VALID_PASSWORD, EMAIL_REGEX, PASSWORD_REGEX } =
 		REGISTER_STATE
@@ -131,10 +130,10 @@ export const Registration = () => {
 		<section>
 			<RotatingBackdrop />
 
-			<div className={container}>
+			<div className="form-container">
 				{success ? (
 					<Header>
-						<h1>
+						<h1 className="fade-in">
 							Registration completed! <i className="fa fa-check-circle scale-up" />
 						</h1>
 						<LinkLabel
@@ -153,46 +152,42 @@ export const Registration = () => {
 						/>
 
 						<form onSubmit={handleSubmit}>
-							<div className="input-row">
-								<FormInput
-									id="email"
-									type="email"
-									inputMode="email"
-									autoComplete="email"
-									autoCapitalize="none"
-									placeholder="sample@email.com"
-									value={email}
-									linkRef={emailRef}
-									disabled={submit}
-									required
-									label="Email Address"
-									isFocused={inputFocus.email}
-									isValid={isValidEmail && !errMsg}
-									validations={emailReq}
-									className={inputFocus.email ? '' : isValidEmail ? 'valid' : 'invalid'}
-									{...{ onChange, onFocus, onBlur }}
-								/>
-							</div>
+							<FormInput
+								id="email"
+								type="email"
+								inputMode="email"
+								autoComplete="email"
+								autoCapitalize="none"
+								placeholder="sample@email.com"
+								value={email}
+								linkRef={emailRef}
+								disabled={submit}
+								required
+								label="Email Address"
+								isFocused={inputFocus.email}
+								isValid={isValidEmail && !errMsg}
+								validations={emailReq}
+								className={inputFocus.email ? '' : isValidEmail ? 'valid' : 'invalid'}
+								{...{ onChange, onFocus, onBlur }}
+							/>
 
-							<div className="input-row">
-								<FormInput
-									id="password"
-									type="password"
-									value={password}
-									disabled={submit}
-									required
-									havePasswordMeter={true}
-									label="Master Password"
-									isFocused={inputFocus.password}
-									isValid={isValidPassword && !errMsg}
-									validations={passwordReq}
-									title="Your master password must contain:"
-									{...{ onChange, onFocus, onBlur }}
-									className={inputFocus.password ? '' : isValidPassword ? 'valid' : 'invalid'}
-								/>
-							</div>
+							<FormInput
+								id="password"
+								type="password"
+								value={password}
+								disabled={submit}
+								required
+								havePasswordMeter={true}
+								label="Master Password"
+								isFocused={inputFocus.password}
+								isValid={isValidPassword && !errMsg}
+								validations={passwordReq}
+								title="Your master password must contain:"
+								{...{ onChange, onFocus, onBlur }}
+								className={inputFocus.password ? '' : isValidPassword ? 'valid' : 'invalid'}
+							/>
 
-							<div className="input-row vr">
+							<div className="vr">
 								<FormInput
 									id="confirm"
 									type="password"

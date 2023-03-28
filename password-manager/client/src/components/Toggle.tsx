@@ -7,7 +7,7 @@ const Description: FCWithChildren<{ checked?: boolean }> = ({ children, checked 
 
 export const Toggle = ({ children, ...inputProps }: IInputElement & IChildren) => {
 	return (
-		<div className="container">
+		<div className="toggle-container">
 			<input
 				type="checkbox"
 				className="input"

@@ -15,12 +15,12 @@ The `Header` component is a React functional component that renders a header ele
 export const Header: FCProps<IHeaderProps> = ({ children, title, subTitle, status, ...rest }) => {
 	return (
 		<header {...rest}>
-			{title && <h1>{title}</h1>}
-			{subTitle && <p className="center">{subTitle}</p>}
+			{title && <h1 className="fade-in">{title}</h1>}
+			{subTitle && <p className="center descend">{subTitle}</p>}
 
 			{status &&
 				(status.success ? (
-					<i className="fa fa-check" />
+					<i className="fa fa-check scale-up" />
 				) : (
 					status.errMsg && (
 						<div

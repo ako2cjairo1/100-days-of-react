@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import styles from '@/assets/modules/Login.module.css'
+import '@/assets/modules/Login.css'
 import { TCredentials, TStatus } from '@/types/global.type'
 import { useInput } from '@/hooks'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
@@ -22,7 +22,6 @@ import {
 import useAuthContext from '@/hooks/useAuthContext'
 
 export const Login = () => {
-	const { container } = styles
 	// constants
 	const { minLength } = REGISTER_STATE.PASSWORD_REGEX
 	// custom form input hook
@@ -121,10 +120,10 @@ export const Login = () => {
 	return (
 		<section>
 			<RotatingBackdrop />
-			<div className={container}>
+			<div className="form-container">
 				{success ? (
 					<Header>
-						<h1>
+						<h1 className="fade-in">
 							You are logged in! <i className="fa fa-check-circle scale-up" />
 						</h1>
 						<LinkLabel
@@ -144,8 +143,8 @@ export const Login = () => {
 						/>
 
 						<form onSubmit={handleSubmit}>
-							{isInputEmail ? (
-								<div className="input-row vr">
+							<div className="vr">
+								{isInputEmail ? (
 									<FormInput
 										id="email"
 										type="text"
@@ -163,26 +162,26 @@ export const Login = () => {
 										className={!inputFocus.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
-								</div>
-							) : (
-								<div className={`${!isInputEmail ? 'input-row descend vr' : ''} vr`}>
-									<FormInput
-										id="password"
-										type="password"
-										placeholder="Password"
-										required
-										value={password}
-										linkRef={passwordInputRef}
-										disabled={isSubmitted}
-										label="Master Password"
-										isFocused={inputFocus.password}
-										isValid={isMinLength && !errMsg}
-										validations={!errMsg ? passwordValidation : []}
-										className={!inputFocus.password && (errMsg || !isMinLength) ? 'invalid' : ''}
-										{...{ onChange, onFocus, onBlur }}
-									/>
-								</div>
-							)}
+								) : (
+									<div className={`${!isInputEmail ? 'descend' : ''}`}>
+										<FormInput
+											id="password"
+											type="password"
+											placeholder="Password"
+											required
+											value={password}
+											linkRef={passwordInputRef}
+											disabled={isSubmitted}
+											label="Master Password"
+											isFocused={inputFocus.password}
+											isValid={isMinLength && !errMsg}
+											validations={!errMsg ? passwordValidation : []}
+											className={!inputFocus.password && (errMsg || !isMinLength) ? 'invalid' : ''}
+											{...{ onChange, onFocus, onBlur }}
+										/>
+									</div>
+								)}
+							</div>
 
 							{isInputEmail && (
 								<Toggle

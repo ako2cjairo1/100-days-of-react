@@ -20,7 +20,7 @@ export const LinkLabel: FCProps<ILinkLabel> = ({
 	onClick,
 }) => {
 	return (
-		<div className={`${className} center small`}>
+		<div className={`${className} center small descend`}>
 			<p className="small">
 				{preText}{' '}
 				<Link

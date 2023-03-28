@@ -1,5 +1,7 @@
+import '@/assets/modules/PasswordStrength.css'
 import { FCProps, TEvaluatedPassword, IPasswordStrength } from '@/types'
 import { PasswordStatus } from '@/services/constants'
+import { useEffect, useState } from 'react'
 /**
  * Evaluates the strength of a password based on its length and whether it meets certain requirements.
  *
@@ -50,11 +52,22 @@ export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvalu
  */
 export const PasswordStrength: FCProps<IPasswordStrength> = ({ password, regex }) => {
 	const { status, score } = evaluatePassword({ password, regex })
+	const [toggleAnimation, setToggleAnimation] = useState(false)
+
+	useEffect(() => {
+		setToggleAnimation(prev => !prev)
+	}, [status])
 
 	const passwordStatuses = Object.values(PasswordStatus)
 	return (
 		<div className="password-strength">
-			<p className={`x-small smooth ${password ? 'show' : 'hidden'}`}>{status}</p>
+			<p
+				className={`x-small smooth ${
+					password ? `show ${toggleAnimation ? 'scale-up' : 'scale-down'}` : 'hidden'
+				}`}
+			>
+				{status}
+			</p>
 
 			{passwordStatuses.map((strength, idx) => {
 				// Do not render the default status

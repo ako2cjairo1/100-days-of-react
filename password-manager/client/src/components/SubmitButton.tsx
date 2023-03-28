@@ -20,7 +20,7 @@ export const SubmitButton: FCProps<ISubmitButton> = ({
 		<button
 			data-testid="submit"
 			type="submit"
-			className={`submit ${className}`}
+			className={`submit ${className ? className : ''}`}
 			disabled={disabled}
 			onClick={props.onClick}
 			{...props}

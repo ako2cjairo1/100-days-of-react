@@ -20,7 +20,7 @@ export const FormInput: FCProps<
 		Pick<IValidationMessage, 'title' | 'validations'>
 > = ({ isFocused, isValid, linkRef, validations, havePasswordMeter, ...rest }) => {
 	return (
-		<>
+		<div className="input-row">
 			{rest.label && (
 				<div className="password-label">
 					<RequiredLabel
@@ -53,6 +53,6 @@ export const FormInput: FCProps<
 					validations={validations}
 				/>
 			)}
-		</>
+		</div>
 	)
 }
