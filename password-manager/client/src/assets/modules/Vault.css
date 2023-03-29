@@ -1,0 +1,102 @@
+.vault-container {
+	display: flex;
+	width: auto;
+	place-items: start;
+	gap: 20px;
+}
+
+.vault-item {
+	display: flex;
+	align-items: center;
+	place-content: start;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	margin: 5px;
+	padding: 5px;
+	transition: var(--transition);
+}
+
+.vault-item:hover:not(:disabled) {
+	background-color: rgba(255, 255, 255, 0.1);
+	box-shadow: 0px 0px 5px 1px white;
+	cursor: pointer;
+}
+
+.vault-item i {
+	padding: 0 10px;
+}
+
+.logo-key {
+	position: relative;
+	margin-top: 15px;
+	margin-left: 10px;
+	font-size: 20px;
+	transition: var(--transition);
+}
+.logo-shield {
+	position: absolute;
+	left: 45%;
+	opacity: 0.5;
+	transition: var(--transition);
+}
+
+.vault-item img {
+	width: 30px;
+	height: 30px;
+	margin: 5px 10px;
+	position: relative;
+	background-color: rgba(255, 255, 255, 1);
+	padding: 5px;
+	border-radius: 30%;
+	overflow: visible;
+	transition: var(--transition);
+}
+
+.vault-item a {
+	color: currentColor;
+	margin: unset;
+	overflow: hidden;
+}
+
+.vault-item p {
+	color: rgba(255, 255, 255, 0.4);
+	padding: 0;
+	margin: 0;
+}
+
+.vault-menu {
+	width: 35px !important;
+	height: 35px !important;
+	border-radius: 50% !important;
+	font-size: 15px !important;
+}
+
+.vault-item-description {
+	width: 100%;
+	padding: inherit;
+	text-align: start;
+}
+
+.vault-container > section > * {
+	opacity: 0;
+	animation: descend-opacity 0.5s forwards;
+}
+
+.vault-container > section > *:nth-child(1) {
+	animation-delay: 0.1s;
+}
+
+.vault-container > section > *:nth-child(2) {
+	animation-delay: 0.2s;
+}
+
+.vault-container > section > *:nth-child(3) {
+	animation-delay: 0.3s;
+}
+
+.vault-container > section > *:nth-child(4) {
+	animation-delay: 0.4s;
+}
+
+.vault-container > section > *:last-child {
+	animation-delay: 0.5s;
+}

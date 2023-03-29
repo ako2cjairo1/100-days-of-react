@@ -15,16 +15,17 @@
 	border-radius: calc(var(--toggle-size) / 4);
 	border-radius: 13px;
 	background-color: var(--background-color);
+
 	transition: all 0.2s ease-in-out;
 }
 
 .button {
 	display: block;
 	position: absolute;
-	top: 2px;
-	left: 2px;
-	width: calc(var(--toggle-size) / 2 - 4px);
-	height: calc(var(--toggle-size) / 2 - 4px);
+	top: 4px;
+	left: 6px;
+	width: calc(var(--toggle-size) / 2 - 8px);
+	height: calc(var(--toggle-size) / 2 - 8px);
 	border: var(--border);
 	background-color: #ccc;
 	border-radius: calc((var(--toggle-size) / 2 - 4px) / 2);
@@ -33,11 +34,11 @@
 }
 
 .input:checked + .label .button {
-	transform: translateX(calc(var(--toggle-size) / 2));
+	transform: translateX(calc(var(--toggle-size) / 2.5));
 }
 
 .input:checked + .label {
-	background-color: rgb(88, 182, 117);
+	background-color: var(--accent-color);
 }
 
 .input + .label:hover:not(.input:disabled) {

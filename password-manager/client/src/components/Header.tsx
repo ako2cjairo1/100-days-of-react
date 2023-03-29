@@ -18,6 +18,8 @@ export const Header: FCProps<IHeaderProps> = ({ children, title, subTitle, statu
 			{title && <h1 className="fade-in">{title}</h1>}
 			{subTitle && <p className="center descend">{subTitle}</p>}
 
+			{children}
+
 			{status &&
 				(status.success ? (
 					<i className="fa fa-check scale-up" />
@@ -27,12 +29,11 @@ export const Header: FCProps<IHeaderProps> = ({ children, title, subTitle, statu
 							className={`center fdc ${status.errMsg ? 'fade-in' : ''}`}
 							style={{ opacity: `${status.errMsg ? 1 : 0}` }}
 						>
-							<i className="fa fa-exclamation-triangle pulse error" />
+							<i className="fa-solid fa-triangle-exclamation fa-fade error regular" />
 							<p className="center x-small descend error">{status.errMsg}</p>
 						</div>
 					)
 				))}
-			{children}
 		</header>
 	)
 }

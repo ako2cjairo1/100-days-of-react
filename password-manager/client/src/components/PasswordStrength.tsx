@@ -53,12 +53,13 @@ export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvalu
 export const PasswordStrength: FCProps<IPasswordStrength> = ({ password, regex }) => {
 	const { status, score } = evaluatePassword({ password, regex })
 	const [toggleAnimation, setToggleAnimation] = useState(false)
+	const passwordStatuses = Object.values(PasswordStatus).filter(status => status !== 'strength')
+	const len = passwordStatuses.length
 
 	useEffect(() => {
 		setToggleAnimation(prev => !prev)
 	}, [status])
 
-	const passwordStatuses = Object.values(PasswordStatus)
 	return (
 		<div className="password-strength">
 			<p
@@ -70,24 +71,15 @@ export const PasswordStrength: FCProps<IPasswordStrength> = ({ password, regex }
 			</p>
 
 			{passwordStatuses.map((strength, idx) => {
-				// Do not render the default status
-				if (strength === PasswordStatus.none) return null
 				const statusIndex = idx + 1
+				let customAnimation = ''
 
-				const opacity =
-					passwordStatuses.length === statusIndex
-						? 1
-						: statusIndex === 1
-						? 0.3
-						: statusIndex === 2
-						? 0.5
-						: statusIndex === 3
-						? 0.7
-						: 0.9
-				let customAnimation = `scale-down ${PasswordStatus.none}`
 				if (password && statusIndex <= score) customAnimation = `scale-up ${status}`
+				else customAnimation = `scale-down ${PasswordStatus.none}`
 
-				// Renders all the strength except 'none'
+				// determine opacity of bullet based on its index
+				const opacity = statusIndex === len - 1 ? 1 : Math.round(statusIndex * (1 / len) * 10) / 10
+				// Render all status except 'none'
 				// should only render exactly 5 bullets (or div)
 				return (
 					<div

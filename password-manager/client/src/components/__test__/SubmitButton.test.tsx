@@ -2,11 +2,6 @@ import { SubmitButton } from '@/components'
 import { render, fireEvent } from '@/services/Utils/test.util'
 
 describe('SubmitButton', () => {
-	it('renders with default text', () => {
-		const { getByRole } = render(<SubmitButton submitted={false} />)
-		expect(getByRole('button')).toHaveTextContent('Submit')
-	})
-
 	it('renders with custom text', () => {
 		const text = 'Custom Text'
 		const { getByRole } = render(<SubmitButton submitted={false}>{text}</SubmitButton>)
@@ -27,20 +22,6 @@ describe('SubmitButton', () => {
 	it('renders "spinner" if submitted prop is true', () => {
 		const { getByTestId } = render(<SubmitButton submitted={true} />)
 		expect(getByTestId('spinner')).toBeInTheDocument()
-	})
-
-	it('calls onClick when default button text is "Submit', async () => {
-		const handleClick = vi.fn()
-
-		const { getByText } = render(
-			<SubmitButton
-				onClick={handleClick}
-				submitted={false}
-			/>
-		)
-
-		fireEvent.click(getByText('Submit'))
-		expect(handleClick).toHaveBeenCalled()
 	})
 
 	it('calls onClick when clicked with given button text (children)', async () => {

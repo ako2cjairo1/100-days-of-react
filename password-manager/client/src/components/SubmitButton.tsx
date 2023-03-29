@@ -10,6 +10,7 @@ import { FCProps, ISubmitButton } from '@/types'
 export const SubmitButton: FCProps<ISubmitButton> = ({
 	children,
 	className,
+	variant = 'cancel',
 	submitted = false,
 	disabled = false,
 	textStatus = 'Processing...',
@@ -20,19 +21,15 @@ export const SubmitButton: FCProps<ISubmitButton> = ({
 		<button
 			data-testid="submit"
 			type="submit"
-			className={`submit ${className ? className : ''}`}
+			className={`submit ${variant === 'primary' ? 'accent-bg' : ''} ${className ? className : ''}`}
 			disabled={disabled}
 			onClick={props.onClick}
 			{...props}
 		>
 			{submitted ? (
 				<div className="center">
-					{/* <div
-						data-testid="spinner"
-						className="spinner"
-					/> */}
 					<i
-						className="fa fa-spinner spinner"
+						className="fa fa-spinner fa-spin spinner"
 						data-testid="spinner"
 						aria-hidden="true"
 					></i>
@@ -46,7 +43,7 @@ export const SubmitButton: FCProps<ISubmitButton> = ({
 							className={`fa ${iconName}`}
 						/>
 					)}{' '}
-					{children ? children : 'Submit'}
+					{children}
 				</>
 			)}
 		</button>

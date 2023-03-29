@@ -7,7 +7,6 @@ import { useInput } from '@/hooks'
 import {
 	Header,
 	LinkLabel,
-	RotatingBackdrop,
 	Separator,
 	AuthProviderSection,
 	SubmitButton,
@@ -50,14 +49,14 @@ export const Registration = () => {
 		setTestPassword(validPassword)
 		setLoginValidation({
 			isValidEmail: EMAIL_REGEX.test(email),
-			isValidPassword: Object.values(validPassword).every(validation => validation === true),
+			isValidPassword: Object.values(validPassword).every(Boolean),
 		})
 	}, [EMAIL_REGEX, alphabet, email, minLength, number, password, symbol])
 
 	useEffect(() => {
-		if (!registrationStatus.success) emailRef.current?.focus()
+		if (!success) emailRef.current?.focus()
 		else loginRef.current?.focus()
-	}, [registrationStatus.success, submit])
+	}, [success, submit])
 
 	useEffect(() => {
 		inputValidationCb()
@@ -80,7 +79,7 @@ export const Registration = () => {
 			setRegistrationStatus(prev => ({ ...prev, errMsg: '' }))
 			setSubmit(true)
 			RunAfterSomeTime(() => {
-				if (Object.values(loginValidation).every(cred => cred === true)) {
+				if (Object.values(loginValidation).every(Boolean)) {
 					// TODO: use custom API to handle registration
 
 					updateAuthInfo({ ...inputStates, accessToken: 'fakeToken' })
@@ -128,13 +127,11 @@ export const Registration = () => {
 
 	return (
 		<section>
-			<RotatingBackdrop />
-
 			<div className="form-container">
 				{success ? (
 					<Header>
 						<h1 className="fade-in">
-							Registration completed! <i className="fa fa-check-circle scale-up" />
+							<i className="fa fa-check-circle scale-up" /> Registration completed!
 						</h1>
 						<LinkLabel
 							linkRef={loginRef}
@@ -148,6 +145,7 @@ export const Registration = () => {
 					<>
 						<Header
 							title="Create Account"
+							subTitle="Create a free account with your email."
 							status={registrationStatus}
 						/>
 
@@ -227,6 +225,8 @@ export const Registration = () => {
 							</Toggle>
 
 							<SubmitButton
+								variant="primary"
+								className="accent-bg"
 								iconName="fa-user-plus"
 								submitted={submit}
 								disabled={

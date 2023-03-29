@@ -27,7 +27,7 @@ describe('Header', () => {
 	it('should render error icon and message when "success" is false and "errMsg" is defined', () => {
 		const props = { success: false, errMsg: 'Error message' }
 		const { container, getByText } = render(<Header status={props} />)
-		expect(container.querySelector('.fa.fa-exclamation-triangle')).toBeInTheDocument()
+		expect(container.querySelector('.fa-solid.fa-triangle-exclamation')).toBeInTheDocument()
 		expect(getByText(props.errMsg)).toBeInTheDocument()
 	})
 })

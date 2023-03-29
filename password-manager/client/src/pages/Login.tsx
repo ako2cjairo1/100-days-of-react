@@ -7,13 +7,13 @@ import {
 	CreateError,
 	ExtractValFromRegEx,
 	LocalStorage,
+	LogValue,
 	RunAfterSomeTime,
 } from '@/services/Utils/password-manager.helper'
 import {
 	Header,
 	LinkLabel,
 	FormInput,
-	RotatingBackdrop,
 	Separator,
 	AuthProviderSection,
 	SubmitButton,
@@ -49,9 +49,12 @@ export const Login = () => {
 	}, [setInputStates])
 
 	useEffect(() => {
+		LogValue(vaultLinkRef.current)
 		if (isInputEmail) emailInputRef.current?.focus()
 		else if (success) vaultLinkRef.current?.focus()
 		else passwordInputRef.current?.focus()
+
+		vaultLinkRef.current?.focus()
 	}, [success, isInputEmail, isSubmitted])
 
 	useEffect(() => {
@@ -80,7 +83,7 @@ export const Login = () => {
 					// 	'[TEST]: An error has occurred. E-mail or Password is incorrect. Try again'
 					// )
 
-					updateAuthInfo({ ...inputStates, accessToken: '' })
+					updateAuthInfo({ ...inputStates, accessToken: 'fake token' })
 					setLoginStatus({ success: true, errMsg: '' })
 					resetInputState()
 
@@ -119,12 +122,11 @@ export const Login = () => {
 
 	return (
 		<section>
-			<RotatingBackdrop />
 			<div className="form-container">
 				{success ? (
 					<Header>
 						<h1 className="fade-in">
-							You are logged in! <i className="fa fa-check-circle scale-up" />
+							<i className="fa fa-check-circle scale-up" /> You are logged in!
 						</h1>
 						<LinkLabel
 							linkRef={vaultLinkRef}
@@ -198,6 +200,7 @@ export const Login = () => {
 							)}
 
 							<SubmitButton
+								variant="primary"
 								iconName={isInputEmail ? '' : 'fa-sign-in'}
 								submitted={isSubmitted}
 								disabled={

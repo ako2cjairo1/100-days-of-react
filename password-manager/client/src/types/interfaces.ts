@@ -26,6 +26,7 @@ export interface IRequiredLabelProps extends Omit<TLabelAttrs, 'htmlFor' | 'form
 
 type TButtonAttrs = TDetailedHTMLProps<HTMLButtonElement>
 export interface ISubmitButton extends Omit<TButtonAttrs, 'type' | 'disabled'> {
+	variant?: 'primary' | 'cancel' | 'default'
 	submitted: boolean
 	disabled?: boolean
 	textStatus?: string

@@ -1,7 +1,7 @@
 .background {
 	width: 430px;
 	height: 520px;
-	position: relative;
+	position: absolute;
 	transform: translate(-50%, -50%);
 	animation: rotate 60s linear infinite;
 }

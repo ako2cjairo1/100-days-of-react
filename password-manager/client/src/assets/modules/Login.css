@@ -1,11 +1,7 @@
 .form-container {
-	position: absolute;
-	top: 50%;
-	left: 50%;
 	width: 400px;
-	min-width: 400px;
+	max-width: 400px;
 	background-color: rgba(255, 255, 255, 0.13);
-	transform: translate(-50%, -50%);
 	border-radius: 32px;
 	backdrop-filter: blur(50px);
 	-webkit-backdrop-filter: blur(50px);
@@ -59,20 +55,6 @@ input.invalid:focus {
 	opacity: 50%;
 }
 
-@media (prefers-color-scheme: light) {
-	.form-container {
-		border-radius: 25px;
-		border-color: transparent;
-		background-color: rgba(0, 0, 0, 0.5);
-		box-shadow: 0px 0px 30px 1px black;
-	}
-	input {
-		background-color: rgba(255, 255, 255, 0.27);
-		border: 1px solid rgba(255, 255, 255, 0.3);
-		color: currentColor;
-	}
-}
-
 form > div {
 	opacity: 0;
 	animation: descend-opacity 0.5s forwards;
@@ -96,4 +78,18 @@ form > div:nth-child(4) {
 
 form > div:last-child {
 	animation-delay: 0.5s;
+}
+
+@media (prefers-color-scheme: light) {
+	.form-container {
+		border-radius: 25px;
+		border-color: transparent;
+		background-color: rgba(0, 0, 0, 0.5);
+		box-shadow: 0px 0px 30px 1px black;
+	}
+	input {
+		background-color: rgba(255, 255, 255, 0.27);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		color: currentColor;
+	}
 }
