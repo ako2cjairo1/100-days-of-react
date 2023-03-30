@@ -4,7 +4,14 @@ import { render } from '@/services/Utils/test.util'
 describe('Header', () => {
 	it('should render a header element with given "title" and "subtitle"', () => {
 		const props = { title: 'Example Title', subTitle: 'Example Subtitle' }
-		const { getByText } = render(<Header {...props} />)
+		const { getByText } = render(
+			<Header>
+				<Header.Title
+					title={props.title}
+					subTitle={props.subTitle}
+				/>
+			</Header>
+		)
 		expect(getByText(props.title)).toBeInTheDocument()
 		expect(getByText(props.subTitle)).toBeInTheDocument()
 	})
@@ -20,13 +27,21 @@ describe('Header', () => {
 	})
 
 	it('should render success icon when status.success is true', () => {
-		const { container } = render(<Header status={{ success: true }} />)
+		const { container } = render(
+			<Header>
+				<Header.Status status={{ success: true }} />
+			</Header>
+		)
 		expect(container.querySelector('.fa.fa-check')).toBeInTheDocument()
 	})
 
 	it('should render error icon and message when "success" is false and "errMsg" is defined', () => {
 		const props = { success: false, errMsg: 'Error message' }
-		const { container, getByText } = render(<Header status={props} />)
+		const { container, getByText } = render(
+			<Header>
+				<Header.Status status={props} />
+			</Header>
+		)
 		expect(container.querySelector('.fa-solid.fa-triangle-exclamation')).toBeInTheDocument()
 		expect(getByText(props.errMsg)).toBeInTheDocument()
 	})

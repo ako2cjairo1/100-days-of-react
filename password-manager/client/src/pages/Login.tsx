@@ -13,16 +13,18 @@ import {
 import {
 	Header,
 	LinkLabel,
-	FormInput,
 	Separator,
 	AuthProviderSection,
 	SubmitButton,
 	Toggle,
+	PMForm,
+	ValidationMessage,
 } from '@/components'
 
 export const Login = () => {
+	const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
+	const { minLength } = PASSWORD_REGEX
 	// constants
-	const { minLength } = REGISTER_STATE.PASSWORD_REGEX
 	// custom form input hook
 	const { inputAttributes, resetInputState } = useInput<TCredentials>(LOGIN_STATE.Credential)
 	// destructure
@@ -104,7 +106,7 @@ export const Login = () => {
 	}
 
 	const isMinLength = minLength.test(password)
-	const isValidEmail = REGISTER_STATE.EMAIL_REGEX.test(email)
+	const isValidEmail = EMAIL_REGEX.test(email)
 
 	const { emailValidation, passwordValidation } = {
 		emailValidation: [{ isValid: isValidEmail, message: 'Input is not a valid email' }],
@@ -123,29 +125,38 @@ export const Login = () => {
 			<div className="form-container">
 				{success ? (
 					<Header>
-						<h1 className="fade-in">
-							<i className="fa fa-check-circle scale-up" /> You are logged in!
-						</h1>
-						<LinkLabel
-							linkRef={vaultLinkRef}
-							routeTo="/secure-vault"
-							preText="Proceed to your secured"
-						>
-							password vault
-						</LinkLabel>
+						<i className="fa fa-check-circle scale-up" />
+						<Header.Title title="You are logged in!">
+							<LinkLabel
+								linkRef={vaultLinkRef}
+								routeTo="/secure-vault"
+								preText="Proceed to your secured"
+							>
+								password vault
+							</LinkLabel>
+						</Header.Title>
 					</Header>
 				) : (
 					<>
-						<Header
-							title="Welcome back"
-							subTitle="Log in or create a new account to access your secured vault"
-							status={loginStatus}
-						/>
+						<Header>
+							<Header.Title
+								title="Welcome back"
+								subTitle="Log in or create a new account to access your secured vault"
+							/>
+							<Header.Status status={loginStatus} />
+						</Header>
 
-						<form onSubmit={handleSubmit}>
-							<div className="vr">
-								{isInputEmail ? (
-									<FormInput
+						<PMForm onSubmit={handleSubmit}>
+							{isInputEmail ? (
+								<div className="input-row vr">
+									<PMForm.Label
+										props={{
+											label: 'Email Address',
+											labelFor: 'email',
+											isFulfilled: isValidEmail && !errMsg,
+										}}
+									/>
+									<PMForm.Input
 										id="email"
 										type="text"
 										inputMode="email"
@@ -155,33 +166,40 @@ export const Login = () => {
 										value={email}
 										linkRef={emailInputRef}
 										disabled={!isInputEmail || isSubmitted}
-										label="Email Address"
-										isFocused={inputFocus.email}
-										isValid={isValidEmail && !errMsg}
-										validations={!errMsg ? emailValidation : []}
 										className={!inputFocus.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
-								) : (
-									<div className={`${!isInputEmail ? 'descend' : ''}`}>
-										<FormInput
-											id="password"
-											type="password"
-											placeholder="Password"
-											required
-											value={password}
-											linkRef={passwordInputRef}
-											disabled={isSubmitted}
-											label="Master Password"
-											isFocused={inputFocus.password}
-											isValid={isMinLength && !errMsg}
-											validations={!errMsg ? passwordValidation : []}
-											className={!inputFocus.password && (errMsg || !isMinLength) ? 'invalid' : ''}
-											{...{ onChange, onFocus, onBlur }}
-										/>
-									</div>
-								)}
-							</div>
+									<ValidationMessage
+										isVisible={!inputFocus.email && !(isValidEmail && !errMsg)}
+										validations={!errMsg ? emailValidation : []}
+									/>
+								</div>
+							) : (
+								<div className={`input-row vr ${!isInputEmail ? 'descend' : ''}`}>
+									<PMForm.Label
+										props={{
+											label: 'Master Password',
+											labelFor: 'password',
+											isFulfilled: isMinLength && !errMsg,
+										}}
+									/>
+									<PMForm.Input
+										id="password"
+										type="password"
+										placeholder="Password"
+										required
+										value={password}
+										linkRef={passwordInputRef}
+										disabled={isSubmitted}
+										className={!inputFocus.password && (errMsg || !isMinLength) ? 'invalid' : ''}
+										{...{ onChange, onFocus, onBlur }}
+									/>
+									<ValidationMessage
+										isVisible={!inputFocus.password && !(isMinLength && !errMsg)}
+										validations={!errMsg ? passwordValidation : []}
+									/>
+								</div>
+							)}
 
 							{isInputEmail && (
 								<Toggle
@@ -207,7 +225,7 @@ export const Login = () => {
 							>
 								{isInputEmail ? 'Continue' : 'Log in with Master Password'}
 							</SubmitButton>
-						</form>
+						</PMForm>
 
 						{isInputEmail ? (
 							<LinkLabel

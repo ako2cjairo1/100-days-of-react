@@ -22,7 +22,7 @@ export const LinkLabel: FCProps<ILinkLabel> = ({
 	return (
 		<div className={`${className} center small descend`}>
 			<p className="small">
-				{preText}{' '}
+				{preText}
 				<Link
 					ref={linkRef} // to handle focus from parent component
 					to={routeTo}

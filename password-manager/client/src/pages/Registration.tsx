@@ -6,6 +6,7 @@ import {
 	RunAfterSomeTime,
 	ExtractValFromRegEx,
 	Log,
+	MergeRegExObj,
 } from '@/services/Utils/password-manager.helper'
 import { useInput, useAuthContext } from '@/hooks'
 import {
@@ -14,8 +15,10 @@ import {
 	Separator,
 	AuthProviderSection,
 	SubmitButton,
-	FormInput,
 	Toggle,
+	PMForm,
+	ValidationMessage,
+	PasswordStrength,
 } from '@/components'
 
 export const Registration = () => {
@@ -133,72 +136,100 @@ export const Registration = () => {
 			<div className="form-container">
 				{success ? (
 					<Header>
-						<h1 className="fade-in">
-							<i className="fa fa-check-circle scale-up" /> Registration completed!
-						</h1>
-						<LinkLabel
-							linkRef={loginRef}
-							routeTo="/login"
-							preText="Proceed to"
-						>
-							login?
-						</LinkLabel>
+						<i className="fa fa-check-circle scale-up" />
+						<Header.Title title="Registration completed!">
+							<LinkLabel
+								linkRef={loginRef}
+								routeTo="/login"
+								preText="Proceed to"
+							>
+								login?
+							</LinkLabel>
+						</Header.Title>
 					</Header>
 				) : (
 					<>
-						<Header
-							title="Create Account"
-							subTitle="Create a free account with your email."
-							status={registrationStatus}
-						/>
-
-						<form onSubmit={handleSubmit}>
-							<FormInput
-								id="email"
-								type="email"
-								inputMode="email"
-								autoComplete="email"
-								autoCapitalize="none"
-								placeholder="sample@email.com"
-								value={email}
-								linkRef={emailRef}
-								disabled={submit}
-								required
-								label="Email Address"
-								isFocused={inputFocus.email}
-								isValid={isValidEmail && !errMsg}
-								validations={emailReq}
-								className={inputFocus.email ? '' : isValidEmail ? 'valid' : 'invalid'}
-								{...{ onChange, onFocus, onBlur }}
+						<Header>
+							<Header.Title
+								title="Create Account"
+								subTitle="Create a free account with your email."
 							/>
+							<Header.Status status={registrationStatus} />
+						</Header>
 
-							<FormInput
-								id="password"
-								type="password"
-								value={password}
-								disabled={submit}
-								required
-								havePasswordMeter={true}
-								label="Master Password"
-								isFocused={inputFocus.password}
-								isValid={isValidPassword && !errMsg}
-								validations={passwordReq}
-								title="Your master password must contain:"
-								{...{ onChange, onFocus, onBlur }}
-								className={inputFocus.password ? '' : isValidPassword ? 'valid' : 'invalid'}
-							/>
+						<PMForm onSubmit={handleSubmit}>
+							<div className="input-row">
+								<PMForm.Label
+									props={{
+										label: 'Email Address',
+										labelFor: 'email',
+										isFulfilled: isValidEmail && !errMsg,
+									}}
+								/>
+								<PMForm.Input
+									id="email"
+									type="email"
+									inputMode="email"
+									autoComplete="email"
+									autoCapitalize="none"
+									placeholder="sample@email.com"
+									value={email}
+									linkRef={emailRef}
+									disabled={submit}
+									required
+									className={inputFocus.email ? '' : isValidEmail ? 'valid' : 'invalid'}
+									{...{ onChange, onFocus, onBlur }}
+								/>
+								<ValidationMessage
+									isVisible={!inputFocus.email && !(isValidEmail && !errMsg)}
+									validations={emailReq}
+								/>
+							</div>
 
-							<div className="vr">
-								<FormInput
+							<div className="input-row">
+								<PMForm.Label
+									props={{
+										label: 'Master Password',
+										labelFor: 'password',
+										isFulfilled: isValidPassword && !errMsg,
+									}}
+								>
+									<PasswordStrength
+										password={password}
+										regex={MergeRegExObj(PASSWORD_REGEX)}
+									/>
+								</PMForm.Label>
+								<PMForm.Input
+									id="password"
+									type="password"
+									value={password}
+									disabled={submit}
+									required
+									{...{ onChange, onFocus, onBlur }}
+									className={inputFocus.password ? '' : isValidPassword ? 'valid' : 'invalid'}
+								/>
+								<ValidationMessage
+									title="Your master password must contain:"
+									isVisible={!inputFocus.password && !(isValidPassword && !errMsg)}
+									validations={passwordReq}
+								/>
+							</div>
+
+							<div className="input-row vr">
+								<PMForm.Label
+									props={{
+										label: 'Confirm Master Password',
+										labelFor: 'confirm',
+										isFulfilled: !inputFocus.confirm && isValidPassword && password === confirm,
+									}}
+								/>
+
+								<PMForm.Input
 									id="confirm"
 									type="password"
 									value={confirm}
 									disabled={submit}
 									required
-									label="Confirm Master Password"
-									isFocused={inputFocus.confirm}
-									isValid={!inputFocus.confirm && isValidPassword && password === confirm}
-									validations={confirmReq}
 									{...{ onChange, onFocus, onBlur }}
 									className={
 										inputFocus.confirm
@@ -207,6 +238,14 @@ export const Registration = () => {
 											? 'valid'
 											: 'invalid'
 									}
+								/>
+
+								<ValidationMessage
+									isVisible={
+										!inputFocus.confirm &&
+										!(!inputFocus.confirm && isValidPassword && password === confirm)
+									}
+									validations={confirmReq}
 								/>
 							</div>
 
@@ -243,7 +282,7 @@ export const Registration = () => {
 							>
 								Create account
 							</SubmitButton>
-						</form>
+						</PMForm>
 
 						<LinkLabel
 							routeTo="/login"

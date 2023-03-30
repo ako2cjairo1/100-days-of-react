@@ -61,7 +61,6 @@ header i {
 
 header p {
 	margin-top: 0;
-	/* margin-bottom: 20px; */
 }
 
 img,
@@ -75,16 +74,15 @@ video {
 h1 {
 	font-weight: 500;
 	line-height: 42px;
-	/* margin: 5px 0; */
 }
 a {
 	text-decoration: none;
 	margin-left: 5px;
-	color: var(--accent-color);
-	cursor: pointer;
 }
 a:hover,
 a:focus {
+	cursor: pointer;
+	color: var(--accent-color);
 	text-decoration: underline;
 }
 p {
@@ -223,14 +221,6 @@ button:disabled {
 	width: 100%;
 }
 .spinner {
-	/* position: relative;
-	left: -7%;
-	width: 24px;
-	height: 24px;
-	margin: -10px;
-	border-radius: 50%;
-	border: 3px solid rgba(255, 255, 255, 0.07);
-	border-top-color: currentColor; */
 	margin-right: 10px;
 	color: rgba(255, 255, 255, 0.47);
 	animation: spin 1s infinite linear;

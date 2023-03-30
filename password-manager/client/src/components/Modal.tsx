@@ -23,8 +23,7 @@ export const Modal: FCProps<IModal> = ({
 					onClick={clickBackdropToClose ? onClose : () => null}
 				/>
 			)}
-
-			<div className="modal-container">
+			<div className="modal-container form-container descend">
 				{!hideCloseButton && (
 					<div
 						className="modal-close"

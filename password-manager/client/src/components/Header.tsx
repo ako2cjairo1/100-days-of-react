@@ -1,4 +1,4 @@
-import { FCProps, IHeaderProps } from '@/types'
+import { IChildren, IHeaderProps } from '@/types'
 
 /** 
 The `Header` component is a React functional component that renders a header element with optional title, subtitle, and status.
@@ -12,14 +12,23 @@ The `Header` component is a React functional component that renders a header ele
 * 			and a p element containing the error message will be rendered.
 */
 
-export const Header: FCProps<IHeaderProps> = ({ children, title, subTitle, status, ...rest }) => {
+const Title = ({
+	children,
+	title,
+	subTitle,
+}: IChildren & Pick<IHeaderProps, 'title' | 'subTitle'>) => {
 	return (
-		<header {...rest}>
+		<>
 			{title && <h1 className="fade-in">{title}</h1>}
 			{subTitle && <p className="center descend">{subTitle}</p>}
-
 			{children}
+		</>
+	)
+}
 
+const Status = ({ children, status }: IChildren & Pick<IHeaderProps, 'status'>) => {
+	return (
+		<>
 			{status &&
 				(status.success ? (
 					<i className="fa fa-check scale-up" />
@@ -34,6 +43,14 @@ export const Header: FCProps<IHeaderProps> = ({ children, title, subTitle, statu
 						</div>
 					)
 				))}
-		</header>
+			{children}
+		</>
 	)
 }
+
+export const Header = ({ children }: IChildren) => {
+	return <header>{children}</header>
+}
+
+Header.Title = Title
+Header.Status = Status

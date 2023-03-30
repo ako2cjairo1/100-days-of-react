@@ -74,20 +74,10 @@ export const Vault = () => {
 			</VaultMenu>
 
 			<Modal props={{ isOpen: modal, onClose: () => setModal(false) }}>
-				<div
-					className="form-container descend"
-					style={{ borderRadius: '5px' }}
-				>
-					TODO: Implement New item form here...
-				</div>
+				TODO: Implement New item form here...
 			</Modal>
 			<Modal props={{ isOpen: itemModal, onClose: () => setItemModal(false) }}>
-				<div
-					className="form-container descend"
-					style={{ borderRadius: '5px' }}
-				>
-					TODO: Implement Item details here...
-				</div>
+				TODO: Implement Item details here...
 			</Modal>
 		</div>
 	)
