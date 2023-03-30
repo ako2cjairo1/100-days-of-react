@@ -2,11 +2,11 @@ import '@/assets/modules/AuthProviderSection.css'
 import google from '@/assets/google.png'
 import apple from '@/assets/apple.png'
 import github from '@/assets/github.png'
-import { FCProps } from '@/types'
+import { FCProps, TFunction } from '@/types'
 /**
  * Renders a section with buttons for external authentication providers.
  */
-export const AuthProviderSection: FCProps<{ cb?: () => void }> = ({ cb }) => {
+export const AuthProviderSection: FCProps<{ cb?: TFunction }> = ({ cb }) => {
 	const handleExternalAuth = () => {
 		alert('TODO: Implement external authentication.')
 		cb && cb()

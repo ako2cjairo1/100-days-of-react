@@ -1,7 +1,8 @@
 import { IRegExObj, TConvertToStringUnion } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
 
-export const LogValue = <T>(Obj: T) => {
+export const Log = <T>(Obj: T) => {
+	if (Obj instanceof Error) console.error(Obj)
 	console.log(Obj)
 }
 
@@ -143,7 +144,6 @@ type TraversedProperty = Partial<{
 export const MapUnknownObj = (obj: object): TraversedProperty => {
 	let result: TraversedProperty = {}
 
-	console.log()
 	for (const [key, value] of Object.entries(obj)) {
 		if (typeof value === 'object' && value !== null) {
 			const nestedProperties = MapUnknownObj(value)

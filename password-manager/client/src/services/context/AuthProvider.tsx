@@ -2,7 +2,7 @@ import { TAuthContext, TAuthProvider, FCWithChildren } from '@/types'
 import { createContext, useState } from 'react'
 import { AUTH_CONTEXT } from '@/services/constants'
 
-export const AuthContext = createContext<TAuthContext<TAuthProvider>>(AUTH_CONTEXT)
+export const AuthContext = createContext<TAuthContext<TAuthProvider> | null>(null)
 
 /**
  * AuthProvider component provides authentication context to its children components.

@@ -2,8 +2,12 @@ import { FormEvent, useEffect, useRef, useState, useCallback } from 'react'
 import '@/assets/modules/Login.css'
 import { TCredentials, TStatus, TPassword, TInputValidation } from '@/types/global.type'
 import { REGISTER_STATE } from '@/services/constants/Registration.constant'
-import { RunAfterSomeTime, ExtractValFromRegEx } from '@/services/Utils/password-manager.helper'
-import { useInput } from '@/hooks'
+import {
+	RunAfterSomeTime,
+	ExtractValFromRegEx,
+	Log,
+} from '@/services/Utils/password-manager.helper'
+import { useInput, useAuthContext } from '@/hooks'
 import {
 	Header,
 	LinkLabel,
@@ -13,7 +17,6 @@ import {
 	FormInput,
 	Toggle,
 } from '@/components'
-import useAuthContext from '@/hooks/useAuthContext'
 
 export const Registration = () => {
 	// constants
@@ -69,7 +72,7 @@ export const Registration = () => {
 		setRegistrationStatus(STATUS)
 		setLoginValidation(INPUT_VALIDATION)
 		setTestPassword(VALID_PASSWORD)
-		console.log(authInfo)
+		Log(authInfo)
 	}
 
 	const handleSubmit = async (e: FormEvent) => {

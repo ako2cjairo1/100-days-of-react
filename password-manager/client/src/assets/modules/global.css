@@ -357,4 +357,5 @@ input {
 .App {
 	display: flex;
 	place-items: center;
+	margin: 20px 0;
 }

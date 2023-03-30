@@ -1,13 +1,11 @@
-import { FCProps } from '@/types'
+import { FCProps, IVaultItem } from '@/types'
 
-interface IVaultItem {
-	logo: string
-	link: string
-	username: string
-}
-export const VaultItem: FCProps<IVaultItem> = ({ logo, link, username }) => {
+export const VaultItem: FCProps<IVaultItem> = ({ logo, link, username, onClick }) => {
 	return (
-		<div className="vault-item">
+		<div
+			className="vault-item"
+			onClick={() => onClick && onClick(username)}
+		>
 			<img
 				src={logo}
 				alt={link}

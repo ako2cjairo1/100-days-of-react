@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
-import { TStatus, TValidation } from './global.type'
+import { IChildren } from './base.type'
+import { TFunction, TStatus, TValidation } from './global.type'
 
 // Component Interfaces
 type TDetailedHTMLProps<T = HTMLElement> = React.DetailedHTMLProps<React.HTMLAttributes<T>, T>
@@ -67,6 +68,23 @@ export interface IPasswordStrength {
 
 export interface IRegExObj {
 	[key: string]: RegExp
+}
+
+export interface IVaultItem {
+	logo: string
+	link: string
+	username: string
+	onClick?: TFunction<string>
+}
+
+export interface IModal extends IChildren {
+	props: {
+		isOpen: boolean
+		noBackdrop?: boolean
+		clickBackdropToClose?: boolean
+		onClose?: TFunction
+		hideCloseButton?: boolean
+	}
 }
 
 // import { Header } from '@/components'

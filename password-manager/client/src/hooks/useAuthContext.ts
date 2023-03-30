@@ -1,7 +1,12 @@
 import { AuthContext } from '@/services/context'
-import { TAuthContext, TAuthProvider } from '@/types'
 import { useContext } from 'react'
 
-export default function useAuthContext(): TAuthContext<TAuthProvider> {
-	return useContext(AuthContext)
+export const useAuthContext = () => {
+	const context = useContext(AuthContext)
+
+	if (!context) {
+		throw new Error('AuthContext is missing')
+	}
+
+	return context
 }

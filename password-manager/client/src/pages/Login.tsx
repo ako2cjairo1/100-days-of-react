@@ -1,13 +1,13 @@
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
 import { TCredentials, TStatus } from '@/types/global.type'
-import { useInput } from '@/hooks'
+import { useInput, useAuthContext } from '@/hooks'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
 import {
 	CreateError,
 	ExtractValFromRegEx,
 	LocalStorage,
-	LogValue,
+	Log,
 	RunAfterSomeTime,
 } from '@/services/Utils/password-manager.helper'
 import {
@@ -19,7 +19,6 @@ import {
 	SubmitButton,
 	Toggle,
 } from '@/components'
-import useAuthContext from '@/hooks/useAuthContext'
 
 export const Login = () => {
 	// constants
@@ -49,7 +48,6 @@ export const Login = () => {
 	}, [setInputStates])
 
 	useEffect(() => {
-		LogValue(vaultLinkRef.current)
 		if (isInputEmail) emailInputRef.current?.focus()
 		else if (success) vaultLinkRef.current?.focus()
 		else passwordInputRef.current?.focus()
@@ -61,7 +59,7 @@ export const Login = () => {
 		setLoginStatus(prev => ({ ...prev, errMsg: '' }))
 	}, [inputStates])
 
-	const handleSubmit = async (e: FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 
 		setLoginStatus(prev => ({ ...prev, errMsg: '' }))
@@ -102,7 +100,7 @@ export const Login = () => {
 	const handleChangeEmail = () => {
 		resetInputState('password')
 		setIsInputEmail(true)
-		console.log(authInfo)
+		Log(authInfo)
 	}
 
 	const isMinLength = minLength.test(password)

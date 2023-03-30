@@ -1,5 +1,5 @@
 import { ChangeEvent, FocusEvent, useCallback, useEffect, useState } from 'react'
-import { ConvertPropsToBool } from '@/services/Utils/password-manager.helper'
+import { ConvertPropsToBool, Log } from '@/services/Utils/password-manager.helper'
 
 /**
  * A custom hook that manages input states and focus events.
@@ -51,7 +51,7 @@ export const useInput = <T>(initState: T) => {
 		inputFocus,
 		setInputStates,
 		onChange: handleChange,
-		onFocus: (e: TInputEvent) => console.log(`"${e.target.id}" focused`),
+		onFocus: (e: TInputEvent) => Log(`"${e.target.id}" focused`),
 		onBlur: (e: TInputEvent) => setInputFocus(prev => ({ ...prev, [e.target.id]: false })),
 	}
 
