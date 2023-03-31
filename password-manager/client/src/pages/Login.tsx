@@ -17,7 +17,7 @@ import {
 	AuthProviderSection,
 	SubmitButton,
 	Toggle,
-	PMForm,
+	FormGroup,
 	ValidationMessage,
 } from '@/components'
 
@@ -146,17 +146,17 @@ export const Login = () => {
 							<Header.Status status={loginStatus} />
 						</Header>
 
-						<PMForm onSubmit={handleSubmit}>
+						<FormGroup onSubmit={handleSubmit}>
 							{isInputEmail ? (
 								<div className="input-row vr">
-									<PMForm.Label
+									<FormGroup.Label
 										props={{
 											label: 'Email Address',
 											labelFor: 'email',
 											isFulfilled: isValidEmail && !errMsg,
 										}}
 									/>
-									<PMForm.Input
+									<FormGroup.Input
 										id="email"
 										type="text"
 										inputMode="email"
@@ -176,14 +176,14 @@ export const Login = () => {
 								</div>
 							) : (
 								<div className={`input-row vr ${!isInputEmail ? 'descend' : ''}`}>
-									<PMForm.Label
+									<FormGroup.Label
 										props={{
 											label: 'Master Password',
 											labelFor: 'password',
 											isFulfilled: isMinLength && !errMsg,
 										}}
 									/>
-									<PMForm.Input
+									<FormGroup.Input
 										id="password"
 										type="password"
 										placeholder="Password"
@@ -225,7 +225,7 @@ export const Login = () => {
 							>
 								{isInputEmail ? 'Continue' : 'Log in with Master Password'}
 							</SubmitButton>
-						</PMForm>
+						</FormGroup>
 
 						{isInputEmail ? (
 							<LinkLabel

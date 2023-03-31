@@ -2,15 +2,19 @@ import '@/assets/modules/Vault.css'
 import google from '@/assets/google.png'
 import apple from '@/assets/apple.png'
 import github from '@/assets/github.png'
-import { Header, VaultMenu } from '@/components'
+import { Header, Toolbar } from '@/components'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '@/hooks'
 import { Modal } from '@/components/Modal'
 import { useState } from 'react'
 import { Log } from '@/services/Utils/password-manager.helper'
-import { MainVault } from '@/components/MainVault'
+import { KeychainContainer } from '@/components/KeychainContainer'
 
-export const Vault = () => {
+/**
+ * Renders a Keychain component
+ * @returns A div element with the class "vault-container" containing a KeychainContainer, a Toolbar, and two Modal components
+ */
+export const Keychain = () => {
 	const [modal, setModal] = useState(false)
 	const [itemModal, setItemModal] = useState(false)
 
@@ -50,28 +54,28 @@ export const Vault = () => {
 
 	return (
 		<div className="vault-container">
-			<MainVault>
+			<KeychainContainer>
 				<Header>
 					<h1 className="scale-up">
 						<i className="fa fa-key logo-key fade-in" />
 						<i className="fa fa-shield logo-shield scale-up" /> Secured Keychain
 					</h1>
 				</Header>
-				<MainVault.List {...{ securedList, listEvent }} />
-			</MainVault>
+				<KeychainContainer.List {...{ securedList, listEvent }} />
+			</KeychainContainer>
 
-			<VaultMenu>
-				<VaultMenu.Item
+			<Toolbar>
+				<Toolbar.Item
 					name="logout"
 					iconName="fa-sign-out"
 					menuCb={handleLogout}
 				/>
-				<VaultMenu.Item
+				<Toolbar.Item
 					name="add item"
 					iconName="fa-plus"
 					menuCb={() => setModal(true)}
 				/>
-			</VaultMenu>
+			</Toolbar>
 
 			<Modal props={{ isOpen: modal, onClose: () => setModal(false) }}>
 				TODO: Implement New item form here...

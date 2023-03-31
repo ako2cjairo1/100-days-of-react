@@ -2,6 +2,18 @@ import '@/assets/modules/Modal.css'
 import { FCProps, IModal } from '@/types'
 import { createPortal } from 'react-dom'
 
+/**
+ * This is a Modal component that displays its children when isOpen is true.
+ * param children - The content to be displayed inside the modal.
+ * param props - An object containing the following properties:
+ * param props.isOpen - A boolean indicating whether the modal is open or not.
+ * param props.onClose - A function to be called when the modal is closed.
+ * param props.noBackdrop - An optional boolean indicating whether to show the backdrop or not. Defaults to false.
+ * param props.hideCloseButton - An optional boolean indicating whether to hide the close button or not. Defaults to false.
+ * param props.clickBackdropToClose - An optional boolean indicating whether clicking on the backdrop should close the modal. Defaults to true.
+ *
+ * returns A React Portal containing the modal if isOpen is true, otherwise null.
+ */
 export const Modal: FCProps<IModal> = ({
 	children,
 	props: { isOpen, onClose, noBackdrop = false, hideCloseButton, clickBackdropToClose = true },
@@ -26,6 +38,7 @@ export const Modal: FCProps<IModal> = ({
 			<div className="modal-container form-container descend">
 				{!hideCloseButton && (
 					<div
+						data-testid="modal-close"
 						className="modal-close"
 						onClick={onClose}
 					>

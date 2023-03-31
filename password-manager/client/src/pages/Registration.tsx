@@ -16,7 +16,7 @@ import {
 	AuthProviderSection,
 	SubmitButton,
 	Toggle,
-	PMForm,
+	FormGroup,
 	ValidationMessage,
 	PasswordStrength,
 } from '@/components'
@@ -157,16 +157,16 @@ export const Registration = () => {
 							<Header.Status status={registrationStatus} />
 						</Header>
 
-						<PMForm onSubmit={handleSubmit}>
+						<FormGroup onSubmit={handleSubmit}>
 							<div className="input-row">
-								<PMForm.Label
+								<FormGroup.Label
 									props={{
 										label: 'Email Address',
 										labelFor: 'email',
 										isFulfilled: isValidEmail && !errMsg,
 									}}
 								/>
-								<PMForm.Input
+								<FormGroup.Input
 									id="email"
 									type="email"
 									inputMode="email"
@@ -187,7 +187,7 @@ export const Registration = () => {
 							</div>
 
 							<div className="input-row">
-								<PMForm.Label
+								<FormGroup.Label
 									props={{
 										label: 'Master Password',
 										labelFor: 'password',
@@ -198,8 +198,8 @@ export const Registration = () => {
 										password={password}
 										regex={MergeRegExObj(PASSWORD_REGEX)}
 									/>
-								</PMForm.Label>
-								<PMForm.Input
+								</FormGroup.Label>
+								<FormGroup.Input
 									id="password"
 									type="password"
 									value={password}
@@ -216,7 +216,7 @@ export const Registration = () => {
 							</div>
 
 							<div className="input-row vr">
-								<PMForm.Label
+								<FormGroup.Label
 									props={{
 										label: 'Confirm Master Password',
 										labelFor: 'confirm',
@@ -224,7 +224,7 @@ export const Registration = () => {
 									}}
 								/>
 
-								<PMForm.Input
+								<FormGroup.Input
 									id="confirm"
 									type="password"
 									value={confirm}
@@ -282,7 +282,7 @@ export const Registration = () => {
 							>
 								Create account
 							</SubmitButton>
-						</PMForm>
+						</FormGroup>
 
 						<LinkLabel
 							routeTo="/login"

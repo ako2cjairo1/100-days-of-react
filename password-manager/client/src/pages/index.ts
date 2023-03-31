@@ -1,3 +1,3 @@
 export * from './Login'
 export * from './Registration'
-export * from './Vault'
+export * from './Keychain'
