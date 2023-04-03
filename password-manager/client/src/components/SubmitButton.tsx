@@ -21,7 +21,9 @@ export const SubmitButton: FCProps<ISubmitButton> = ({
 		<button
 			data-testid="submit"
 			type="submit"
-			className={`submit ${variant === 'primary' ? 'accent-bg' : ''} ${className ? className : ''}`}
+			className={`button-style submit ${variant === 'primary' ? 'accent-bg' : ''} ${
+				className ? className : ''
+			}`}
 			disabled={disabled}
 			onClick={props.onClick}
 			{...props}

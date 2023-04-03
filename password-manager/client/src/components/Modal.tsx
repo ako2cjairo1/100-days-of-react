@@ -22,10 +22,8 @@ export const Modal: FCProps<IModal> = ({
 		return null
 	}
 
-	const modalRoot = document.getElementById('modal-root') as HTMLElement
-
+	const modalRoot = document.getElementById('modal-root')
 	if (!modalRoot) return null
-	modalRoot.style.position = 'absolute'
 
 	return createPortal(
 		<div className="modal-wrapper">

@@ -33,7 +33,7 @@ export const Registration = () => {
 	const { password, email, confirm, isTermsAgreed } = inputStates
 	const [registrationStatus, setRegistrationStatus] = useState<TStatus>(STATUS)
 	// destructure
-	const { success, errMsg } = registrationStatus
+	const { success, message } = registrationStatus
 	const [loginValidation, setLoginValidation] = useState<TInputValidation>(INPUT_VALIDATION)
 	// destructure
 	const { isValidEmail, isValidPassword } = loginValidation
@@ -67,7 +67,7 @@ export const Registration = () => {
 	useEffect(() => {
 		inputValidationCb()
 
-		setRegistrationStatus(prev => ({ ...prev, errMsg: '' }))
+		setRegistrationStatus(prev => ({ ...prev, message: '' }))
 	}, [inputValidationCb])
 
 	const resetRegistration = () => {
@@ -82,7 +82,7 @@ export const Registration = () => {
 		e.preventDefault()
 
 		if (!submit) {
-			setRegistrationStatus(prev => ({ ...prev, errMsg: '' }))
+			setRegistrationStatus(prev => ({ ...prev, message: '' }))
 			setSubmit(true)
 			RunAfterSomeTime(() => {
 				if (Object.values(loginValidation).every(Boolean)) {
@@ -90,11 +90,11 @@ export const Registration = () => {
 
 					updateAuthInfo({ ...inputStates, accessToken: 'fakeToken' })
 					resetRegistration()
-					setRegistrationStatus({ success: true, errMsg: '' })
+					setRegistrationStatus({ success: true, message: '' })
 				} else {
 					setRegistrationStatus({
 						success: false,
-						errMsg: 'Registration Failed!',
+						message: 'Registration Failed!',
 					})
 				}
 
@@ -163,7 +163,7 @@ export const Registration = () => {
 									props={{
 										label: 'Email Address',
 										labelFor: 'email',
-										isFulfilled: isValidEmail && !errMsg,
+										isFulfilled: isValidEmail && !message,
 									}}
 								/>
 								<FormGroup.Input
@@ -181,7 +181,7 @@ export const Registration = () => {
 									{...{ onChange, onFocus, onBlur }}
 								/>
 								<ValidationMessage
-									isVisible={!inputFocus.email && !(isValidEmail && !errMsg)}
+									isVisible={!inputFocus.email && !(isValidEmail && !message)}
 									validations={emailReq}
 								/>
 							</div>
@@ -191,7 +191,7 @@ export const Registration = () => {
 									props={{
 										label: 'Master Password',
 										labelFor: 'password',
-										isFulfilled: isValidPassword && !errMsg,
+										isFulfilled: isValidPassword && !message,
 									}}
 								>
 									<PasswordStrength
@@ -210,7 +210,7 @@ export const Registration = () => {
 								/>
 								<ValidationMessage
 									title="Your master password must contain:"
-									isVisible={!inputFocus.password && !(isValidPassword && !errMsg)}
+									isVisible={!inputFocus.password && !(isValidPassword && !message)}
 									validations={passwordReq}
 								/>
 							</div>
@@ -235,8 +235,8 @@ export const Registration = () => {
 										inputFocus.confirm
 											? ''
 											: isValidPassword && password === confirm
-											? 'valid'
-											: 'invalid'
+												? 'valid'
+												: 'invalid'
 									}
 								/>
 
@@ -300,7 +300,7 @@ export const Registration = () => {
 								cb={() =>
 									setRegistrationStatus(prev => ({
 										...prev,
-										errMsg: 'TODO: Implement external authentication.',
+										message: 'TODO: Implement external authentication.',
 									}))
 								}
 							/>

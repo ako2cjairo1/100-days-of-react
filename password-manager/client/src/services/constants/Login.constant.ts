@@ -9,6 +9,6 @@ export const LOGIN_STATE = {
 	},
 	Status: {
 		success: false,
-		errMsg: '',
+		message: '',
 	},
 } satisfies Record<'Credential', TCredentials> & Record<'Status', TStatus>

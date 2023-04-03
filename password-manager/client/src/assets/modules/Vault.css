@@ -5,6 +5,20 @@
 	gap: 15px;
 }
 
+.keychain-info {
+	display: block;
+	height: 30px;
+	width: 100%;
+	margin: 5px 0px;
+	padding: 5px;
+	border-radius: 5px;
+	background-color: rgba(255, 255, 255, 0.07);
+	border: 2px solid rgba(255, 255, 255, 0.1);
+	font-size: 14px;
+	font-weight: 300;
+	transition: var(--transition);
+}
+
 .keychain-item {
 	display: flex;
 	align-items: center;
@@ -14,6 +28,16 @@
 	border-radius: 5px;
 	background-color: rgba(255, 255, 255, 0.1);
 	transition: var(--transition);
+}
+
+.keychain-item + .details {
+	background: transparent !important;
+	cursor: default !important;
+}
+
+.header {
+	width: 50px !important;
+	height: 50px !important;
 }
 
 .keychain-item:hover:not(:disabled) {
@@ -28,20 +52,19 @@
 .logo-key {
 	position: relative;
 	margin-top: 15px;
-	margin-left: 10px;
 	font-size: 20px;
 	transition: var(--transition);
 }
 .logo-shield {
 	position: absolute;
-	left: 45%;
+	left: 43%;
 	opacity: 0.5;
 	transition: var(--transition);
 }
 
 .keychain-item img {
-	width: 30px;
-	height: 30px;
+	width: 35px;
+	height: 35px;
 	margin: 5px;
 	position: relative;
 	padding: 5px;
@@ -53,6 +76,7 @@
 .keychain-item a {
 	color: currentColor;
 	margin: unset;
+	width: fit-content;
 	overflow: hidden;
 }
 
@@ -70,16 +94,38 @@
 	gap: 10px;
 }
 .menu {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 35px !important;
 	height: 35px !important;
 	border-radius: 50% !important;
 	font-size: 15px !important;
 }
 
-.keychain-item-description {
+.keychain-item-header {
 	width: 100%;
 	padding: inherit;
 	text-align: start;
+}
+
+.keychain-item-description {
+	display: grid;
+	width: 100%;
+	padding: inherit;
+	text-align: left;
+}
+.keychain-item-description div {
+	display: flex;
+	place-items: center;
+}
+
+.details > div > p {
+	margin: 15px 5px;
+	padding: 5px;
+}
+.keychain-item > div:first-child {
+	width: 155px;
 }
 
 .vault-container > section > * {
@@ -105,4 +151,59 @@
 
 .vault-container > section > *:last-child {
 	animation-delay: 0.5s;
+}
+
+.action-button {
+	border: 1px solid;
+	height: fit-content;
+	width: fit-content;
+	padding: 8px !important;
+	text-align: center;
+	background-color: var(--background-color);
+	opacity: 0.4;
+	color: currentColor;
+	transition: var(--transition);
+}
+
+input {
+	border-top-right-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+}
+
+.rounded-right {
+	border-top-right-radius: 0.25rem;
+	border-bottom-right-radius: 0.25rem;
+}
+
+.action-button.active {
+	/* background-color: var(--background-color); */
+	opacity: 1;
+}
+
+.action-button:hover:not(:disabled) {
+	background-color: var(--background-color);
+	/* opacity: 1; */
+	cursor: pointer;
+}
+
+@media (max-width: 500px) {
+	.vault-container {
+		display: grid;
+		gap: 0px;
+	}
+	.vault-menu {
+		display: flex;
+		width: 100%;
+		flex-direction: row;
+		gap: 10px;
+		height: 65px;
+		place-items: center;
+	}
+	.menu {
+		width: 35px !important;
+		height: 35px !important;
+		padding: 0px !important;
+		border-radius: 50% !important;
+		font-size: 15px !important;
+	}
 }

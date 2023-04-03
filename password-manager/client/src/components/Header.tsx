@@ -33,13 +33,13 @@ const Status = ({ children, status }: IChildren & Pick<IHeaderProps, 'status'>) 
 				(status.success ? (
 					<i className="fa fa-check scale-up" />
 				) : (
-					status.errMsg && (
+					status.message && (
 						<div
-							className={`center fdc ${status.errMsg ? 'fade-in' : ''}`}
-							style={{ opacity: `${status.errMsg ? 1 : 0}` }}
+							className={`center fdc ${status.message ? 'fade-in' : ''}`}
+							style={{ opacity: `${status.message ? 1 : 0}` }}
 						>
 							<i className="fa-solid fa-triangle-exclamation fa-fade error regular" />
-							<p className="center x-small descend error">{status.errMsg}</p>
+							<p className="center x-small descend error">{status.message}</p>
 						</div>
 					)
 				))}

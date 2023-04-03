@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
  * 		score (a number representing the score of the password).
  */
 export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvaluatedPassword => {
+	if (!password) return { status: 'none', score: 0 }
 	if (!regex) {
 		regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/
 	}
@@ -50,7 +51,7 @@ export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvalu
  *
  * @returns {FCProps} A Custom Password Strength indicator component
  */
-export const PasswordStrength: FCProps<IPasswordStrength> = ({ password, regex }) => {
+export const PasswordStrength: FCProps<Partial<IPasswordStrength>> = ({ password, regex }) => {
 	const { status, score } = evaluatePassword({ password, regex })
 	const [toggleAnimation, setToggleAnimation] = useState(false)
 	const passwordStatuses = Object.values(PasswordStatus).filter(status => status !== 'strength')

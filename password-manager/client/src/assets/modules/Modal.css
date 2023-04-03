@@ -1,6 +1,8 @@
 .modal-wrapper {
 	display: flex;
-	position: relative;
+	position: absolute;
+	top: 50%;
+	left: 50%;
 	justify-content: center;
 	align-items: center;
 	z-index: 1;
@@ -62,6 +64,12 @@
 	z-index: 1;
 }
 .modal-close i {
+	opacity: 0.5;
+	color: darkgray;
+	transition: var(--transition);
+}
+.modal-close:hover i {
+	opacity: 1;
 	color: currentColor;
 }
 

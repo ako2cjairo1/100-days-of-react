@@ -146,24 +146,27 @@ input.invalid:focus {
 .invalid {
 	border: 1px solid rgb(248, 120, 116);
 }
-button {
+
+button,
+.button-style {
 	width: 100%;
 	padding: 5px;
 	text-align: center;
 	border-radius: 20px;
 	background-color: var(--background-color);
 	border: var(--border);
-	color: currentColor;
+	color: currentColor !important;
 	transition: var(--transition);
 }
-button:hover:not(:disabled) {
+
+.button-style:hover:not(:disabled) {
 	/* background-color: rgba(255, 255, 255, 0.47); */
 	border: 2px solid rgba(255, 255, 255, 0.1);
 	box-shadow: 0px 0px 5px 1px rgb(255, 255, 255);
 	/* color: black; */
 	cursor: pointer;
 }
-button:disabled {
+.button-style:disabled {
 	background-color: var(--background-color);
 }
 .accent-bg {

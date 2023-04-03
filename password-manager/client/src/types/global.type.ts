@@ -11,7 +11,7 @@ export type TCredentials = {
 
 export type TStatus = Partial<{
 	success: boolean
-	errMsg: string
+	message: string
 }>
 
 export type TInputValidation = {

@@ -32,7 +32,7 @@ export const Login = () => {
 	const { email, password, isRemember } = inputStates
 	const [loginStatus, setLoginStatus] = useState<TStatus>(LOGIN_STATE.Status)
 	// destructure states
-	const { success, errMsg } = loginStatus
+	const { success, message } = loginStatus
 	const emailInputRef = useRef<HTMLInputElement>(null)
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const vaultLinkRef = useRef<HTMLAnchorElement>(null)
@@ -58,13 +58,13 @@ export const Login = () => {
 	}, [success, isInputEmail, isSubmitted])
 
 	useEffect(() => {
-		setLoginStatus(prev => ({ ...prev, errMsg: '' }))
+		setLoginStatus(prev => ({ ...prev, message: '' }))
 	}, [inputStates])
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 
-		setLoginStatus(prev => ({ ...prev, errMsg: '' }))
+		setLoginStatus(prev => ({ ...prev, message: '' }))
 		if (isInputEmail) {
 			setIsInputEmail(false)
 			if (isRemember) LocalStorage.set('password_manager_email', email)
@@ -84,13 +84,13 @@ export const Login = () => {
 					// )
 
 					updateAuthInfo({ ...inputStates, accessToken: 'fake token' })
-					setLoginStatus({ success: true, errMsg: '' })
+					setLoginStatus({ success: true, message: '' })
 					resetInputState()
 
 					setIsSubmitted(false)
 				} catch (error) {
 					setIsSubmitted(false)
-					setLoginStatus({ success: false, errMsg: CreateError(error).message })
+					setLoginStatus({ success: false, message: CreateError(error).message })
 					return false
 				}
 			}, 3)
@@ -153,7 +153,7 @@ export const Login = () => {
 										props={{
 											label: 'Email Address',
 											labelFor: 'email',
-											isFulfilled: isValidEmail && !errMsg,
+											isFulfilled: isValidEmail && !message,
 										}}
 									/>
 									<FormGroup.Input
@@ -166,12 +166,12 @@ export const Login = () => {
 										value={email}
 										linkRef={emailInputRef}
 										disabled={!isInputEmail || isSubmitted}
-										className={!inputFocus.email && (errMsg || !isValidEmail) ? 'invalid' : ''}
+										className={!inputFocus.email && (message || !isValidEmail) ? 'invalid' : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
-										isVisible={!inputFocus.email && !(isValidEmail && !errMsg)}
-										validations={!errMsg ? emailValidation : []}
+										isVisible={!inputFocus.email && !(isValidEmail && !message)}
+										validations={!message ? emailValidation : []}
 									/>
 								</div>
 							) : (
@@ -180,7 +180,7 @@ export const Login = () => {
 										props={{
 											label: 'Master Password',
 											labelFor: 'password',
-											isFulfilled: isMinLength && !errMsg,
+											isFulfilled: isMinLength && !message,
 										}}
 									/>
 									<FormGroup.Input
@@ -191,12 +191,12 @@ export const Login = () => {
 										value={password}
 										linkRef={passwordInputRef}
 										disabled={isSubmitted}
-										className={!inputFocus.password && (errMsg || !isMinLength) ? 'invalid' : ''}
+										className={!inputFocus.password && (message || !isMinLength) ? 'invalid' : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
-										isVisible={!inputFocus.password && !(isMinLength && !errMsg)}
-										validations={!errMsg ? passwordValidation : []}
+										isVisible={!inputFocus.password && !(isMinLength && !message)}
+										validations={!message ? passwordValidation : []}
 									/>
 								</div>
 							)}
@@ -253,7 +253,7 @@ export const Login = () => {
 								cb={() =>
 									setLoginStatus(prev => ({
 										...prev,
-										errMsg: 'TODO: Implement external authentication.',
+										message: 'TODO: Implement external authentication.',
 									}))
 								}
 							/>

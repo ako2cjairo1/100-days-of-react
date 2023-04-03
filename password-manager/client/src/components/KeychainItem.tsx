@@ -1,4 +1,4 @@
-import { FCProps, IVaultItem } from '@/types'
+import { FCProps, IKeychainItem } from '@/types'
 
 /**
  * This is a functional component that represents a keychain item in a vault.
@@ -10,7 +10,7 @@ import { FCProps, IVaultItem } from '@/types'
  *
  * returns {JSX.Element} A JSX element representing the keychain item.
  */
-export const KeychainItem: FCProps<IVaultItem> = ({ logo, link, username, onClick }) => {
+export const KeychainItem: FCProps<IKeychainItem> = ({ logo, link, username, onClick }) => {
 	return (
 		<div
 			className="keychain-item"

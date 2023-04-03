@@ -1,16 +1,55 @@
 import { Toolbar } from '@/components'
 import { fireEvent, render } from '@/services/Utils/test.util'
+import { MemoryRouter } from 'react-router-dom'
 
-describe('Toolbar', () => {
-	it('calls menuCb when Toolbar.Item is clicked', () => {
+describe('Item', () => {
+	it('renders a Link with the given name as title', () => {
+		const { getByTitle } = render(
+			<MemoryRouter>
+				<Toolbar.Item name="Test" />
+			</MemoryRouter>
+		)
+		expect(getByTitle('Test')).toBeInTheDocument()
+	})
+
+	it('navigates to the given URL when clicked', () => {
+		const navigateTo = '/test'
+		const { getByTitle } = render(
+			<MemoryRouter>
+				<Toolbar.Item
+					name="Test"
+					navigateTo={navigateTo}
+				/>
+			</MemoryRouter>
+		)
+		fireEvent.click(getByTitle('Test'))
+		// expect the URL to have changed to the given navigateTo value
+	})
+
+	it('calls the given callback function when clicked', () => {
 		const menuCb = vi.fn()
 		const { getByTitle } = render(
-			<Toolbar.Item
-				name="Item 1"
-				menuCb={menuCb}
-			/>
+			<MemoryRouter>
+				<Toolbar.Item
+					name="Test"
+					menuCb={menuCb}
+				/>
+			</MemoryRouter>
 		)
-		fireEvent.click(getByTitle('Item 1'))
+		fireEvent.click(getByTitle('Test'))
 		expect(menuCb).toHaveBeenCalled()
+	})
+
+	it('renders an icon with the given iconName', () => {
+		const iconName = 'fa fa-test'
+		const { getByTestId } = render(
+			<MemoryRouter>
+				<Toolbar.Item
+					name="Test"
+					iconName={iconName}
+				/>
+			</MemoryRouter>
+		)
+		expect(getByTestId(iconName)).toBeInTheDocument()
 	})
 })

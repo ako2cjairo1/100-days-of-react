@@ -59,7 +59,7 @@ export const RunAfterSomeTime = (
 	} else {
 		timerId = setInterval(() => callbackFn(), seconds * 1000)
 	}
-	return () => timerId
+	return timerId
 }
 
 /**
@@ -165,12 +165,12 @@ export const MapUnknownObj = (obj: object): TraversedProperty => {
  * param {unknown} error - The error to be processed.
  * returns {IPasswordMangerError} - The processed error object.
  */
-type PasswordMangerError = Error & {
+type PasswordManagerError = Error & {
 	code: number | string
 	unknownError?: unknown
 }
 export const CreateError = (error: unknown) => {
-	let result: PasswordMangerError = {
+	let result: PasswordManagerError = {
 		code: -1,
 		name: 'An error has occurred.',
 		message: 'An unknown error occurred.',
@@ -183,7 +183,7 @@ export const CreateError = (error: unknown) => {
 
 	if (typeof error === 'object' && error !== null) {
 		// error is an object cast to interface with a name, message or code properties
-		const unknownError = error as PasswordMangerError
+		const unknownError = error as PasswordManagerError
 
 		if (unknownError) {
 			const { code, name, message } = unknownError

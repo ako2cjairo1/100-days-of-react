@@ -1,8 +1,8 @@
-import { FCProps, IChildren, IVaultItem, TFunction } from '@/types'
+import { FCProps, IChildren, IKeychainItem, TFunction } from '@/types'
 import { KeychainItem } from './KeychainItem'
 
 interface IKeychainList {
-	securedList: Array<IVaultItem>
+	securedList: Array<IKeychainItem>
 	listEvent: TFunction<string>
 }
 
