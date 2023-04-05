@@ -1,9 +1,9 @@
-import { FCProps, IChildren, IKeychainItem, TFunction } from '@/types'
+import { IChildren, IKeychainItem, TFunction } from '@/types'
 import { KeychainItem } from './KeychainItem'
 
 interface IKeychainList {
 	keychain: Array<IKeychainItem>
-	event: TFunction<number>
+	event: TFunction<string>
 }
 
 /**
@@ -13,14 +13,14 @@ interface IKeychainList {
  *
  * returns A React fragment containing a list of KeychainItem components
  */
-const Keychain: FCProps<IKeychainList> = ({ keychain, event }) => {
+function Keychain({ keychain, event }: IKeychainList) {
 	return (
 		<>
-			{keychain.map(({ keychainId, logo, website: link, username }, idx) => (
+			{keychain.map(({ keychainId, logo, website, username }) => (
 				<KeychainItem
-					key={idx}
+					key={keychainId}
 					onClick={event}
-					{...{ keychainId, logo, website: link, username }}
+					{...{ keychainId, logo, website, username }}
 				/>
 			))}
 		</>
@@ -33,7 +33,7 @@ const Keychain: FCProps<IKeychainList> = ({ keychain, event }) => {
  *
  * returns A section element with the class "form-container" containing the child components
  */
-export const KeychainContainer = ({ children }: IChildren) => {
+export function KeychainContainer({ children }: IChildren) {
 	return <section className="form-container">{children}</section>
 }
 

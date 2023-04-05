@@ -10,11 +10,11 @@ export type TCredentials = {
 }
 
 export type TKeychain = {
-	keychainId: number
+	keychainId: string
 	logo?: string
-	website?: string
-	username?: string
-	password?: string
+	website: string
+	username: string
+	password: string
 }
 
 export type TStatus = {

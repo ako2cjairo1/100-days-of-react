@@ -1,13 +1,21 @@
 import { Link } from 'react-router-dom'
 import { PasswordStrength } from './PasswordStrength'
-import { FCProps, IKeychainItem, TFunction } from '@/types'
+import { TFunction, TKeychain } from '@/types'
 import { useTimedCopyToClipboard } from '@/hooks'
 import { useState } from 'react'
-import { SubmitButton } from './SubmitButton'
 
-export const KeychainForm: FCProps<
-	Partial<IKeychainItem> & { isEdit?: boolean; cbFn: TFunction }
-> = ({ logo, website: link, username, password, isEdit = false, cbFn }) => {
+interface IKeychainForm extends Partial<TKeychain> {
+	isEdit?: boolean
+	updateCallback: TFunction<Partial<TKeychain>>
+}
+export function KeychainForm({
+	logo,
+	website,
+	username,
+	password,
+	isEdit = false,
+	updateCallback,
+}: IKeychainForm) {
 	const [revealPassword, setRevealPassword] = useState(false)
 	const userNameClipboard = useTimedCopyToClipboard({ value: username, message: 'Email copied!' })
 	const passwordClipboard = useTimedCopyToClipboard({
@@ -30,7 +38,9 @@ export const KeychainForm: FCProps<
 		userNameClipboard.clear()
 		passwordClipboard.clear()
 		setRevealPassword(false)
-		cbFn()
+
+		// send the changes of keychain info for mutation
+		updateCallback({})
 	}
 
 	return (
@@ -39,18 +49,18 @@ export const KeychainForm: FCProps<
 				<img
 					className="header"
 					src={logo}
-					alt={link}
+					alt={website}
 				/>
 				<div
 					className="keychain-item-header"
 					onClick={handleBackToKeychains}
 				>
 					<a
-						href={`//${link}`}
+						href={`//${website}`}
 						rel="noreferrer"
 						target="_blank"
 					>
-						{link}
+						{website}
 					</a>
 					<p>Last modified </p>
 				</div>
@@ -66,20 +76,19 @@ export const KeychainForm: FCProps<
 
 			<div className="keychain-item details">
 				<div className="keychain-item-description">
-					{isEdit && <p>Website</p>}
+					<p>Website</p>
 					<p>User Name</p>
 					<p>Password</p>
 				</div>
+
 				<div className="keychain-item-description">
-					{isEdit && (
-						<input
-							className="keychain-info"
-							type="text"
-							autoComplete="false"
-							placeholder="example.com"
-							value={username}
-						/>
-					)}
+					<input
+						className="keychain-info"
+						type="text"
+						autoComplete="false"
+						placeholder="example.com"
+						value={username}
+					/>
 					<div>
 						<input
 							className="keychain-info"
@@ -87,7 +96,7 @@ export const KeychainForm: FCProps<
 							autoComplete="false"
 							placeholder="User Name"
 							value={username}
-							readOnly={!isEdit}
+							readOnly
 						/>
 						<i
 							className={`fa fa-clone small action-button rounded-right ${
@@ -104,7 +113,7 @@ export const KeychainForm: FCProps<
 							className="keychain-info"
 							type={revealPassword ? 'text' : 'password'}
 							value={password}
-							readOnly={!isEdit}
+							readOnly
 						/>
 						<i
 							className={`fa fa-eye${revealPassword ? '-slash' : ''} small action-button active`}
@@ -118,6 +127,7 @@ export const KeychainForm: FCProps<
 						/>
 					</div>
 				</div>
+
 				{(userNameClipboard.isCopied || passwordClipboard.isCopied) && (
 					<div className="clipboard-status">
 						<i className="fa fa-check scale-up" />

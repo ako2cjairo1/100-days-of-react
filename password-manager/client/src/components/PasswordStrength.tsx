@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
  * 		score (a number representing the score of the password).
  */
 export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvaluatedPassword => {
-	if (!password) return { status: 'none', score: 0 }
+	if (!password) return { status: 'weak', score: 0 }
 	if (!regex) {
 		regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/
 	}
@@ -26,7 +26,8 @@ export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvalu
 	else if (!regex.test(password)) score = 2
 	else if (length >= 12 && length <= 16) score = 3
 	else if (length >= 17 && length <= 24) score = 4
-	else score = 5
+	else if (length >= 16 && regex.test(password)) score = 5
+	else score = 2
 
 	return {
 		status:

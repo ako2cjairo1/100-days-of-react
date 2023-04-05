@@ -41,35 +41,24 @@
 	margin-left: 10px;
 }
 
-.title-icon {
-	color: currentColor;
-	width: 25px;
-	height: 25px;
-}
-.close-icon {
-	color: currentColor !important;
-	width: 30px;
-	height: 30px;
-	cursor: pointer;
-	padding: 3px;
-	border-radius: 50%;
-	background-color: hsla(0, 0%, 100%, 0.24);
-	z-index: 1;
-	transition: var(--transition);
-}
 .modal-close {
 	position: absolute;
 	top: 20px;
 	right: 20px;
 	z-index: 1;
+
+	color: currentColor;
+	padding: 3px 8px;
+	border-radius: 50%;
+	background-color: hsla(0, 0%, 100%, 0.1);
+	z-index: 1;
+	transition: var(--transition);
 }
 .modal-close i {
-	opacity: 0.5;
 	color: darkgray;
 	transition: var(--transition);
 }
 .modal-close:hover i {
-	opacity: 1;
 	color: currentColor;
 }
 

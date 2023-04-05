@@ -1,5 +1,6 @@
 import { IRegExObj, TConvertToStringUnion } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
+import { REGISTER_STATE } from '../constants'
 
 export const Log = <T>(Obj: T) => {
 	if (Obj instanceof Error) console.error(Obj)
@@ -213,4 +214,34 @@ export const LocalStorage: ILocalStorage = {
 	set: (key, value) => localStorage.setItem(key, value),
 	get: key => localStorage.getItem(key),
 	remove: key => localStorage.removeItem(key),
+}
+
+const passwordRegex = MergeRegExObj(REGISTER_STATE.PASSWORD_REGEX)
+export const GeneratePassword = (regex: RegExp = passwordRegex) => {
+	let resultCombination = ''
+	const characters =
+		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' +
+		ExtractValFromRegEx(REGISTER_STATE.PASSWORD_REGEX.symbol.source)
+	Log(characters)
+
+	while (!regex.test(resultCombination)) {
+		resultCombination = ''
+
+		while (resultCombination.length <= 16) {
+			const random = GetRandomItem(characters.split('')) ?? ''
+
+			if (!resultCombination.includes(random)) {
+				resultCombination += random
+			}
+		}
+	}
+	return resultCombination
+}
+
+export const GenerateUUID = () => {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+		const r = (Math.random() * 16) | 0
+		const v = c === 'x' ? r : (r & 0x3) | 0x8
+		return v.toString(16)
+	})
 }

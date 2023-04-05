@@ -1,4 +1,4 @@
-import { IChildren, IHeaderProps } from '@/types'
+import { FCProps, IChildren, IHeaderProps } from '@/types'
 
 /** 
 The `Header` component is a React functional component that renders a header element with optional title, subtitle, and status.
@@ -12,22 +12,23 @@ The `Header` component is a React functional component that renders a header ele
 * 			and a p element containing the error message will be rendered.
 */
 
-const Logo = () => {
+function Logo({ children }: IChildren) {
 	return (
 		<h1 className="scale-up">
 			<i className="fa fa-key logo-key fade-in" />
 			<i className="fa fa-shield logo-shield scale-up" />
+			{children}
 		</h1>
 	)
 }
 
-const Title = ({
+function Title({
 	children,
 	title,
 	subTitle,
-}: IChildren & Pick<IHeaderProps, 'title' | 'subTitle'>) => {
+}: Pick<IHeaderProps, 'children' | 'title' | 'subTitle'>) {
 	return (
-		<div style={{ margin: '10px 0' }}>
+		<div style={{ marginTop: '15px' }}>
 			{title && <h1 className="fade-in">{title}</h1>}
 			{subTitle && <p className="center descend">{subTitle}</p>}
 			{children}
@@ -35,7 +36,7 @@ const Title = ({
 	)
 }
 
-const Status = ({ children, status }: IChildren & Pick<IHeaderProps, 'status'>) => {
+function Status({ children, status }: Pick<IHeaderProps, 'children' | 'status'>) {
 	return (
 		<>
 			{status && (
@@ -65,8 +66,8 @@ const Status = ({ children, status }: IChildren & Pick<IHeaderProps, 'status'>) 
 	)
 }
 
-export const Header = ({ children }: IChildren) => {
-	return <header>{children}</header>
+export function Header({ children, ...props }: IHeaderProps) {
+	return <header {...props}>{children}</header>
 }
 
 Header.Logo = Logo

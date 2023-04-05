@@ -134,9 +134,9 @@ export const Login = () => {
 							<LinkLabel
 								linkRef={vaultLinkRef}
 								routeTo="/keychain"
-								preText="Proceed to your secured"
+								preText="Proceed to your"
 							>
-								password vault
+								secured vault
 							</LinkLabel>
 						</Header.Title>
 					</Header>
@@ -222,6 +222,7 @@ export const Login = () => {
 
 							<SubmitButton
 								variant="primary"
+								textStatus="Processing..."
 								iconName={isInputEmail ? '' : 'fa-sign-in'}
 								submitted={isSubmitted}
 								disabled={

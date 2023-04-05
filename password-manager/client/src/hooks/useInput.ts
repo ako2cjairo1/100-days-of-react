@@ -56,7 +56,7 @@ export const useInput = <T>(initState: T) => {
 		inputFocus,
 		isSubmitted,
 		submitForm: (isSubmit: boolean) => setSubmit(isSubmit),
-		mutate: (state: T) => setInputStates(prev => ({ ...prev, ...state })),
+		mutate: (state: Partial<T>) => setInputStates(prev => ({ ...prev, ...state })),
 		onChange: handleChange,
 		onBlur: (e: TInputEvent) => setInputFocus(prev => ({ ...prev, [e.target.id]: false })),
 		onFocus: (e: TInputEvent) => Log(`"${e.target.id}" focused`),

@@ -15,8 +15,14 @@ import { Modal } from '@/components/Modal'
 import { useEffect, useState } from 'react'
 import { KeychainContainer } from '@/components/KeychainContainer'
 import { IKeychainItem, TKeychain, TStatus } from '@/types'
-import { Log, MergeRegExObj } from '@/services/Utils/password-manager.helper'
+import {
+	GeneratePassword,
+	GenerateUUID,
+	Log,
+	MergeRegExObj,
+} from '@/services/Utils/password-manager.helper'
 import { REGISTER_STATE } from '@/services/constants'
+import { KEYCHAIN_CONST } from '@/services/constants/Keychain.constants'
 
 /**
  * Renders a Keychain component
@@ -24,7 +30,7 @@ import { REGISTER_STATE } from '@/services/constants'
  */
 export const Keychain = () => {
 	const [newKeychainModal, setNewKeychainModal] = useState(false)
-	const [viewKeychainModal, setViewKeychainModal] = useState(false)
+	const [showKeychainInfo, setShowKeychainInfo] = useState(false)
 	const [keychainInfo, setKeychainInfo] = useState<Partial<IKeychainItem>>()
 	const [clipboardStatus, setClipboardStatus] = useState<TStatus>({ success: false, message: '' })
 	const { authInfo, updateAuthInfo } = useAuthContext()
@@ -34,31 +40,37 @@ export const Keychain = () => {
 	})
 
 	// form controlled inputs
-	const { resetInputState, inputAttributes } = useInput<Partial<TKeychain>>({})
+	const { resetInputState, inputAttributes } = useInput<TKeychain>({
+		keychainId: '0',
+		password: '',
+		username: '',
+		website: '',
+		logo: '',
+	})
 	// destructure
 	const { inputStates, onChange, onFocus, onBlur, mutate, isSubmitted, submitForm } =
 		inputAttributes
 	const { keychainId, website, username, password, logo } = inputStates
 
-	const keychain = [
+	const keychain: Array<TKeychain> = [
 		{
-			keychainId: 1,
+			keychainId: '1',
 			logo: apple,
-			link: 'apple.com',
+			website: 'apple.com',
 			username: 'ako2cjairo@icloud.com',
 			password: '123234',
 		},
 		{
-			keychainId: 2,
+			keychainId: '2',
 			logo: google,
-			link: 'google.com',
+			website: 'google.com',
 			username: 'ako2cjairo@gmail.com',
 			password: 'January231990',
 		},
 		{
-			keychainId: 3,
+			keychainId: '3',
 			logo: github,
-			link: 'github.com',
+			website: 'github.com',
 			username: 'ako2cjairo@gmail.com',
 			password: 'password123',
 		},
@@ -68,7 +80,7 @@ export const Keychain = () => {
 		setNewKeychainStatus(prev => ({ ...prev, message: '' }))
 	}, [inputStates])
 
-	const handleOpenKeychain = (keychainId: number) => {
+	const handleOpenKeychain = (keychainId: string) => {
 		const info = keychain.find(info => info.keychainId === keychainId)
 
 		if (!info)
@@ -77,17 +89,19 @@ export const Keychain = () => {
 				message: 'Keychain information not found! Try again after a while.',
 			})
 
-		setViewKeychainModal(true)
+		setShowKeychainInfo(true)
 		setKeychainInfo(info)
 	}
 
-	const callback = () => {
-		setKeychainInfo({})
+	const keychainFormCallback = (keychainInfo: Partial<TKeychain>) => {
 		setClipboardStatus({
 			success: false,
 			message: '',
 		})
-		setViewKeychainModal(false)
+		setShowKeychainInfo(false)
+
+		// update info if there are changes
+		if (keychainInfo) setKeychainInfo(keychainInfo)
 	}
 
 	return (
@@ -108,7 +122,10 @@ export const Keychain = () => {
 				<Toolbar.Item
 					name="add item"
 					iconName="fa fa-plus"
-					menuCb={() => setNewKeychainModal(true)}
+					menuCb={() => {
+						setNewKeychainModal(true)
+						mutate({ keychainId: GenerateUUID(), password: GeneratePassword() })
+					}}
 				/>
 			</Toolbar>
 
@@ -134,8 +151,7 @@ export const Keychain = () => {
 							props={{
 								label: 'Website',
 								labelFor: 'website',
-								isFulfilled: false,
-								isOptional: true,
+								isFulfilled: KEYCHAIN_CONST.WEBSITE_REGEX.test(website ?? ''),
 							}}
 						/>
 						<FormGroup.Input
@@ -153,8 +169,7 @@ export const Keychain = () => {
 							props={{
 								label: 'User Name',
 								labelFor: 'username',
-								isFulfilled: false,
-								isOptional: true,
+								isFulfilled: username.trim() ? true : false,
 							}}
 						/>
 						<FormGroup.Input
@@ -173,8 +188,7 @@ export const Keychain = () => {
 							props={{
 								label: 'Password',
 								labelFor: 'password',
-								isFulfilled: false,
-								isOptional: true,
+								isFulfilled: password.trim() ? true : false,
 							}}
 						>
 							<PasswordStrength
@@ -184,24 +198,23 @@ export const Keychain = () => {
 						</FormGroup.Label>
 						<FormGroup.Input
 							id="password"
-							type="password"
+							type="text"
 							value={password}
 							disabled={false}
 							{...{ onChange, onFocus, onBlur }}
 						/>
 					</div>
-					<div style={{ display: 'flex', width: '70%', gap: '8px' }}>
+					<div style={{ display: 'flex', gap: '8px' }}>
 						<SubmitButton
 							variant="primary"
-							className="accent-bg"
-							iconName="fa-user-plus"
 							submitted={!newKeychainModal}
-							disabled={false}
+							disabled={!KEYCHAIN_CONST.WEBSITE_REGEX.test(website ?? '') || !username || !password}
 							onClick={() => console.log('Save button triggered!')}
 						>
 							Save
 						</SubmitButton>
 						<SubmitButton
+							variant="cancel"
 							submitted={false}
 							disabled={false}
 							onClick={() => setNewKeychainModal(false)}
@@ -215,15 +228,18 @@ export const Keychain = () => {
 			<KeychainContainer>
 				<Header>
 					<Header.Logo />
-					<Header.Title title="Secured Keychain" />
+					<Header.Title title="Secured Vault" />
 					<Header.Status status={clipboardStatus} />
 				</Header>
-				{!viewKeychainModal ? (
-					<KeychainContainer.Keychain {...{ keychain, event: handleOpenKeychain }} />
+				{!showKeychainInfo ? (
+					<KeychainContainer.Keychain
+						{...{ keychain }}
+						event={handleOpenKeychain}
+					/>
 				) : (
 					<KeychainForm
 						{...keychainInfo}
-						cbFn={callback}
+						updateCallback={keychainFormCallback}
 					/>
 				)}
 			</KeychainContainer>

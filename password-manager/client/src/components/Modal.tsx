@@ -37,7 +37,7 @@ export const Modal: FCProps<IModal> = ({
 				{!hideCloseButton && (
 					<div
 						data-testid="modal-close"
-						className="modal-close"
+						className="close-icon modal-close"
 						onClick={onClose}
 					>
 						<i className="fa fa-close spins" />

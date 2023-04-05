@@ -12,6 +12,7 @@
 	--border: 1px solid rgba(255, 255, 255, 0.3);
 	--background-color: rgba(255, 255, 255, 0.27);
 	--accent-color: rgb(0, 108, 190);
+	--danger-color: rgb(248, 120, 116);
 }
 
 * {
@@ -107,7 +108,7 @@ p {
 .fa-exclamation,
 .fa-info-circle,
 .fa-exclamation-circle {
-	color: rgb(248, 120, 116);
+	color: var(--danger-color);
 }
 
 .strength {
@@ -128,8 +129,8 @@ p {
 	box-shadow: 0px 0px 10px 1px rgb(191, 126, 22);
 }
 .weak {
-	background: rgb(248, 120, 116);
-	box-shadow: 0px 0px 10px 1px rgb(248, 120, 116);
+	background: var(--danger-color);
+	box-shadow: 0px 0px 10px 1px var(--danger-color);
 }
 
 input.valid:focus {
@@ -137,14 +138,14 @@ input.valid:focus {
 	background-color: rgb(88, 182, 117, 0.2);
 }
 input.invalid:focus {
-	border: 2px solid rgb(248, 120, 116);
+	border: 2px solid var(--danger-color);
 	background-color: rgb(248, 120, 116, 0.2);
 }
 .valid {
 	border: 1px solid rgb(88, 182, 117);
 }
 .invalid {
-	border: 1px solid rgb(248, 120, 116);
+	border: 1px solid var(--danger-color);
 }
 
 button,
@@ -165,10 +166,14 @@ button,
 	cursor: pointer;
 }
 .button-style:disabled {
-	background-color: var(--background-color);
+	opacity: 0.3;
+	cursor: not-allowed !important;
 }
 .accent-bg {
 	background-color: var(--accent-color);
+}
+.cancel-bg {
+	background-color: var(--danger-color);
 }
 
 .input-row {
