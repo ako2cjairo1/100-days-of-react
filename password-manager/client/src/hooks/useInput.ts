@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent, useCallback, useEffect, useState } from 'react'
+import { ChangeEvent, FocusEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { ConvertPropsToBool, Log } from '@/services/Utils/password-manager.helper'
 
 /**
@@ -16,6 +16,8 @@ type TInputEvent = FocusEvent<HTMLInputElement> | ChangeEvent<HTMLInputElement>
 export const useInput = <T>(initState: T) => {
 	const [inputStates, setInputStates] = useState<T>(initState)
 	const [inputFocus, setInputFocus] = useState<TUseInputFocus<T>>({})
+	const [isSubmitted, setSubmit] = useState(false)
+	const initFocus = useRef(true)
 
 	// Resets inputStates and focusEvents to their initial values
 	const resetInputState = useCallback(
@@ -42,17 +44,22 @@ export const useInput = <T>(initState: T) => {
 
 	useEffect(() => {
 		// used to create and initialize focus states to "true"
-		resetInputState()
-	}, [resetInputState])
+		if (initFocus.current) {
+			setInputFocus(ConvertPropsToBool(initState, true)) // initialize focus states to true
+			initFocus.current = false
+		}
+	}, [initState])
 
 	// Object containing inputStates, focusEvents and event handlers for onFocus, onBlur and onChange events
 	const inputAttributes = {
 		inputStates,
 		inputFocus,
-		setInputStates,
+		isSubmitted,
+		submitForm: (isSubmit: boolean) => setSubmit(isSubmit),
+		mutate: (state: T) => setInputStates(prev => ({ ...prev, ...state })),
 		onChange: handleChange,
-		onFocus: (e: TInputEvent) => Log(`"${e.target.id}" focused`),
 		onBlur: (e: TInputEvent) => setInputFocus(prev => ({ ...prev, [e.target.id]: false })),
+		onFocus: (e: TInputEvent) => Log(`"${e.target.id}" focused`),
 	}
 
 	return { resetInputState, inputAttributes }

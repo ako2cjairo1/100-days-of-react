@@ -1,4 +1,5 @@
 import { FCProps, IKeychainItem } from '@/types'
+import { Link } from 'react-router-dom'
 
 /**
  * This is a functional component that represents a keychain item in a vault.
@@ -10,11 +11,17 @@ import { FCProps, IKeychainItem } from '@/types'
  *
  * returns {JSX.Element} A JSX element representing the keychain item.
  */
-export const KeychainItem: FCProps<IKeychainItem> = ({ logo, link, username, onClick }) => {
+export const KeychainItem: FCProps<IKeychainItem> = ({
+	keychainId,
+	logo,
+	website: link,
+	username,
+	onClick,
+}) => {
 	return (
 		<div
 			className="keychain-item"
-			onClick={() => onClick && onClick(username)}
+			onClick={() => onClick && onClick(keychainId)}
 		>
 			<img
 				src={logo}
@@ -30,7 +37,14 @@ export const KeychainItem: FCProps<IKeychainItem> = ({ logo, link, username, onC
 				</a>
 				<p>{username}</p>
 			</div>
-			<i className="fa fa-chevron-right small" />
+			<Link
+				to=""
+				title="show details"
+				className="menu descend"
+				onClick={() => onClick && onClick(keychainId)}
+			>
+				<i className="fa fa-chevron-right small" />
+			</Link>
 		</div>
 	)
 }

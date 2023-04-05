@@ -71,11 +71,12 @@ export interface IRegExObj {
 }
 
 export interface IKeychainItem {
+	keychainId: number
 	logo?: string
-	link?: string
+	website?: string
 	username: string
 	password?: string
-	onClick?: TFunction<string>
+	onClick?: TFunction<number>
 }
 
 export interface IModal extends IChildren {
@@ -87,3 +88,11 @@ export interface IModal extends IChildren {
 		hideCloseButton?: boolean
 	}
 }
+
+// import { Header } from '@/components'
+// import { render, cleanup } from '@/services/Utils/test-utils'
+// afterEach(() => cleanup())
+// 1. Generate function comments (/** * short description here... * param ... * param ... * returns ... */)
+// 2. Generate automated tests (react-testing i.e.: describe, it, expected tobe, etc.), create test cases for all possible input parameters (required and optional)
+// describe('Simple working test', () => {
+// it('the title is visible', () => { // render(<App />) // expect(screen.getByText(/Hello Vite \+ React!/i)).toBeInTheDocument() // }) // it('should increment count on click', async () => { // render(<App />) // userEvent.click(screen.getByRole('button')) // expect(await screen.findByText(/count is: 1/i)).toBeInTheDocument() // }) // it('uses flexbox in app header', async () => { // render(<App />) // const element = screen.getByRole('banner') // expect(element.className).toEqual('App-header') // expect(getComputed

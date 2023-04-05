@@ -1,13 +1,14 @@
 import { Log, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
+import { TFunction } from '@/types'
 import { useRef, useState } from 'react'
 
 interface IUseTimedCopyToClipboard {
 	value: string
 	message: string
-	callbackFn: () => void
+	callbackFn: TFunction
 	timeout: number
 }
-const CLIPBOARD_TIMEOUT = 30
+const CLIPBOARD_TIMEOUT = 15
 export const useTimedCopyToClipboard = ({
 	value,
 	message,
@@ -35,6 +36,8 @@ export const useTimedCopyToClipboard = ({
 		// copy the actual value to clipboard
 		navigator.clipboard.writeText(value ?? '')
 		setIsCopied(true)
+
+		setStatusMessage(message ?? '')
 		Log(message)
 
 		let countDown = timeout

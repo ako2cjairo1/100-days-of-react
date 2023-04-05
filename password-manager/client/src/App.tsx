@@ -20,7 +20,7 @@ const App = () => {
 					element={<Registration />}
 				/>
 				<Route
-					path="/secure-vault"
+					path="/keychain"
 					element={<Keychain />}
 				/>
 			</Routes>

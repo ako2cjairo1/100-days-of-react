@@ -9,10 +9,18 @@ export type TCredentials = {
 	isTermsAgreed?: boolean
 }
 
-export type TStatus = Partial<{
+export type TKeychain = {
+	keychainId: number
+	logo?: string
+	website?: string
+	username?: string
+	password?: string
+}
+
+export type TStatus = {
 	success: boolean
 	message: string
-}>
+}
 
 export type TInputValidation = {
 	isValidEmail: boolean
@@ -45,6 +53,8 @@ export type TAuthContext<T> = {
 	updateAuthInfo: (authInfo: T) => void
 }
 
-export type TFunction<T = Array<unknown>> = T extends Array<unknown extends infer J ? J : never>
-	? () => void
-	: (...params: T[]) => void
+export type TFunction<T = Array<unknown>, RT = unknown> = T extends Array<
+	unknown extends infer J ? J : never
+>
+	? (...params: T) => RT extends infer K ? K : void
+	: (param: T) => RT extends infer K ? K : void

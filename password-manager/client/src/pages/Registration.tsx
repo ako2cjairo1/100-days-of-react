@@ -235,8 +235,8 @@ export const Registration = () => {
 										inputFocus.confirm
 											? ''
 											: isValidPassword && password === confirm
-												? 'valid'
-												: 'invalid'
+											? 'valid'
+											: 'invalid'
 									}
 								/>
 

@@ -1,49 +1,62 @@
-import '@/assets/modules/Vault.css'
+import '@/assets/modules/Keychain.css'
 import google from '@/assets/google.png'
 import apple from '@/assets/apple.png'
 import github from '@/assets/github.png'
-import { Header, PasswordStrength, Toolbar } from '@/components'
-import { useAuthContext } from '@/hooks'
+import {
+	FormGroup,
+	Header,
+	KeychainForm,
+	PasswordStrength,
+	SubmitButton,
+	Toolbar,
+} from '@/components'
+import { useAuthContext, useInput } from '@/hooks'
 import { Modal } from '@/components/Modal'
 import { useEffect, useState } from 'react'
-import { Log } from '@/services/Utils/password-manager.helper'
 import { KeychainContainer } from '@/components/KeychainContainer'
-import { IKeychainItem, TStatus } from '@/types'
-import { useTimedCopyToClipboard } from '@/hooks/useTimedCopyToClipboard'
+import { IKeychainItem, TKeychain, TStatus } from '@/types'
+import { Log, MergeRegExObj } from '@/services/Utils/password-manager.helper'
+import { REGISTER_STATE } from '@/services/constants'
 
 /**
  * Renders a Keychain component
- * @returns A div element with the class "vault-container" containing a KeychainContainer, a Toolbar, and two Modal components
+ * returns A div element with the class "vault-container" containing a KeychainContainer, a Toolbar, and two Modal components
  */
 export const Keychain = () => {
 	const [newKeychainModal, setNewKeychainModal] = useState(false)
 	const [viewKeychainModal, setViewKeychainModal] = useState(false)
-	const [keychainInfo, setKeychainInfo] = useState<Partial<IKeychainItem>>({})
-	const { link, logo, username, password } = keychainInfo
-	const [revealPassword, setRevealPassword] = useState(false)
-	const [clipboardStatus, setClipboardStatus] = useState<TStatus>()
-
-	const userNameClipboard = useTimedCopyToClipboard({ value: username, message: 'Email copied!' })
-	const passwordClipboard = useTimedCopyToClipboard({
-		value: password,
-		message: 'Password copied!',
-		callbackFn: () => setRevealPassword(false),
+	const [keychainInfo, setKeychainInfo] = useState<Partial<IKeychainItem>>()
+	const [clipboardStatus, setClipboardStatus] = useState<TStatus>({ success: false, message: '' })
+	const { authInfo, updateAuthInfo } = useAuthContext()
+	const [newKeychainStatus, setNewKeychainStatus] = useState<TStatus>({
+		success: false,
+		message: '',
 	})
 
-	const securedList = [
+	// form controlled inputs
+	const { resetInputState, inputAttributes } = useInput<Partial<TKeychain>>({})
+	// destructure
+	const { inputStates, onChange, onFocus, onBlur, mutate, isSubmitted, submitForm } =
+		inputAttributes
+	const { keychainId, website, username, password, logo } = inputStates
+
+	const keychain = [
 		{
+			keychainId: 1,
 			logo: apple,
 			link: 'apple.com',
 			username: 'ako2cjairo@icloud.com',
 			password: '123234',
 		},
 		{
+			keychainId: 2,
 			logo: google,
 			link: 'google.com',
 			username: 'ako2cjairo@gmail.com',
 			password: 'January231990',
 		},
 		{
+			keychainId: 3,
 			logo: github,
 			link: 'github.com',
 			username: 'ako2cjairo@gmail.com',
@@ -51,30 +64,30 @@ export const Keychain = () => {
 		},
 	]
 
-	const { authInfo, updateAuthInfo } = useAuthContext()
+	useEffect(() => {
+		setNewKeychainStatus(prev => ({ ...prev, message: '' }))
+	}, [inputStates])
 
-	const listEvent = (userName: string) => {
+	const handleOpenKeychain = (keychainId: number) => {
+		const info = keychain.find(info => info.keychainId === keychainId)
+
+		if (!info)
+			return setClipboardStatus({
+				success: false,
+				message: 'Keychain information not found! Try again after a while.',
+			})
+
 		setViewKeychainModal(true)
-
-		setKeychainInfo(securedList.find(info => info.username === userName) ?? {})
-		Log(userName)
+		setKeychainInfo(info)
 	}
 
-	useEffect(() => {
+	const callback = () => {
+		setKeychainInfo({})
 		setClipboardStatus({
-			success: true,
-			message: userNameClipboard.statusMessage + passwordClipboard.statusMessage,
+			success: false,
+			message: '',
 		})
-	}, [userNameClipboard.statusMessage, passwordClipboard.statusMessage])
-
-	const handleClipboards = (type: 'email' | 'password') => {
-		if (type === 'email') {
-			passwordClipboard.clear()
-			userNameClipboard.copy()
-		} else if (type === 'password') {
-			userNameClipboard.clear()
-			passwordClipboard.copy()
-		}
+		setViewKeychainModal(false)
 	}
 
 	return (
@@ -99,94 +112,119 @@ export const Keychain = () => {
 				/>
 			</Toolbar>
 
-			<Modal props={{ isOpen: newKeychainModal, onClose: () => setNewKeychainModal(false) }}>
-				TODO: Implement New item form here...
+			<Modal
+				props={{
+					isOpen: newKeychainModal,
+					onClose: () => setNewKeychainModal(false),
+					hideCloseButton: false,
+					clickBackdropToClose: false,
+				}}
+			>
+				<Header>
+					<Header.Title
+						title="Add Password"
+						// subTitle="Create a free account with your email."
+					/>
+					<Header.Status status={{ success: false, message: '' }} />
+				</Header>
+
+				<FormGroup onSubmit={() => Log('TODO: handle submit')}>
+					<div className="input-row">
+						<FormGroup.Label
+							props={{
+								label: 'Website',
+								labelFor: 'website',
+								isFulfilled: false,
+								isOptional: true,
+							}}
+						/>
+						<FormGroup.Input
+							id="website"
+							type="text"
+							placeholder="sample.com"
+							value={website}
+							// linkRef={emailRef}
+							disabled={false}
+							{...{ onChange, onFocus, onBlur }}
+						/>
+					</div>
+					<div className="input-row">
+						<FormGroup.Label
+							props={{
+								label: 'User Name',
+								labelFor: 'username',
+								isFulfilled: false,
+								isOptional: true,
+							}}
+						/>
+						<FormGroup.Input
+							id="username"
+							type="text"
+							placeholder="sample@email.com"
+							value={username}
+							// linkRef={emailRef}
+							disabled={false}
+							{...{ onChange, onFocus, onBlur }}
+						/>
+					</div>
+
+					<div className="input-row">
+						<FormGroup.Label
+							props={{
+								label: 'Password',
+								labelFor: 'password',
+								isFulfilled: false,
+								isOptional: true,
+							}}
+						>
+							<PasswordStrength
+								password={password}
+								regex={MergeRegExObj(REGISTER_STATE.PASSWORD_REGEX)}
+							/>
+						</FormGroup.Label>
+						<FormGroup.Input
+							id="password"
+							type="password"
+							value={password}
+							disabled={false}
+							{...{ onChange, onFocus, onBlur }}
+						/>
+					</div>
+					<div style={{ display: 'flex', width: '70%', gap: '8px' }}>
+						<SubmitButton
+							variant="primary"
+							className="accent-bg"
+							iconName="fa-user-plus"
+							submitted={!newKeychainModal}
+							disabled={false}
+							onClick={() => console.log('Save button triggered!')}
+						>
+							Save
+						</SubmitButton>
+						<SubmitButton
+							submitted={false}
+							disabled={false}
+							onClick={() => setNewKeychainModal(false)}
+						>
+							Cancel
+						</SubmitButton>
+					</div>
+				</FormGroup>
 			</Modal>
 
 			<KeychainContainer>
 				<Header>
-					<h1 className="scale-up">
-						<i className="fa fa-key logo-key fade-in" />
-						<i className="fa fa-shield logo-shield scale-up" /> Secured Keychain
-					</h1>
-
-					<div
-						className={`center fdc ${clipboardStatus?.message ? 'fade-in' : ''}`}
-						style={{ opacity: `${clipboardStatus?.message ? 1 : 0}` }}
-					>
-						<i className="fa fa-check scale-up regular" />
-						<p className="center x-small descend">{clipboardStatus?.message}</p>
-					</div>
+					<Header.Logo />
+					<Header.Title title="Secured Keychain" />
+					<Header.Status status={clipboardStatus} />
 				</Header>
 				{!viewKeychainModal ? (
-					<KeychainContainer.List {...{ securedList, listEvent }} />
+					<KeychainContainer.Keychain {...{ keychain, event: handleOpenKeychain }} />
 				) : (
-					<>
-						<div className="keychain-item">
-							<img
-								className="header"
-								src={logo}
-								alt={link}
-							/>
-							<div
-								className="keychain-item-header"
-								onClick={() => setViewKeychainModal(false)}
-							>
-								<a
-									href={`//${link}`}
-									rel="noreferrer"
-									target="_blank"
-								>
-									{link}
-								</a>
-								<p>Last modified </p>
-							</div>
-							<i className="fa fa-chevron-left small" />
-						</div>
-						<div className="keychain-item details">
-							<div className="keychain-item-description">
-								<p>User Name</p>
-								<p>Password</p>
-							</div>
-							<div className="keychain-item-description">
-								<div>
-									<input
-										className="keychain-info"
-										type="email"
-										value={username}
-										readOnly
-									/>
-									<i
-										className={`fa fa-clone small action-button rounded-right ${
-											!userNameClipboard.isCopied && 'active'
-										}`}
-										onClick={() => handleClipboards('email')}
-									/>
-								</div>
-								<PasswordStrength password={password} />
-								<div>
-									<input
-										className="keychain-info"
-										type={revealPassword ? 'text' : 'password'}
-										value={password}
-										readOnly
-									/>
-									<i
-										className={`fa fa-eye${
-											revealPassword ? '-slash' : ''
-										} small action-button active`}
-										onClick={() => setRevealPassword(prev => !prev)}
-									/>
-									<i
-										className={`fa fa-clone small action-button rounded-right ${
-											!passwordClipboard.isCopied && 'active'
-										}`}
-										onClick={() => handleClipboards('password')}
-									/>
-								</div>
-							</div>
-						</div>
-					</>
+					<KeychainForm
+						{...keychainInfo}
+						cbFn={callback}
+					/>
 				)}
 			</KeychainContainer>
 		</div>

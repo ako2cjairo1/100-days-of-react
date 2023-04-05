@@ -28,7 +28,8 @@ export const Login = () => {
 	// custom form input hook
 	const { inputAttributes, resetInputState } = useInput<TCredentials>(LOGIN_STATE.Credential)
 	// destructure
-	const { inputStates, inputFocus, onChange, onFocus, onBlur, setInputStates } = inputAttributes
+	const { inputStates, inputFocus, onChange, onFocus, onBlur, mutate, submitForm, isSubmitted } =
+		inputAttributes
 	const { email, password, isRemember } = inputStates
 	const [loginStatus, setLoginStatus] = useState<TStatus>(LOGIN_STATE.Status)
 	// destructure states
@@ -36,18 +37,21 @@ export const Login = () => {
 	const emailInputRef = useRef<HTMLInputElement>(null)
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const vaultLinkRef = useRef<HTMLAnchorElement>(null)
-	const [isSubmitted, setIsSubmitted] = useState(false)
+	const cachedEmailref = useRef(true)
 	const [isInputEmail, setIsInputEmail] = useState(true)
 	const { authInfo, updateAuthInfo } = useAuthContext()
 
 	useEffect(() => {
-		const cachedEmail = LocalStorage.get('password_manager_email') ?? ''
-		setInputStates(prev => ({
-			...prev,
-			email: cachedEmail,
-			isRemember: cachedEmail ? true : false,
-		}))
-	}, [setInputStates])
+		if (cachedEmailref.current) {
+			const cachedEmail = LocalStorage.get('password_manager_email') ?? ''
+			mutate({
+				...inputStates,
+				email: cachedEmail,
+				isRemember: cachedEmail ? true : false,
+			})
+			cachedEmailref.current = false
+		}
+	}, [inputStates, mutate])
 
 	useEffect(() => {
 		if (isInputEmail) emailInputRef.current?.focus()
@@ -74,7 +78,7 @@ export const Login = () => {
 		}
 
 		if (!isSubmitted) {
-			setIsSubmitted(true)
+			submitForm(true)
 			RunAfterSomeTime(() => {
 				try {
 					// TODO: fetch access token to custom authentication backend api
@@ -87,9 +91,9 @@ export const Login = () => {
 					setLoginStatus({ success: true, message: '' })
 					resetInputState()
 
-					setIsSubmitted(false)
+					submitForm(false)
 				} catch (error) {
-					setIsSubmitted(false)
+					submitForm(false)
 					setLoginStatus({ success: false, message: CreateError(error).message })
 					return false
 				}
@@ -129,7 +133,7 @@ export const Login = () => {
 						<Header.Title title="You are logged in!">
 							<LinkLabel
 								linkRef={vaultLinkRef}
-								routeTo="/secure-vault"
+								routeTo="/keychain"
 								preText="Proceed to your secured"
 							>
 								password vault
@@ -139,6 +143,7 @@ export const Login = () => {
 				) : (
 					<>
 						<Header>
+							<Header.Logo />
 							<Header.Title
 								title="Welcome back"
 								subTitle="Log in or create a new account to access your secured vault"

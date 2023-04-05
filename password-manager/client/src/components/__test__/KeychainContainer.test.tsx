@@ -1,37 +1,36 @@
-import { KeychainContainer, KeychainItem } from '@/components'
+import { KeychainContainer } from '@/components'
 import { fireEvent, render } from '@/services/Utils/test.util'
+import { MemoryRouter } from 'react-router-dom'
 
 describe('Keychain components', () => {
 	it('renders a list of KeychainItem components', () => {
-		const securedList = [
-			{ logo: 'logo1', link: 'link1', username: 'username1' },
-			{ logo: 'logo2', link: 'link2', username: 'username2' },
+		const keychain = [
+			{ keychainId: 1, logo: 'logo1', link: 'link1', username: 'username1' },
+			{ keychainId: 2, logo: 'logo2', link: 'link2', username: 'username2' },
 		]
 		const listEvent = vi.fn()
 		const { container } = render(
-			<KeychainContainer>
-				<KeychainContainer.List
-					securedList={securedList}
-					listEvent={listEvent}
-				/>
-			</KeychainContainer>
+			<MemoryRouter>
+				<KeychainContainer>
+					<KeychainContainer.Keychain {...{ keychain, event: listEvent }} />
+				</KeychainContainer>
+			</MemoryRouter>
 		)
 		expect(container.querySelectorAll('.keychain-item')).toHaveLength(2)
 	})
 
 	it('triggers the listEvent callback when a KeychainItem is clicked', () => {
-		const securedList = [
-			{ logo: 'logo1', link: 'link1', username: 'username1' },
-			{ logo: 'logo2', link: 'link2', username: 'username2' },
+		const keychain = [
+			{ keychainId: 1, logo: 'logo1', link: 'link1', username: 'username1' },
+			{ keychainId: 2, logo: 'logo2', link: 'link2', username: 'username2' },
 		]
 		const listEvent = vi.fn()
 		const { container } = render(
-			<KeychainContainer>
-				<KeychainContainer.List
-					securedList={securedList}
-					listEvent={listEvent}
-				/>
-			</KeychainContainer>
+			<MemoryRouter>
+				<KeychainContainer>
+					<KeychainContainer.Keychain {...{ keychain, event: listEvent }} />
+				</KeychainContainer>
+			</MemoryRouter>
 		)
 
 		const keychainItems = container.querySelectorAll('.keychain-item')

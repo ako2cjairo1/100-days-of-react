@@ -12,6 +12,8 @@
 	margin: 5px 0px;
 	padding: 5px;
 	border-radius: 5px;
+	border-top-right-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
 	background-color: rgba(255, 255, 255, 0.07);
 	border: 2px solid rgba(255, 255, 255, 0.1);
 	font-size: 14px;
@@ -95,6 +97,7 @@
 }
 .menu {
 	display: flex;
+	text-decoration: none !important;
 	align-items: center;
 	justify-content: center;
 	width: 35px !important;
@@ -154,9 +157,9 @@
 }
 
 .action-button {
-	border: 1px solid;
-	height: fit-content;
-	width: fit-content;
+	border: 1px solid var(--background-color);
+	height: 30px;
+	width: 30px;
 	padding: 8px !important;
 	text-align: center;
 	background-color: var(--background-color);
@@ -165,25 +168,29 @@
 	transition: var(--transition);
 }
 
-input {
-	border-top-right-radius: 0 !important;
-	border-bottom-right-radius: 0 !important;
-}
-
 .rounded-right {
 	border-top-right-radius: 0.25rem;
 	border-bottom-right-radius: 0.25rem;
 }
 
 .action-button.active {
-	/* background-color: var(--background-color); */
+	background-color: var(--background-color);
+	cursor: pointer;
 	opacity: 1;
 }
 
 .action-button:hover:not(:disabled) {
+	border-color: currentColor;
 	background-color: var(--background-color);
-	/* opacity: 1; */
-	cursor: pointer;
+}
+
+.clipboard-status {
+	position: absolute;
+	width: 100%;
+	display: flex;
+	top: 120px;
+	align-items: center;
+	justify-content: center;
 }
 
 @media (max-width: 500px) {
