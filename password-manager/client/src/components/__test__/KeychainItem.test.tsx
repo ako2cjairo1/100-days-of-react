@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 describe('KeychainItem', () => {
 	it('renders correctly', () => {
 		const props = {
-			keychainId: 1,
+			keychainId: '1',
 			logo: 'logo.png',
 			website: 'https://example.com',
 			username: 'testuser',
@@ -23,9 +23,9 @@ describe('KeychainItem', () => {
 
 	it('calls onClick when clicked', () => {
 		const props = {
-			keychainId: 1,
+			keychainId: '1',
 			logo: 'logo.png',
-			link: 'https://example.com',
+			website: 'https://example.com',
 			username: 'testuser',
 			onClick: vi.fn(),
 		}
