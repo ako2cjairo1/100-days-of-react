@@ -47,10 +47,6 @@
 	cursor: pointer;
 }
 
-.keychain-item i {
-	padding: 0 10px;
-}
-
 .logo-key {
 	position: relative;
 	margin-top: 15px;
@@ -158,9 +154,7 @@
 
 .action-button {
 	border: 1px solid var(--background-color);
-	height: 30px;
-	width: 30px;
-	padding: 8px !important;
+	padding: 8px;
 	text-align: center;
 	background-color: var(--background-color);
 	opacity: 0.4;
@@ -188,9 +182,17 @@
 	position: absolute;
 	width: 100%;
 	display: flex;
-	top: 120px;
+	top: 90%;
 	align-items: center;
 	justify-content: center;
+}
+
+.clipboard-status p {
+	color: currentColor;
+	padding: 0 5px !important;
+	border-radius: 10px;
+	background-color: rgba(255, 255, 255, 0.07);
+	border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 500px) {

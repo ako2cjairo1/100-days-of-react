@@ -1,4 +1,4 @@
-import { FCProps, IChildren, IHeaderProps } from '@/types'
+import { IChildren, IHeaderProps } from '@/types'
 
 /** 
 The `Header` component is a React functional component that renders a header element with optional title, subtitle, and status.

@@ -1,46 +1,41 @@
-import { Log, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
+import { CopyToClipboard, Log, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
 import { TFunction } from '@/types'
 import { useRef, useState } from 'react'
 
 interface IUseTimedCopyToClipboard {
-	value: string
 	message: string
 	callbackFn: TFunction
-	timeout: number
+	expiration: number
 }
 const CLIPBOARD_TIMEOUT = 15
-export const useTimedCopyToClipboard = ({
-	value,
-	message,
-	callbackFn,
-	timeout = CLIPBOARD_TIMEOUT,
-}: Partial<IUseTimedCopyToClipboard>) => {
+export function useTimedCopyToClipboard({
+	message = 'Copied to clipboard!',
+	callbackFn = () => null,
+	expiration = CLIPBOARD_TIMEOUT,
+}: Partial<IUseTimedCopyToClipboard>) {
 	const [isCopied, setIsCopied] = useState(false)
-	const [statusMessage, setStatusMessage] = useState('')
+	const [statusMessage, setStatusMessage] = useState(message)
 	const timerRef = useRef<NodeJS.Timeout>()
 	const timeoutRef = useRef<NodeJS.Timeout>()
 
 	const clear = () => {
-		navigator.clipboard.writeText('')
+		CopyToClipboard('')
 		setIsCopied(false)
 		setStatusMessage('')
 		clearInterval(timerRef.current)
 		clearTimeout(timeoutRef.current)
-		timerRef.current = undefined
-		timeoutRef.current = undefined
 	}
 
-	const copy = () => {
+	const copy = (value: string) => {
+		let countDown = expiration
+
+		// reset and clear all clipboards
 		clear()
-
 		// copy the actual value to clipboard
-		navigator.clipboard.writeText(value ?? '')
+		CopyToClipboard(value)
 		setIsCopied(true)
+		setStatusMessage(message)
 
-		setStatusMessage(message ?? '')
-		Log(message)
-
-		let countDown = timeout
 		timerRef.current = RunAfterSomeTime(
 			() => {
 				countDown--
@@ -54,8 +49,8 @@ export const useTimedCopyToClipboard = ({
 			// clear contents of clipboard and execute callback function(s)
 			clear()
 			Log('Clipboard cleared!')
-			callbackFn && callbackFn()
-		}, timeout)
+			callbackFn()
+		}, expiration)
 	}
 
 	return {

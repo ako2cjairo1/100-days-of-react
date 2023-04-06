@@ -9,28 +9,27 @@ interface IKeychainForm extends Partial<TKeychain> {
 	updateCallback: TFunction<Partial<TKeychain>>
 }
 export function KeychainForm({
-	logo,
-	website,
-	username,
-	password,
+	logo = '',
+	website = '',
+	username = '',
+	password = '',
 	isEdit = false,
-	updateCallback,
+	updateCallback = () => null,
 }: IKeychainForm) {
 	const [revealPassword, setRevealPassword] = useState(false)
-	const userNameClipboard = useTimedCopyToClipboard({ value: username, message: 'Email copied!' })
+	const userNameClipboard = useTimedCopyToClipboard({ message: 'User Name copied to clipboard!' })
 	const passwordClipboard = useTimedCopyToClipboard({
-		value: password,
-		message: 'Password copied!',
+		message: 'Password copied to clipboard!',
 		callbackFn: () => setRevealPassword(false),
 	})
 
 	const handleClipboards = (type: 'email' | 'password') => {
 		if (type === 'email' && !userNameClipboard.isCopied) {
 			passwordClipboard.clear()
-			userNameClipboard.copy()
+			userNameClipboard.copy(username)
 		} else if (type === 'password' && !passwordClipboard.isCopied) {
 			userNameClipboard.clear()
-			passwordClipboard.copy()
+			passwordClipboard.copy(password)
 		}
 	}
 
@@ -38,7 +37,6 @@ export function KeychainForm({
 		userNameClipboard.clear()
 		passwordClipboard.clear()
 		setRevealPassword(false)
-
 		// send the changes of keychain info for mutation
 		updateCallback({})
 	}
@@ -76,19 +74,11 @@ export function KeychainForm({
 
 			<div className="keychain-item details">
 				<div className="keychain-item-description">
-					<p>Website</p>
 					<p>User Name</p>
 					<p>Password</p>
 				</div>
 
 				<div className="keychain-item-description">
-					<input
-						className="keychain-info"
-						type="text"
-						autoComplete="false"
-						placeholder="example.com"
-						value={username}
-					/>
 					<div>
 						<input
 							className="keychain-info"

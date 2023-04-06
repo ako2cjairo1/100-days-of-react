@@ -64,15 +64,16 @@ export const PasswordStrength: FCProps<Partial<IPasswordStrength>> = ({ password
 
 	return (
 		<div className="password-strength">
-			<p
-				className={`x-small smooth ${
-					password ? `show ${toggleAnimation ? 'scale-up' : 'scale-down'}` : 'hidden'
-				}`}
-			>
-				{status}
-			</p>
-
-			{passwordStatuses.map((strength, idx) => {
+			{password && (
+				<p
+					className={`x-small smooth ${
+						password ? `show ${toggleAnimation ? 'scale-up' : 'scale-down'}` : 'hidden'
+					}`}
+				>
+					{status}
+				</p>
+			)}
+			{passwordStatuses.map((_, idx) => {
 				const statusIndex = idx + 1
 				let customAnimation = ''
 
@@ -83,11 +84,12 @@ export const PasswordStrength: FCProps<Partial<IPasswordStrength>> = ({ password
 				const opacity = statusIndex === len - 1 ? 1 : Math.round(statusIndex * (1 / len) * 10) / 10
 				// Render all status except 'none'
 				// should only render exactly 5 bullets (or div)
+
 				return (
 					<div
-						key={idx}
+						key={statusIndex}
 						id="bullet"
-						style={{ opacity, animationDelay: `${idx * 0.1}s` }}
+						style={{ opacity, animationDelay: `${statusIndex * 0.1}s` }}
 						className={`smooth ${customAnimation}`}
 					></div>
 				)

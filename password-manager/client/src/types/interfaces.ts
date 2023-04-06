@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { IChildren } from './base.type'
 import { TFunction, TKeychain, TStatus, TValidation } from './global.type'
 

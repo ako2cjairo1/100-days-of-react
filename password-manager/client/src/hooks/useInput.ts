@@ -15,52 +15,55 @@ type TInputEvent = FocusEvent<HTMLInputElement> | ChangeEvent<HTMLInputElement>
 
 export const useInput = <T>(initState: T) => {
 	const [inputStates, setInputStates] = useState<T>(initState)
-	const [inputFocus, setInputFocus] = useState<TUseInputFocus<T>>({})
+	const [isFocus, setIsFocus] = useState<TUseInputFocus<T>>({})
 	const [isSubmitted, setSubmit] = useState(false)
 	const initFocus = useRef(true)
 
 	// Resets inputStates and focusEvents to their initial values
-	const resetInputState = useCallback(
+	const resetInput = useCallback(
 		(id?: string) => {
 			// reset specific state using id arg
 			if (id) setInputStates(prev => ({ ...prev, [id]: '' }))
 			// reset all input state
 			else setInputStates(initState)
 
-			setInputFocus(ConvertPropsToBool(initState, true)) // initialize focus states to true
+			setIsFocus(ConvertPropsToBool(initState, true)) // initialize focus states to true
 		},
 		[initState]
 	)
 
-	const handleChange = <T extends TInputEvent>(e: T) => {
+	const onChange = <T extends TInputEvent>(e: T) => {
 		// set the input state using id as key to set a value
 		if (e.target.type === 'checkbox') {
 			setInputStates(prev => ({ ...prev, [e.target.id]: e.target.checked }))
 		} else setInputStates(prev => ({ ...prev, [e.target.id]: e.target.value }))
 
 		// set the focus to false to trigger input validations
-		setInputFocus(prev => ({ ...prev, [e.target.id]: false }))
+		setIsFocus(prev => ({ ...prev, [e.target.id]: false }))
 	}
 
 	useEffect(() => {
 		// used to create and initialize focus states to "true"
 		if (initFocus.current) {
-			setInputFocus(ConvertPropsToBool(initState, true)) // initialize focus states to true
+			setIsFocus(ConvertPropsToBool(initState, true)) // initialize focus states to true
 			initFocus.current = false
 		}
 	}, [initState])
 
-	// Object containing inputStates, focusEvents and event handlers for onFocus, onBlur and onChange events
-	const inputAttributes = {
-		inputStates,
-		inputFocus,
-		isSubmitted,
-		submitForm: (isSubmit: boolean) => setSubmit(isSubmit),
-		mutate: (state: Partial<T>) => setInputStates(prev => ({ ...prev, ...state })),
-		onChange: handleChange,
-		onBlur: (e: TInputEvent) => setInputFocus(prev => ({ ...prev, [e.target.id]: false })),
-		onFocus: (e: TInputEvent) => Log(`"${e.target.id}" focused`),
+	// Object containing state and actions of this hook
+	return {
+		inputAction: {
+			resetInput,
+			submit: (value: boolean) => setSubmit(value),
+			mutate: (state: Partial<T>) => setInputStates(prev => ({ ...prev, ...state })),
+		},
+		inputAttribute: {
+			inputStates,
+			isFocus,
+			isSubmitted,
+			onChange,
+			onBlur: (e: TInputEvent) => setIsFocus(prev => ({ ...prev, [e.target.id]: false })),
+			onFocus: (e: TInputEvent) => Log(`"${e.target.id}" focused`),
+		},
 	}
-
-	return { resetInputState, inputAttributes }
 }

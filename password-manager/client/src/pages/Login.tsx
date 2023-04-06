@@ -26,10 +26,11 @@ export const Login = () => {
 	const { minLength } = PASSWORD_REGEX
 	// constants
 	// custom form input hook
-	const { inputAttributes, resetInputState } = useInput<TCredentials>(LOGIN_STATE.Credential)
+	const { inputAttribute: inputAttributes, inputAction } = useInput<TCredentials>(
+		LOGIN_STATE.Credential
+	)
 	// destructure
-	const { inputStates, inputFocus, onChange, onFocus, onBlur, mutate, submitForm, isSubmitted } =
-		inputAttributes
+	const { inputStates, isFocus, onChange, onFocus, onBlur, isSubmitted } = inputAttributes
 	const { email, password, isRemember } = inputStates
 	const [loginStatus, setLoginStatus] = useState<TStatus>(LOGIN_STATE.Status)
 	// destructure states
@@ -37,21 +38,21 @@ export const Login = () => {
 	const emailInputRef = useRef<HTMLInputElement>(null)
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const vaultLinkRef = useRef<HTMLAnchorElement>(null)
-	const cachedEmailref = useRef(true)
+	const savedEmailRef = useRef(true)
 	const [isInputEmail, setIsInputEmail] = useState(true)
 	const { authInfo, updateAuthInfo } = useAuthContext()
 
 	useEffect(() => {
-		if (cachedEmailref.current) {
-			const cachedEmail = LocalStorage.get('password_manager_email') ?? ''
-			mutate({
+		if (savedEmailRef.current) {
+			const cachedEmail = LocalStorage.read('password_manager_email')
+			inputAction.mutate({
 				...inputStates,
 				email: cachedEmail,
 				isRemember: cachedEmail ? true : false,
 			})
-			cachedEmailref.current = false
+			savedEmailRef.current = false
 		}
-	}, [inputStates, mutate])
+	}, [inputStates, inputAction])
 
 	useEffect(() => {
 		if (isInputEmail) emailInputRef.current?.focus()
@@ -71,14 +72,14 @@ export const Login = () => {
 		setLoginStatus(prev => ({ ...prev, message: '' }))
 		if (isInputEmail) {
 			setIsInputEmail(false)
-			if (isRemember) LocalStorage.set('password_manager_email', email)
+			if (isRemember) LocalStorage.write('password_manager_email', email)
 			else LocalStorage.remove('password_manager_email')
 
 			return true
 		}
 
 		if (!isSubmitted) {
-			submitForm(true)
+			inputAction.submit(true)
 			RunAfterSomeTime(() => {
 				try {
 					// TODO: fetch access token to custom authentication backend api
@@ -89,11 +90,11 @@ export const Login = () => {
 
 					updateAuthInfo({ ...inputStates, accessToken: 'fake token' })
 					setLoginStatus({ success: true, message: '' })
-					resetInputState()
+					inputAction.resetInput()
 
-					submitForm(false)
+					inputAction.submit(true)
 				} catch (error) {
-					submitForm(false)
+					inputAction.submit(true)
 					setLoginStatus({ success: false, message: CreateError(error).message })
 					return false
 				}
@@ -104,7 +105,7 @@ export const Login = () => {
 	}
 
 	const handleChangeEmail = () => {
-		resetInputState('password')
+		inputAction.resetInput('password')
 		setIsInputEmail(true)
 		Log(authInfo)
 	}
@@ -171,11 +172,11 @@ export const Login = () => {
 										value={email}
 										linkRef={emailInputRef}
 										disabled={!isInputEmail || isSubmitted}
-										className={!inputFocus.email && (message || !isValidEmail) ? 'invalid' : ''}
+										className={!isFocus.email && (message || !isValidEmail) ? 'invalid' : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
-										isVisible={!inputFocus.email && !(isValidEmail && !message)}
+										isVisible={!isFocus.email && !(isValidEmail && !message)}
 										validations={!message ? emailValidation : []}
 									/>
 								</div>
@@ -196,11 +197,11 @@ export const Login = () => {
 										value={password}
 										linkRef={passwordInputRef}
 										disabled={isSubmitted}
-										className={!inputFocus.password && (message || !isMinLength) ? 'invalid' : ''}
+										className={!isFocus.password && (message || !isMinLength) ? 'invalid' : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
-										isVisible={!inputFocus.password && !(isMinLength && !message)}
+										isVisible={!isFocus.password && !(isMinLength && !message)}
 										validations={!message ? passwordValidation : []}
 									/>
 								</div>

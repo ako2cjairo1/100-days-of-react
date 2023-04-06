@@ -22,16 +22,16 @@ describe('useInput', () => {
 
 	it('should initialize inputStates with provided init value', () => {
 		const { result } = renderHook(() => useInput(initState))
-		const { inputStates } = result.current.inputAttributes
+		const { inputStates } = result.current.inputAttribute
 
 		expect(inputStates).toEqual(initState)
 	})
 
 	it('should initialize inputFocus with default values to "true"', () => {
 		const { result } = renderHook(() => useInput(initState))
-		const { inputFocus } = result.current.inputAttributes
+		const { isFocus } = result.current.inputAttribute
 
-		expect(inputFocus).toEqual({
+		expect(isFocus).toEqual({
 			email: true,
 			password: true,
 			confirm: true,
@@ -40,14 +40,14 @@ describe('useInput', () => {
 
 	it('should update inputStates onChange event', async () => {
 		const { result } = renderHook(() => useInput(initState))
-		const { onChange } = result.current.inputAttributes
+		const { onChange } = result.current.inputAttribute
 
 		// invoke onChange events
 		onChange(email)
 		onChange(password)
 		onChange(confirm)
 
-		expect(result.current.inputAttributes.inputStates).toEqual({
+		expect(result.current.inputAttribute.inputStates).toEqual({
 			email: 'onChange test@example.com',
 			password: 'onChange password123',
 			confirm: 'onChange confirmPassword123',
@@ -56,7 +56,7 @@ describe('useInput', () => {
 
 	it('should update inputStates onBlur event', async () => {
 		const { result } = renderHook(() => useInput(initState))
-		const { onBlur } = result.current.inputAttributes
+		const { onBlur } = result.current.inputAttribute
 
 		const email = OverrideEventTarget<FocusEvent<HTMLInputElement>>({
 			id: 'email',
@@ -76,43 +76,43 @@ describe('useInput', () => {
 		onBlur(password)
 		onBlur(confirm)
 
-		expect(result.current.inputAttributes.inputFocus).not.toEqual(initFocus)
+		expect(result.current.inputAttribute.isFocus).not.toEqual(initFocus)
 	})
 
-	it('should reset the "email" ONLY to initial value using "resetInputState"', () => {
+	it('should reset the "email" ONLY to initial value using "resetInput"', () => {
 		const { result } = renderHook(() => useInput(initState))
-		const { inputAttributes, resetInputState } = result.current
-		const { onChange } = inputAttributes
+		const { inputAttribute, inputAction } = result.current
+		const { onChange } = inputAttribute
 
 		// invoke onChange events
 		onChange(email)
 		onChange(password)
 		onChange(confirm)
 
-		expect(result.current.inputAttributes.inputStates).toEqual({
+		expect(result.current.inputAttribute.inputStates).toEqual({
 			email: 'onChange test@example.com',
 			password: 'onChange password123',
 			confirm: 'onChange confirmPassword123',
 		})
 
 		// trigger reset the "email"
-		resetInputState('email')
+		inputAction.resetInput('email')
 
-		const { inputStates } = result.current.inputAttributes
+		const { inputStates } = result.current.inputAttribute
 		expect(inputStates).toEqual({ ...inputStates, email: '' })
 	})
 
-	it('should reset all inputStates to initial values using "resetInputState"', () => {
+	it('should reset all inputStates to initial values using "resetInput"', () => {
 		const { result } = renderHook(() => useInput(initState))
-		const { inputAttributes, resetInputState } = result.current
-		const { onChange } = inputAttributes
+		const { inputAttribute, inputAction } = result.current
+		const { onChange } = inputAttribute
 
 		// invoke change events to mock update the inputStates
 		onChange(email)
 		onChange(password)
 		onChange(confirm)
 
-		const { inputStates } = result.current.inputAttributes
+		const { inputStates } = result.current.inputAttribute
 		expect(inputStates).toEqual({
 			email: 'onChange test@example.com',
 			password: 'onChange password123',
@@ -120,20 +120,20 @@ describe('useInput', () => {
 		})
 
 		// invoke reset
-		resetInputState()
+		inputAction.resetInput()
 
-		expect(result.current.inputAttributes.inputStates).toEqual(initState)
+		expect(result.current.inputAttribute.inputStates).toEqual(initState)
 	})
 
-	it('should reset inputStates and inputFocus on "resetInputState" call', () => {
+	it('should reset inputStates and inputFocus on "resetInput" call', () => {
 		const { result } = renderHook(() => useInput(initState))
-		const { resetInputState } = result.current
+		const { inputAction } = result.current
 
 		// invoke to reset all inputStates
-		resetInputState()
+		inputAction.resetInput()
 
-		const { inputFocus, inputStates } = result.current.inputAttributes
-		expect(inputFocus).toEqual(initFocus)
+		const { isFocus, inputStates } = result.current.inputAttribute
+		expect(isFocus).toEqual(initFocus)
 		expect(inputStates).toEqual(initState)
 	})
 })

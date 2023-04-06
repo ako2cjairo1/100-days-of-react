@@ -27,9 +27,9 @@ export const Registration = () => {
 		REGISTER_STATE
 	const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
 	// form controlled inputs
-	const { resetInputState, inputAttributes } = useInput<TCredentials>(CREDENTIALS)
+	const { inputAttribute, inputAction } = useInput<TCredentials>(CREDENTIALS)
 	// destructure
-	const { inputStates, onChange, onFocus, onBlur, inputFocus } = inputAttributes
+	const { inputStates, onChange, onFocus, onBlur, isFocus, isSubmitted } = inputAttribute
 	const { password, email, confirm, isTermsAgreed } = inputStates
 	const [registrationStatus, setRegistrationStatus] = useState<TStatus>(STATUS)
 	// destructure
@@ -41,7 +41,7 @@ export const Registration = () => {
 	// destructure states
 	const emailRef = useRef<HTMLInputElement>(null)
 	const loginRef = useRef<HTMLAnchorElement>(null)
-	const [submit, setSubmit] = useState(false)
+	// const [submit, setSubmit] = useState(false)
 	const { authInfo, updateAuthInfo } = useAuthContext()
 
 	const inputValidationCb = useCallback(() => {
@@ -62,7 +62,7 @@ export const Registration = () => {
 	useEffect(() => {
 		if (!success) emailRef.current?.focus()
 		else loginRef.current?.focus()
-	}, [success, submit])
+	}, [success])
 
 	useEffect(() => {
 		inputValidationCb()
@@ -71,7 +71,7 @@ export const Registration = () => {
 	}, [inputValidationCb])
 
 	const resetRegistration = () => {
-		resetInputState()
+		inputAction.resetInput()
 		setRegistrationStatus(STATUS)
 		setLoginValidation(INPUT_VALIDATION)
 		setTestPassword(VALID_PASSWORD)
@@ -81,9 +81,9 @@ export const Registration = () => {
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault()
 
-		if (!submit) {
+		if (!isSubmitted) {
 			setRegistrationStatus(prev => ({ ...prev, message: '' }))
-			setSubmit(true)
+			inputAction.submit(true)
 			RunAfterSomeTime(() => {
 				if (Object.values(loginValidation).every(Boolean)) {
 					// TODO: use custom API to handle registration
@@ -98,7 +98,7 @@ export const Registration = () => {
 					})
 				}
 
-				setSubmit(false)
+				inputAction.submit(false)
 			}, 3)
 		}
 	}
@@ -175,13 +175,13 @@ export const Registration = () => {
 									placeholder="sample@email.com"
 									value={email}
 									linkRef={emailRef}
-									disabled={submit}
+									disabled={isSubmitted}
 									required
-									className={inputFocus.email ? '' : isValidEmail ? 'valid' : 'invalid'}
+									className={isFocus.email ? '' : isValidEmail ? 'valid' : 'invalid'}
 									{...{ onChange, onFocus, onBlur }}
 								/>
 								<ValidationMessage
-									isVisible={!inputFocus.email && !(isValidEmail && !message)}
+									isVisible={!isFocus.email && !(isValidEmail && !message)}
 									validations={emailReq}
 								/>
 							</div>
@@ -203,14 +203,14 @@ export const Registration = () => {
 									id="password"
 									type="password"
 									value={password}
-									disabled={submit}
+									disabled={isSubmitted}
 									required
 									{...{ onChange, onFocus, onBlur }}
-									className={inputFocus.password ? '' : isValidPassword ? 'valid' : 'invalid'}
+									className={isFocus.password ? '' : isValidPassword ? 'valid' : 'invalid'}
 								/>
 								<ValidationMessage
 									title="Your master password must contain:"
-									isVisible={!inputFocus.password && !(isValidPassword && !message)}
+									isVisible={!isFocus.password && !(isValidPassword && !message)}
 									validations={passwordReq}
 								/>
 							</div>
@@ -220,7 +220,7 @@ export const Registration = () => {
 									props={{
 										label: 'Confirm Master Password',
 										labelFor: 'confirm',
-										isFulfilled: !inputFocus.confirm && isValidPassword && password === confirm,
+										isFulfilled: !isFocus.confirm && isValidPassword && password === confirm,
 									}}
 								/>
 
@@ -228,11 +228,11 @@ export const Registration = () => {
 									id="confirm"
 									type="password"
 									value={confirm}
-									disabled={submit}
+									disabled={isSubmitted}
 									required
 									{...{ onChange, onFocus, onBlur }}
 									className={
-										inputFocus.confirm
+										isFocus.confirm
 											? ''
 											: isValidPassword && password === confirm
 											? 'valid'
@@ -242,8 +242,8 @@ export const Registration = () => {
 
 								<ValidationMessage
 									isVisible={
-										!inputFocus.confirm &&
-										!(!inputFocus.confirm && isValidPassword && password === confirm)
+										!isFocus.confirm &&
+										!(!isFocus.confirm && isValidPassword && password === confirm)
 									}
 									validations={confirmReq}
 								/>
@@ -270,10 +270,10 @@ export const Registration = () => {
 								variant="primary"
 								className="accent-bg"
 								iconName="fa-user-plus"
-								submitted={submit}
+								submitted={isSubmitted}
 								disabled={
 									!isTermsAgreed ||
-									submit ||
+									isSubmitted ||
 									!isValidEmail ||
 									!isValidPassword ||
 									password !== confirm

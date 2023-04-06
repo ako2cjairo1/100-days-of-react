@@ -26,13 +26,22 @@ describe('Header', () => {
 		expect(getByText(childElement)).toBeInTheDocument()
 	})
 
-	it('should render success icon when status.success is true', () => {
+	it('should render success icon when status.success is true and have a message', () => {
 		const { container } = render(
 			<Header>
-				<Header.Status status={{ success: true }} />
+				<Header.Status status={{ success: true, message: 'success message' }} />
 			</Header>
 		)
 		expect(container.querySelector('.fa.fa-check')).toBeInTheDocument()
+	})
+
+	it('should not render success icon when either success and message are not truthy', () => {
+		const { container } = render(
+			<Header>
+				<Header.Status status={{ success: true, message: '' }} />
+			</Header>
+		)
+		expect(container.querySelector('.fa.fa-check')).not.toBeInTheDocument()
 	})
 
 	it('should render error icon and message when "success" is false and "errMsg" is defined', () => {

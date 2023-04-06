@@ -53,8 +53,8 @@ export type TAuthContext<T> = {
 	updateAuthInfo: (authInfo: T) => void
 }
 
-export type TFunction<T = Array<unknown>, RT = unknown> = T extends Array<
-	unknown extends infer J ? J : never
+export type TFunction<T = Array<unknown>, RT = void> = T extends Array<
+	unknown extends infer IT ? IT : T
 >
-	? (...params: T) => RT extends infer K ? K : void
-	: (param: T) => RT extends infer K ? K : void
+	? (...params: T) => RT extends infer IRT ? IRT : RT
+	: (param: T) => RT extends infer IRT ? IRT : RT

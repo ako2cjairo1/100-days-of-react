@@ -5,8 +5,8 @@ import { MemoryRouter } from 'react-router-dom'
 describe('Keychain components', () => {
 	it('renders a list of KeychainItem components', () => {
 		const keychain = [
-			{ keychainId: 1, logo: 'logo1', link: 'link1', username: 'username1' },
-			{ keychainId: 2, logo: 'logo2', link: 'link2', username: 'username2' },
+			{ keychainId: '1', logo: 'logo1', website: 'link1', username: 'username1' },
+			{ keychainId: '2', logo: 'logo2', website: 'link2', username: 'username2' },
 		]
 		const listEvent = vi.fn()
 		const { container } = render(
@@ -21,8 +21,8 @@ describe('Keychain components', () => {
 
 	it('triggers the listEvent callback when a KeychainItem is clicked', () => {
 		const keychain = [
-			{ keychainId: 1, logo: 'logo1', link: 'link1', username: 'username1' },
-			{ keychainId: 2, logo: 'logo2', link: 'link2', username: 'username2' },
+			{ keychainId: '1', logo: 'logo1', website: 'link1', username: 'username1' },
+			{ keychainId: '2', logo: 'logo2', website: 'link2', username: 'username2' },
 		]
 		const listEvent = vi.fn()
 		const { container } = render(

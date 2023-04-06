@@ -2,22 +2,17 @@ import { IRegExObj, TConvertToStringUnion } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
 import { REGISTER_STATE } from '../constants'
 
-export const Log = <T>(Obj: T) => {
+export function Log<T>(Obj: T) {
 	if (Obj instanceof Error) console.error(Obj)
 	console.log(Obj)
 }
-
-const TimerType = {
-	timeout: 'timeout',
-	interval: 'interval',
-} as const
 
 /**
  * Combines multiple regular expressions into a single regular expression.
  * Parameters: regExObj (object containing key-value pairs of strings and regular expressions).
  * Return value: a single regular expression.
  */
-export const MergeRegExObj = (regExObj: IRegExObj): RegExp => {
+export function MergeRegExObj(regExObj: IRegExObj): RegExp {
 	let mergedRegexString = ''
 
 	for (const key in regExObj) {
@@ -32,23 +27,27 @@ export const MergeRegExObj = (regExObj: IRegExObj): RegExp => {
  * Parameters: list (array of items).
  * Return value: a random item from the list.
  */
-export const GetRandomItem = <T>(list: T[]): T | undefined => {
+export function GetRandomItem<T>(list: T[]): T | undefined {
 	const idx = Math.floor(Math.random() * list.length)
 
 	return list.at(idx) ?? list[0]
 }
 
+const TimerType = {
+	timeout: 'timeout',
+	interval: 'interval',
+} as const
 /**
  * Executes a callback function after a specified amount of time, with an optional timer type.
  *
  * Parameters: callbackfn (function to be executed), seconds (time in seconds), timer type (timeout or interval).
  * Return value: timerId (ID of the timer)
  */
-export const RunAfterSomeTime = (
+export function RunAfterSomeTime(
 	callbackFn: () => void,
 	seconds: number,
 	timerType: TConvertToStringUnion<typeof TimerType> = TimerType.timeout
-) => {
+) {
 	const { timeout } = TimerType
 	let timerId: NodeJS.Timeout
 
@@ -69,7 +68,7 @@ export const RunAfterSomeTime = (
  * param {string} regex - The regular expression string to extract value from.
  * returns {string} The extracted value from the regular expression string.
  */
-export const ExtractValFromRegEx = (regex: string) => {
+export function ExtractValFromRegEx(regex: string) {
 	let extractedValues = ''
 	if (regex.includes('{')) {
 		extractedValues =
@@ -96,12 +95,10 @@ export const ExtractValFromRegEx = (regex: string) => {
  * param {TObj} eventTargetProps - The object containing the target properties to override.
  * returns {T} The overridden Event instance with updated target properties.
  */
-export const OverrideEventTarget = <
+export function OverrideEventTarget<
 	T extends ChangeEvent<HTMLInputElement> extends infer Evt ? Evt : FocusEvent<HTMLInputElement>,
 	TObj = Record<string, string | boolean> //{ id: string; value: string | boolean }
->(
-	eventTargetProps: TObj
-) => {
+>(eventTargetProps: TObj) {
 	// create an instance of Event by assertion (ChangeEvent, FocusEvent)
 	const sourceEvent = {} as T
 
@@ -118,7 +115,7 @@ export const OverrideEventTarget = <
  * param initVal - An optional initial value for all the boolean values in the new object. Defaults to true.
  * returns A new object with the same keys as the input object and boolean values.
  */
-export const ConvertPropsToBool = <T>(targetObj: T, initVal = true) => {
+export function ConvertPropsToBool<T>(targetObj: T, initVal = true) {
 	const resultObj = {} as Record<TConvertToStringUnion<T>, boolean>
 	// type TCOnv =
 
@@ -142,7 +139,7 @@ type TraversedProperty = Partial<{
 	type: unknown
 }>
 
-export const MapUnknownObj = (obj: object): TraversedProperty => {
+export function MapUnknownObj(obj: object): TraversedProperty {
 	let result: TraversedProperty = {}
 
 	for (const [key, value] of Object.entries(obj)) {
@@ -170,7 +167,7 @@ type PasswordManagerError = Error & {
 	code: number | string
 	unknownError?: unknown
 }
-export const CreateError = (error: unknown) => {
+export function CreateError(error: unknown) {
 	let result: PasswordManagerError = {
 		code: -1,
 		name: 'An error has occurred.',
@@ -206,23 +203,21 @@ export const CreateError = (error: unknown) => {
 }
 
 interface ILocalStorage {
-	set: (key: string, value: string) => void
-	get: (key: string) => string | null extends infer T ? T : never
+	write: (key: string, value: string) => void
+	read: (key: string) => string | null extends infer T ? (T extends null ? string : T) : never
 	remove: (key: string) => void
 }
 export const LocalStorage: ILocalStorage = {
-	set: (key, value) => localStorage.setItem(key, value),
-	get: key => localStorage.getItem(key),
+	write: (key, value) => localStorage.setItem(key, value),
+	read: key => localStorage.getItem(key) ?? '',
 	remove: key => localStorage.removeItem(key),
 }
 
-const passwordRegex = MergeRegExObj(REGISTER_STATE.PASSWORD_REGEX)
-export const GeneratePassword = (regex: RegExp = passwordRegex) => {
+export function GeneratePassword(regex: RegExp = MergeRegExObj(REGISTER_STATE.PASSWORD_REGEX)) {
 	let resultCombination = ''
 	const characters =
 		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' +
 		ExtractValFromRegEx(REGISTER_STATE.PASSWORD_REGEX.symbol.source)
-	Log(characters)
 
 	while (!regex.test(resultCombination)) {
 		resultCombination = ''
@@ -238,10 +233,43 @@ export const GeneratePassword = (regex: RegExp = passwordRegex) => {
 	return resultCombination
 }
 
-export const GenerateUUID = () => {
+export function GenerateUUID() {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
 		const r = (Math.random() * 16) | 0
 		const v = c === 'x' ? r : (r & 0x3) | 0x8
 		return v.toString(16)
 	})
+}
+
+export async function GetLogoUrlAsync(siteUrl: string) {
+	const response = await fetch(siteUrl)
+	const text = await response.text()
+	const doc = new DOMParser().parseFromString(text, 'text/html')
+	const logoElement =
+		doc.querySelector("link[rel*='icon']") || doc.querySelector("link[rel*='shortcut icon']")
+	return logoElement ? (logoElement as HTMLLinkElement).href : ''
+}
+
+export async function CopyToClipboard(value: string) {
+	try {
+		await navigator.clipboard.writeText(value)
+	} catch (err) {
+		CopyToClipboardiOS(value)
+		Log(`Failed to copy text: ${CreateError(err).message}`)
+	}
+}
+
+function CopyToClipboardiOS(text: string): void {
+	const textArea = document.createElement('textarea')
+	textArea.value = text
+	document.body.appendChild(textArea)
+	textArea.select()
+
+	try {
+		document.execCommand('copy')
+	} catch (err) {
+		Log(`Failed to copy clipboard: ${CreateError(err).message}`)
+	}
+
+	document.body.removeChild(textArea)
 }
