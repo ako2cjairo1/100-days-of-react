@@ -2,12 +2,7 @@ import '@/assets/modules/Keychain.css'
 import google from '@/assets/google.png'
 import apple from '@/assets/apple.png'
 import github from '@/assets/github.png'
-import {
-	Header,
-	KeychainForm,
-	NewKeychainForm,
-	Toolbar,
-} from '@/components'
+import { Header, KeychainForm, NewKeychainForm, Toolbar } from '@/components'
 import { useAuthContext } from '@/hooks'
 import { Modal } from '@/components/Modal'
 import { useState } from 'react'
@@ -23,7 +18,6 @@ export function Keychain() {
 	const [showKeychain, setShowKeychain] = useState(false)
 	const [keychain, setKeychain] = useState<Partial<IKeychainItem>>()
 	const [clipboardStatus, setClipboardStatus] = useState<TStatus>({ success: false, message: '' })
-
 
 	const { authInfo, updateAuthInfo } = useAuthContext()
 
