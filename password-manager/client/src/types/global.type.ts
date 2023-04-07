@@ -11,7 +11,7 @@ export type TCredentials = {
 
 export type TKeychain = {
 	keychainId: string
-	logo?: string
+	logo: string
 	website: string
 	username: string
 	password: string
@@ -53,8 +53,4 @@ export type TAuthContext<T> = {
 	updateAuthInfo: (authInfo: T) => void
 }
 
-export type TFunction<T = Array<unknown>, RT = void> = T extends Array<
-	unknown extends infer IT ? IT : T
->
-	? (...params: T) => RT extends infer IRT ? IRT : RT
-	: (param: T) => RT extends infer IRT ? IRT : RT
+export type TFunction<T = [], RT = void> = T extends T[] ? (...params: T) => RT : (param: T) => RT

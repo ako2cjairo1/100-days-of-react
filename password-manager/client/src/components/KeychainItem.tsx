@@ -1,4 +1,4 @@
-import { FCProps, IKeychainItem } from '@/types'
+import { IKeychainItem } from '@/types'
 import { Link } from 'react-router-dom'
 
 /**
@@ -11,29 +11,29 @@ import { Link } from 'react-router-dom'
  *
  * returns {JSX.Element} A JSX element representing the keychain item.
  */
-export const KeychainItem: FCProps<IKeychainItem> = ({
+export function KeychainItem({
 	keychainId,
 	logo,
-	website: link,
+	website,
 	username,
-	onClick,
-}) => {
+	onClick = () => null,
+}: IKeychainItem) {
 	return (
 		<div
 			className="keychain-item"
-			onClick={() => onClick && onClick(keychainId)}
+			onClick={() => onClick(keychainId)}
 		>
 			<img
 				src={logo}
-				alt={link}
+				alt={website}
 			/>
 			<div className="keychain-item-description">
 				<a
-					href={`//${link}`}
+					href={`//${website}`}
 					rel="noreferrer"
 					target="_blank"
 				>
-					{link}
+					{website}
 				</a>
 				<p>{username}</p>
 			</div>
@@ -41,7 +41,7 @@ export const KeychainItem: FCProps<IKeychainItem> = ({
 				to=""
 				title="show details"
 				className="menu descend"
-				onClick={() => onClick && onClick(keychainId)}
+				onClick={() => onClick(keychainId)}
 			>
 				<i className="fa fa-chevron-right small" />
 			</Link>

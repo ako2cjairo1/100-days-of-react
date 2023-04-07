@@ -31,7 +31,7 @@ export const RequiredLabel: FCProps<IRequiredLabelProps> = ({
 					{!isFulfilled && ' (required)'}
 				</i>
 			) : (
-				subLabel
+				subLabel ? subLabel : '(optional)'
 			)}
 			{children ? children : null}
 		</label>

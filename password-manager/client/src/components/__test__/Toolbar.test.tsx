@@ -32,7 +32,7 @@ describe('Item', () => {
 			<MemoryRouter>
 				<Toolbar.Item
 					name="Test"
-					menuCb={menuCb}
+					onClick={menuCb}
 				/>
 			</MemoryRouter>
 		)

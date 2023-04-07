@@ -1,20 +1,20 @@
 import { Link } from 'react-router-dom'
 import { PasswordStrength } from './PasswordStrength'
-import { TFunction, TKeychain } from '@/types'
+import { TKeychain } from '@/types'
 import { useTimedCopyToClipboard } from '@/hooks'
 import { useState } from 'react'
+import { SubmitButton } from './SubmitButton'
 
 interface IKeychainForm extends Partial<TKeychain> {
-	isEdit?: boolean
-	updateCallback: TFunction<Partial<TKeychain>>
+	updateCallback: (param?: string) => void
 }
 export function KeychainForm({
+	keychainId,
 	logo = '',
 	website = '',
 	username = '',
 	password = '',
-	isEdit = false,
-	updateCallback = () => null,
+	updateCallback,
 }: IKeychainForm) {
 	const [revealPassword, setRevealPassword] = useState(false)
 	const userNameClipboard = useTimedCopyToClipboard({ message: 'User Name copied to clipboard!' })
@@ -38,7 +38,7 @@ export function KeychainForm({
 		passwordClipboard.clear()
 		setRevealPassword(false)
 		// send the changes of keychain info for mutation
-		updateCallback({})
+		updateCallback()
 	}
 
 	return (
@@ -72,13 +72,9 @@ export function KeychainForm({
 				</Link>
 			</div>
 
-			<div className="keychain-item details">
+			<div className={`keychain-item details ${(userNameClipboard.isCopied || passwordClipboard.isCopied) && ''} vr`}>
 				<div className="keychain-item-description">
-					<p>User Name</p>
-					<p>Password</p>
-				</div>
-
-				<div className="keychain-item-description">
+					<p className='keychain-label'>User Name</p>
 					<div>
 						<input
 							className="keychain-info"
@@ -89,15 +85,13 @@ export function KeychainForm({
 							readOnly
 						/>
 						<i
-							className={`fa fa-clone small action-button rounded-right ${
-								!userNameClipboard.isCopied && 'active'
-							}`}
+							className={`fa fa-clone small action-button rounded-right ${!userNameClipboard.isCopied && 'active'
+								}`}
 							onClick={() => handleClipboards('email')}
 						/>
 					</div>
 
-					<PasswordStrength password={password} />
-
+					<p className='keychain-label'>Password</p>
 					<div>
 						<input
 							className="keychain-info"
@@ -110,12 +104,13 @@ export function KeychainForm({
 							onClick={() => setRevealPassword(prev => !prev)}
 						/>
 						<i
-							className={`fa fa-clone small action-button rounded-right ${
-								!passwordClipboard.isCopied && 'active'
-							}`}
+							className={`fa fa-clone small action-button rounded-right ${!passwordClipboard.isCopied && 'active'
+								}`}
 							onClick={() => handleClipboards('password')}
 						/>
 					</div>
+					<PasswordStrength password={password} />
+
 				</div>
 
 				{(userNameClipboard.isCopied || passwordClipboard.isCopied) && (
@@ -128,6 +123,19 @@ export function KeychainForm({
 					</div>
 				)}
 			</div>
+
+			<SubmitButton
+				variant="default"
+				iconName="fa-pencil"
+				submitted={false}
+				disabled={false}
+				onClick={() => {
+					handleBackToKeychains()
+					updateCallback(keychainId)
+				}}
+			>
+				Edit
+			</SubmitButton>
 		</>
 	)
 }

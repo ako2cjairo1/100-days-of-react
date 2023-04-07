@@ -2,13 +2,14 @@ import '@/assets/modules/Keychain.css'
 import google from '@/assets/google.png'
 import apple from '@/assets/apple.png'
 import github from '@/assets/github.png'
-import { Header, KeychainForm, NewKeychainForm, Toolbar } from '@/components'
+import { Header, KeychainContainer, KeychainForm, NewKeychainForm, Toolbar } from '@/components'
 import { useAuthContext } from '@/hooks'
 import { Modal } from '@/components/Modal'
 import { useState } from 'react'
-import { KeychainContainer } from '@/components/KeychainContainer'
 import { IKeychainItem, TKeychain, TStatus } from '@/types'
+import { KEYCHAIN_CONST } from '@/services/constants'
 
+const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 /**
  * Renders a Keychain component
  * returns A div element with the class "vault-container" containing a KeychainContainer, a Toolbar, and two Modal components
@@ -16,9 +17,8 @@ import { IKeychainItem, TKeychain, TStatus } from '@/types'
 export function Keychain() {
 	const [showModalForm, setShowModalForm] = useState(false)
 	const [showKeychain, setShowKeychain] = useState(false)
-	const [keychain, setKeychain] = useState<Partial<IKeychainItem>>()
-	const [clipboardStatus, setClipboardStatus] = useState<TStatus>({ success: false, message: '' })
-
+	const [keychain, setKeychain] = useState<IKeychainItem>(KEYCHAIN)
+	const [clipboardStatus, setClipboardStatus] = useState<TStatus>(STATUS)
 	const { authInfo, updateAuthInfo } = useAuthContext()
 
 	const keychains: Array<TKeychain> = [
@@ -45,7 +45,7 @@ export function Keychain() {
 		},
 	]
 
-	const openKeychain = (keychainId: string) => {
+	const openKeychain = (keychainId: string, isEdit?: boolean) => {
 		const info = keychains.find(info => info.keychainId === keychainId)
 
 		if (!info)
@@ -54,22 +54,30 @@ export function Keychain() {
 				message: 'Keychain information not found! Try again after a while.',
 			})
 
-		setShowKeychain(true)
 		setKeychain(info)
+		isEdit ? showHideAddKeychainForm(true) : setShowKeychain(true)
 	}
 
-	const keychainFormCallback = (keychainData: Partial<TKeychain>) => {
-		setClipboardStatus({
-			success: false,
-			message: '',
-		})
+	const updateKeychainFormCallback = (keychainId?: string) => {
+		// hide keychain info and reset clipboard status
 		setShowKeychain(false)
+		setClipboardStatus(STATUS)
 
-		// update info if there are changes
-		if (keychainData) setKeychain(keychainData)
+		// subsequently open a modal form if user clicked "Edit"
+		if (keychainId) {
+			openKeychain(keychainId, true)
+		}
 	}
 
-	const showNewKeychainForm = (isShow: boolean) => setShowModalForm(isShow)
+	const showHideAddKeychainForm = (isShow: boolean) => {
+		setShowModalForm(isShow)
+
+		// set the keychain to initial state
+		if (!isShow) {
+			setKeychain(KEYCHAIN)
+			setShowKeychain(false)
+		}
+	}
 
 	return (
 		<div className="vault-container">
@@ -78,7 +86,7 @@ export function Keychain() {
 					name="Logout"
 					iconName="fa fa-sign-out"
 					navigateTo="/login"
-					menuCb={() =>
+					onClick={() =>
 						updateAuthInfo({
 							...authInfo,
 							accessToken: '',
@@ -89,7 +97,7 @@ export function Keychain() {
 				<Toolbar.Item
 					name="add item"
 					iconName="fa fa-plus"
-					menuCb={() => showNewKeychainForm(true)}
+					onClick={() => showHideAddKeychainForm(true)}
 				/>
 			</Toolbar>
 
@@ -101,27 +109,29 @@ export function Keychain() {
 				</Header>
 				{!showKeychain ? (
 					<KeychainContainer.Keychain
-						{...{ keychain: keychains }}
-						event={openKeychain}
+						{...{ keychains }}
+						onClick={openKeychain}
 					/>
 				) : (
 					<KeychainForm
 						{...keychain}
-						updateCallback={keychainFormCallback}
+						updateCallback={updateKeychainFormCallback}
 					/>
 				)}
+				<Modal
+					props={{
+						isOpen: showModalForm,
+						onClose: () => showHideAddKeychainForm(false),
+						hideCloseButton: false,
+						clickBackdropToClose: false,
+					}}
+				>
+					<NewKeychainForm
+						showForm={showHideAddKeychainForm}
+						keychainInfo={keychain}
+					/>
+				</Modal>
 			</KeychainContainer>
-
-			<Modal
-				props={{
-					isOpen: showModalForm,
-					onClose: () => showNewKeychainForm(false),
-					hideCloseButton: false,
-					clickBackdropToClose: false,
-				}}
-			>
-				<NewKeychainForm showForm={showNewKeychainForm} />
-			</Modal>
 		</div>
 	)
 }

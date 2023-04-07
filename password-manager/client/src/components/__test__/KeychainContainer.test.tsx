@@ -12,7 +12,7 @@ describe('Keychain components', () => {
 		const { container } = render(
 			<MemoryRouter>
 				<KeychainContainer>
-					<KeychainContainer.Keychain {...{ keychain, event: listEvent }} />
+					<KeychainContainer.Keychain {...{ keychains: keychain, onClick: listEvent }} />
 				</KeychainContainer>
 			</MemoryRouter>
 		)
@@ -28,7 +28,7 @@ describe('Keychain components', () => {
 		const { container } = render(
 			<MemoryRouter>
 				<KeychainContainer>
-					<KeychainContainer.Keychain {...{ keychain, event: listEvent }} />
+					<KeychainContainer.Keychain {...{ keychains: keychain, onClick: listEvent }} />
 				</KeychainContainer>
 			</MemoryRouter>
 		)

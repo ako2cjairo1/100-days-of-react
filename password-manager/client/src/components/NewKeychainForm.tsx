@@ -14,40 +14,37 @@ import { REGISTER_STATE, KEYCHAIN_CONST } from '@/services/constants'
 
 interface INewKeychainForm {
 	showForm: (param: boolean) => void
+	keychainInfo?: Partial<TKeychain>
 }
-export function NewKeychainForm({ showForm }: INewKeychainForm) {
+const { PASSWORD_REGEX } = REGISTER_STATE
+const { STATUS, KEYCHAIN, WEBSITE_REGEX } = KEYCHAIN_CONST
+
+export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 	// form controlled inputs
-	const { inputAttribute, inputAction } = useInput<TKeychain>({
-		keychainId: '0',
-		password: '',
-		username: '',
-		website: '',
-		logo: '',
-	})
+	const { inputAttribute, inputAction } = useInput<TKeychain>(KEYCHAIN)
 	// destructure
 	const { inputStates, onChange, onFocus, onBlur, isSubmitted } = inputAttribute
 	const { website, username, password } = inputStates
 
 	const [revealPassword, setRevealPassword] = useState(false)
-	const [keychainStatus, setKeychainStatus] = useState<TStatus>({
-		success: false,
-		message: '',
-	})
+	const [keychainStatus, setKeychainStatus] = useState<TStatus>(STATUS)
 	const usernameClipboard = useTimedCopyToClipboard({
 		message: 'User Name copied!',
-		callbackFn: () => setKeychainStatus({ success: true, message: '' }),
+		callbackFn: () => setKeychainStatus(STATUS),
 	})
 	const passwordClipboard = useTimedCopyToClipboard({
 		message: 'Password copied!',
-		callbackFn: () => setKeychainStatus({ success: true, message: '' }),
+		callbackFn: () => setKeychainStatus(STATUS),
 	})
 
 	const websiteInputRef = useRef<HTMLInputElement>(null)
 
 	useEffect(() => {
-		if (!keychainStatus.success) websiteInputRef.current?.focus()
+		inputAction.mutate({ ...keychainInfo })
+	}, [keychainInfo])
 
-		// inputAction.mutate({ keychainId: GenerateUUID(), password: GeneratePassword() })
+	useEffect(() => {
+		if (!keychainStatus.success) websiteInputRef.current?.focus()
 	}, [keychainStatus.success])
 
 	const submitKeychainForm = async (e: FormEvent) => {
@@ -64,7 +61,7 @@ export function NewKeychainForm({ showForm }: INewKeychainForm) {
 			// simulate api call as a promise
 			RunAfterSomeTime(() => {
 				inputAction.submit(false)
-				setKeychainStatus({ success: true, message: '' })
+				setKeychainStatus(STATUS)
 				inputAction.resetInput()
 				inputAction.mutate({ password: GeneratePassword() })
 			}, 3)
@@ -87,14 +84,14 @@ export function NewKeychainForm({ showForm }: INewKeychainForm) {
 						props={{
 							label: 'Website',
 							labelFor: 'website',
-							isFulfilled: KEYCHAIN_CONST.WEBSITE_REGEX.test(website),
+							isFulfilled: WEBSITE_REGEX.test(website),
 						}}
 					/>
 					<FormGroup.Input
 						id="website"
 						type="text"
 						linkRef={websiteInputRef}
-						placeholder="sample.com"
+						placeholder="ex: outlook.com"
 						value={website}
 						required
 						{...{ onChange, onFocus, onBlur }}
@@ -112,15 +109,14 @@ export function NewKeychainForm({ showForm }: INewKeychainForm) {
 					<FormGroup.Input
 						id="username"
 						type="text"
-						placeholder="sample@email.com"
+						placeholder="ex: sample@email.com"
 						value={username}
 						required
 						{...{ onChange, onFocus, onBlur }}
 					/>
 					<i
-						className={`fa fa-clone small action-button ${
-							!usernameClipboard.isCopied && username && 'active'
-						}`}
+						className={`fa fa-clone small action-button ${!usernameClipboard.isCopied && username && 'active'
+							}`}
 						style={{
 							position: 'absolute',
 							padding: '5px',
@@ -148,7 +144,7 @@ export function NewKeychainForm({ showForm }: INewKeychainForm) {
 					>
 						<PasswordStrength
 							password={password}
-							regex={MergeRegExObj(REGISTER_STATE.PASSWORD_REGEX)}
+							regex={MergeRegExObj(PASSWORD_REGEX)}
 						/>
 					</FormGroup.Label>
 					<div>
@@ -173,14 +169,17 @@ export function NewKeychainForm({ showForm }: INewKeychainForm) {
 							}}
 						>
 							<i
-								className={`fa fa-eye${revealPassword ? '-slash' : ''} small action-button ${
-									password && 'active'
-								}`}
+								className={`fa fa-eye${revealPassword ? '-slash' : ''} small action-button ${password && 'active'
+									}`}
 								style={{
 									padding: '5px',
 									borderRadius: '20px',
 								}}
-								onClick={() => setRevealPassword(prev => !prev)}
+								onClick={() => {
+									if (password) {
+										setRevealPassword(prev => !prev)
+									}
+								}}
 							/>
 							<i
 								className={`fa fa-refresh small action-button active`}
@@ -195,9 +194,8 @@ export function NewKeychainForm({ showForm }: INewKeychainForm) {
 								}}
 							/>
 							<i
-								className={`fa fa-clone small action-button ${
-									!passwordClipboard.isCopied && password && 'active'
-								}`}
+								className={`fa fa-clone small action-button ${!passwordClipboard.isCopied && password && 'active'
+									}`}
 								style={{
 									padding: '5px',
 									borderRadius: '20px',
@@ -236,9 +234,7 @@ export function NewKeychainForm({ showForm }: INewKeychainForm) {
 					<SubmitButton
 						variant="primary"
 						submitted={isSubmitted}
-						disabled={
-							isSubmitted || !KEYCHAIN_CONST.WEBSITE_REGEX.test(website) || !username || !password
-						}
+						disabled={isSubmitted || !WEBSITE_REGEX.test(website) || !username || !password}
 					>
 						Save
 					</SubmitButton>

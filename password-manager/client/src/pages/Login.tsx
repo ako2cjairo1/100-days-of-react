@@ -107,7 +107,6 @@ export const Login = () => {
 	const handleChangeEmail = () => {
 		inputAction.resetInput('password')
 		setIsInputEmail(true)
-		Log(authInfo)
 	}
 
 	const isMinLength = minLength.test(password)

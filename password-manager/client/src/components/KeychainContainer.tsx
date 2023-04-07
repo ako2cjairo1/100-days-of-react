@@ -2,8 +2,8 @@ import { IChildren, IKeychainItem, TFunction } from '@/types'
 import { KeychainItem } from './KeychainItem'
 
 interface IKeychainList {
-	keychain: Array<IKeychainItem>
-	event: TFunction<string>
+	keychains: Array<IKeychainItem>
+	onClick: TFunction<string>
 }
 
 /**
@@ -13,13 +13,13 @@ interface IKeychainList {
  *
  * returns A React fragment containing a list of KeychainItem components
  */
-function Keychain({ keychain, event }: IKeychainList) {
+function Keychain({ keychains, onClick }: IKeychainList) {
 	return (
 		<>
-			{keychain.map(({ keychainId, logo, website, username }) => (
+			{keychains.map(({ keychainId, logo, website, username }) => (
 				<KeychainItem
 					key={keychainId}
-					onClick={event}
+					onClick={onClick}
 					{...{ keychainId, logo, website, username }}
 				/>
 			))}
