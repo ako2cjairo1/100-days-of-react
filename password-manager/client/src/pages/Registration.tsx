@@ -235,8 +235,8 @@ export const Registration = () => {
 										isFocus.confirm
 											? ''
 											: isValidPassword && password === confirm
-											? 'valid'
-											: 'invalid'
+												? 'valid'
+												: 'invalid'
 									}
 								/>
 
@@ -267,17 +267,18 @@ export const Registration = () => {
 							</Toggle>
 
 							<SubmitButton
-								variant="primary"
+								props={{
+									variant: 'primary',
+									iconName: 'fa-user-plus',
+									submitted: isSubmitted,
+									disabled:
+										!isTermsAgreed ||
+										isSubmitted ||
+										!isValidEmail ||
+										!isValidPassword ||
+										password !== confirm,
+								}}
 								className="accent-bg"
-								iconName="fa-user-plus"
-								submitted={isSubmitted}
-								disabled={
-									!isTermsAgreed ||
-									isSubmitted ||
-									!isValidEmail ||
-									!isValidPassword ||
-									password !== confirm
-								}
 								onClick={() => console.log('Submit button triggered!')}
 							>
 								Create account

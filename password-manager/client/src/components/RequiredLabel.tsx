@@ -1,4 +1,4 @@
-import { FCProps, IRequiredLabelProps } from '@/types'
+import { IRequiredLabelProps } from '@/types'
 /**
  * This function returns a label element with the given properties.
  * @param {string} labelFor - The id of the form element that the label is bound to.
@@ -10,7 +10,7 @@ import { FCProps, IRequiredLabelProps } from '@/types'
  * @returns {JSX.Element} A label element with the given properties.
  */
 
-export const RequiredLabel: FCProps<IRequiredLabelProps> = ({
+export function RequiredLabel({
 	children,
 	labelFor,
 	label,
@@ -18,7 +18,7 @@ export const RequiredLabel: FCProps<IRequiredLabelProps> = ({
 	isFulfilled = false,
 	isOptional = false,
 	...rest
-}) => {
+}: IRequiredLabelProps) {
 	return (
 		<label
 			{...rest}
@@ -30,8 +30,10 @@ export const RequiredLabel: FCProps<IRequiredLabelProps> = ({
 					{subLabel}
 					{!isFulfilled && ' (required)'}
 				</i>
+			) : subLabel ? (
+				subLabel
 			) : (
-				subLabel ? subLabel : '(optional)'
+				'(optional)'
 			)}
 			{children ? children : null}
 		</label>

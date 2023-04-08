@@ -1,11 +1,11 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { Header, FormGroup, PasswordStrength, SubmitButton } from '.'
 import { useInput, useTimedCopyToClipboard } from '@/hooks'
-import { TKeychain, TStatus } from '@/types'
+import { TFunction, TKeychain, TStatus } from '@/types'
 import {
+	CreateError,
 	GeneratePassword,
 	GenerateUUID,
-	GetLogoUrlAsync,
 	Log,
 	MergeRegExObj,
 	RunAfterSomeTime,
@@ -13,7 +13,7 @@ import {
 import { REGISTER_STATE, KEYCHAIN_CONST } from '@/services/constants'
 
 interface INewKeychainForm {
-	showForm: (param: boolean) => void
+	showForm: TFunction<boolean>
 	keychainInfo?: Partial<TKeychain>
 }
 const { PASSWORD_REGEX } = REGISTER_STATE
@@ -40,7 +40,11 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 	const websiteInputRef = useRef<HTMLInputElement>(null)
 
 	useEffect(() => {
-		inputAction.mutate({ ...keychainInfo })
+		inputAction.mutate({
+			...keychainInfo,
+			keychainId: keychainInfo?.keychainId ? keychainInfo.keychainId : GenerateUUID(),
+			password: keychainInfo?.password ? keychainInfo.password : GeneratePassword(),
+		})
 	}, [keychainInfo])
 
 	useEffect(() => {
@@ -53,50 +57,81 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 		if (!isSubmitted) {
 			inputAction.submit(true)
 			inputAction.mutate({
-				keychainId: GenerateUUID(),
-				logo: await GetLogoUrlAsync(website),
+				// get the logo from website
+				// logo: await GetLogoUrlAsync(website),
 			})
-			setKeychainStatus({ success: true, message: 'Password created!' })
 
-			// simulate api call as a promise
-			RunAfterSomeTime(() => {
-				inputAction.submit(false)
-				setKeychainStatus(STATUS)
-				inputAction.resetInput()
-				inputAction.mutate({ password: GeneratePassword() })
-			}, 3)
+			try {
+				// simulate api post request
+				RunAfterSomeTime(() => {
+					inputAction.submit(false)
+					setKeychainStatus(STATUS)
+					setKeychainStatus({ success: true, message: 'Password Saved!' })
+					inputAction.resetInput()
+
+					// close the modal after sometime
+					RunAfterSomeTime(() => {
+						showForm(false)
+					}, 3)
+				}, 3)
+			} catch (error) {
+				setKeychainStatus({ success: false, message: CreateError(error).message })
+			}
 		}
 	}
 
 	return (
 		<>
 			<Header>
-				<Header.Title
-					title="Add Password"
-					subTitle="We will save this password in your session storage and cloud account"
-				/>
+				{!Object.values(keychainInfo || {}).some(Boolean) ? (
+					<Header.Title
+						title="Add Password"
+						subTitle="We will save this password in your session storage and cloud account"
+					/>
+				) : (
+					<div className="keychain-item">
+						<img
+							className="header"
+							src={keychainInfo?.logo}
+							alt={keychainInfo?.website}
+						/>
+						<div className="keychain-item-header">
+							<a
+								href={`//${keychainInfo?.website}`}
+								rel="noreferrer"
+								target="_blank"
+							>
+								{keychainInfo?.website}
+							</a>
+							<p>Last modified </p>
+						</div>
+					</div>
+				)}
 				<Header.Status status={keychainStatus} />
 			</Header>
 
 			<FormGroup onSubmit={submitKeychainForm}>
-				<div className="input-row">
-					<FormGroup.Label
-						props={{
-							label: 'Website',
-							labelFor: 'website',
-							isFulfilled: WEBSITE_REGEX.test(website),
-						}}
-					/>
-					<FormGroup.Input
-						id="website"
-						type="text"
-						linkRef={websiteInputRef}
-						placeholder="ex: outlook.com"
-						value={website}
-						required
-						{...{ onChange, onFocus, onBlur }}
-					/>
-				</div>
+				{!Object.values(keychainInfo || {}).some(Boolean) && (
+					<div className="input-row">
+						<FormGroup.Label
+							props={{
+								label: 'Website',
+								labelFor: 'website',
+								isFulfilled: WEBSITE_REGEX.test(website),
+							}}
+						/>
+						<FormGroup.Input
+							id="website"
+							type="text"
+							linkRef={websiteInputRef}
+							placeholder="ex: outlook.com"
+							value={website}
+							disabled={isSubmitted}
+							required
+							{...{ onChange, onFocus, onBlur }}
+						/>
+					</div>
+				)}
 
 				<div className="input-row">
 					<FormGroup.Label
@@ -111,6 +146,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						type="text"
 						placeholder="ex: sample@email.com"
 						value={username}
+						disabled={isSubmitted}
 						required
 						{...{ onChange, onFocus, onBlur }}
 					/>
@@ -153,7 +189,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							style={{ paddingRight: '106px' }}
 							type={revealPassword ? 'text' : 'password'}
 							value={password}
-							disabled={false}
+							disabled={isSubmitted}
 							required
 							{...{ onChange, onFocus, onBlur }}
 						/>
@@ -219,9 +255,11 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 
 				<div style={{ display: 'flex', gap: '8px' }}>
 					<SubmitButton
-						variant="cancel"
-						submitted={false}
-						disabled={false}
+						props={{
+							variant: 'cancel',
+							submitted: false,
+							disabled: false,
+						}}
 						onClick={() => {
 							setRevealPassword(false)
 							showForm(false)
@@ -232,8 +270,11 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 					</SubmitButton>
 
 					<SubmitButton
-						variant="primary"
-						submitted={isSubmitted}
+						props={{
+							variant: 'primary',
+							textStatus: 'Saving',
+							submitted: isSubmitted,
+						}}
 						disabled={isSubmitted || !WEBSITE_REGEX.test(website) || !username || !password}
 					>
 						Save

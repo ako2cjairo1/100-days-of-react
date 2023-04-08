@@ -1,13 +1,13 @@
+import { useState } from 'react'
 import '@/assets/modules/Keychain.css'
+import { Header, KeychainContainer, KeychainForm, Modal, NewKeychainForm, Toolbar } from '@/components'
+import { useAuthContext } from '@/hooks'
+import { IKeychainItem, TKeychain, TStatus } from '@/types'
+import { KEYCHAIN_CONST } from '@/services/constants'
+
 import google from '@/assets/google.png'
 import apple from '@/assets/apple.png'
 import github from '@/assets/github.png'
-import { Header, KeychainContainer, KeychainForm, NewKeychainForm, Toolbar } from '@/components'
-import { useAuthContext } from '@/hooks'
-import { Modal } from '@/components/Modal'
-import { useState } from 'react'
-import { IKeychainItem, TKeychain, TStatus } from '@/types'
-import { KEYCHAIN_CONST } from '@/services/constants'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 /**
@@ -55,7 +55,7 @@ export function Keychain() {
 			})
 
 		setKeychain(info)
-		isEdit ? showHideAddKeychainForm(true) : setShowKeychain(true)
+		isEdit ? toggleAddKeychainForm(true) : setShowKeychain(true)
 	}
 
 	const updateKeychainFormCallback = (keychainId?: string) => {
@@ -69,7 +69,7 @@ export function Keychain() {
 		}
 	}
 
-	const showHideAddKeychainForm = (isShow: boolean) => {
+	const toggleAddKeychainForm = (isShow: boolean) => {
 		setShowModalForm(isShow)
 
 		// set the keychain to initial state
@@ -97,7 +97,10 @@ export function Keychain() {
 				<Toolbar.Item
 					name="add item"
 					iconName="fa fa-plus"
-					onClick={() => showHideAddKeychainForm(true)}
+					onClick={() => {
+						setKeychain(KEYCHAIN)
+						toggleAddKeychainForm(true)
+					}}
 				/>
 			</Toolbar>
 
@@ -121,13 +124,13 @@ export function Keychain() {
 				<Modal
 					props={{
 						isOpen: showModalForm,
-						onClose: () => showHideAddKeychainForm(false),
+						onClose: () => toggleAddKeychainForm(false),
 						hideCloseButton: false,
 						clickBackdropToClose: false,
 					}}
 				>
 					<NewKeychainForm
-						showForm={showHideAddKeychainForm}
+						showForm={toggleAddKeychainForm}
 						keychainInfo={keychain}
 					/>
 				</Modal>

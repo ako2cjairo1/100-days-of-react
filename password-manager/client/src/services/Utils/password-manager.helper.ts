@@ -97,7 +97,7 @@ export function ExtractValFromRegEx(regex: string) {
  */
 export function OverrideEventTarget<
 	T extends ChangeEvent<HTMLInputElement> extends infer Evt ? Evt : FocusEvent<HTMLInputElement>,
-	TObj = Record<string, string | boolean> //{ id: string; value: string | boolean }
+	TObj = Record<string, string | boolean>
 >(eventTargetProps: TObj) {
 	// create an instance of Event by assertion (ChangeEvent, FocusEvent)
 	const sourceEvent = {} as T
@@ -116,8 +116,7 @@ export function OverrideEventTarget<
  * returns A new object with the same keys as the input object and boolean values.
  */
 export function ConvertPropsToBool<T>(targetObj: T, initVal = true) {
-	const resultObj = {} as Record<TConvertToStringUnion<T>, boolean>
-	// type TCOnv =
+	const resultObj = {} as Record<keyof T, boolean>
 
 	// use same property names as targetObj
 	for (const key in targetObj) {

@@ -13,7 +13,7 @@ import { ConvertPropsToBool, Log } from '@/services/Utils/password-manager.helpe
 type TUseInputFocus<T> = Record<keyof T, boolean> | { [key: string]: boolean }
 type TInputEvent = FocusEvent<HTMLInputElement> | ChangeEvent<HTMLInputElement>
 
-export const useInput = <T>(initState: T) => {
+export function useInput<T>(initState: T) {
 	const [inputStates, setInputStates] = useState<T>(initState)
 	const [isFocus, setIsFocus] = useState<TUseInputFocus<T>>({})
 	const [isSubmitted, setSubmit] = useState(false)
@@ -26,8 +26,8 @@ export const useInput = <T>(initState: T) => {
 			if (id) setInputStates(prev => ({ ...prev, [id]: '' }))
 			// reset all input state
 			else setInputStates(initState)
-
-			setIsFocus(ConvertPropsToBool(initState, true)) // initialize focus states to true
+			// initialize focus states to true
+			setIsFocus(ConvertPropsToBool(initState, true))
 		},
 		[initState]
 	)
@@ -45,7 +45,8 @@ export const useInput = <T>(initState: T) => {
 	useEffect(() => {
 		// used to create and initialize focus states to "true"
 		if (initFocus.current) {
-			setIsFocus(ConvertPropsToBool(initState, true)) // initialize focus states to true
+			// initialize focus states to true
+			setIsFocus(ConvertPropsToBool(initState, true))
 			initFocus.current = false
 		}
 	}, [initState])

@@ -27,11 +27,13 @@ export interface IRequiredLabelProps extends Omit<TLabelAttrs, 'htmlFor' | 'form
 
 export interface IButtonElement
 	extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-	variant?: 'primary' | 'cancel' | 'default'
-	submitted: boolean
-	disabled?: boolean
-	textStatus?: string
-	iconName?: string
+	props: {
+		variant?: 'primary' | 'cancel' | 'default'
+		submitted: boolean
+		disabled?: boolean
+		textStatus?: string
+		iconName?: string
+	}
 }
 export interface IInputElement
 	extends Omit<

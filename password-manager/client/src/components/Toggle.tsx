@@ -1,11 +1,15 @@
-import { FCWithChildren, IChildren, IInputElement } from '@/types'
+import { IChildren, IInputElement } from '@/types'
 import '@/assets/modules/Toggle.css'
 
-const Description: FCWithChildren<{ checked?: boolean }> = ({ children, checked }) => {
+interface IDescription extends IChildren {
+	checked?: boolean
+}
+function Description({ children, checked }: IDescription) {
 	return <span className={`description ${checked ? 'description-active' : ''}`}>{children}</span>
 }
 
-export const Toggle = ({ children, ...inputProps }: IInputElement & IChildren) => {
+interface IToggle extends IChildren, IInputElement {}
+export function Toggle({ children, ...inputProps }: IToggle) {
 	return (
 		<div className="toggle-container">
 			<input

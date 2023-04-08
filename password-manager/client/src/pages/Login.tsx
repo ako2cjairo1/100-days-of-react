@@ -7,7 +7,6 @@ import {
 	CreateError,
 	ExtractValFromRegEx,
 	LocalStorage,
-	Log,
 	RunAfterSomeTime,
 } from '@/services/Utils/password-manager.helper'
 import {
@@ -40,7 +39,7 @@ export const Login = () => {
 	const vaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const savedEmailRef = useRef(true)
 	const [isInputEmail, setIsInputEmail] = useState(true)
-	const { authInfo, updateAuthInfo } = useAuthContext()
+	const { updateAuthInfo } = useAuthContext()
 
 	useEffect(() => {
 		if (savedEmailRef.current) {
@@ -221,13 +220,14 @@ export const Login = () => {
 							)}
 
 							<SubmitButton
-								variant="primary"
-								textStatus="Processing..."
-								iconName={isInputEmail ? '' : 'fa-sign-in'}
-								submitted={isSubmitted}
-								disabled={
-									isSubmitted || (isInputEmail ? !isValidEmail : !(isValidEmail && isMinLength))
-								}
+								props={{
+									variant: 'primary',
+									textStatus: 'Processing...',
+									iconName: isInputEmail ? '' : 'fa-sign-in',
+									submitted: isSubmitted,
+									disabled:
+										isSubmitted || (isInputEmail ? !isValidEmail : !(isValidEmail && isMinLength)),
+								}}
 							>
 								{isInputEmail ? 'Continue' : 'Log in with Master Password'}
 							</SubmitButton>

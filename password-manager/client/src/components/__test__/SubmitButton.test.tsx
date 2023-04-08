@@ -4,7 +4,7 @@ import { render, fireEvent } from '@/services/Utils/test.util'
 describe('SubmitButton', () => {
 	it('renders with custom text', () => {
 		const text = 'Custom Text'
-		const { getByRole } = render(<SubmitButton submitted={false}>{text}</SubmitButton>)
+		const { getByRole } = render(<SubmitButton props={{ submitted: false }}>{text}</SubmitButton>)
 		expect(getByRole('button')).toHaveTextContent(text)
 	})
 
@@ -12,15 +12,17 @@ describe('SubmitButton', () => {
 		const iconName = 'fa-check'
 		const { getByTestId } = render(
 			<SubmitButton
-				submitted={false}
-				{...{ iconName }}
+				props={{
+					iconName,
+					submitted: false
+				}}
 			/>
 		)
 		expect(getByTestId(iconName)).toBeInTheDocument()
 	})
 
 	it('renders "spinner" if submitted prop is true', () => {
-		const { getByTestId } = render(<SubmitButton submitted={true} />)
+		const { getByTestId } = render(<SubmitButton props={{ submitted: true }} />)
 		expect(getByTestId('spinner')).toBeInTheDocument()
 	})
 
@@ -31,7 +33,7 @@ describe('SubmitButton', () => {
 		const { getByText } = render(
 			<SubmitButton
 				onClick={onClick}
-				submitted={false}
+				props={{ submitted: false }}
 			>
 				{buttonText}
 			</SubmitButton>

@@ -53,4 +53,8 @@ export type TAuthContext<T> = {
 	updateAuthInfo: (authInfo: T) => void
 }
 
-export type TFunction<T = [], RT = void> = T extends T[] ? (...params: T) => RT : (param: T) => RT
+export type TFunction<T = [], RT = void> = T extends T[]
+	? (...params: T) => RT
+	: T extends true | false
+	? (param: boolean) => RT
+	: (param: T) => RT

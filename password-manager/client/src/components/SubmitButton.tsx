@@ -1,4 +1,4 @@
-import { FCProps, IButtonElement } from '@/types'
+import { IButtonElement } from '@/types'
 /**
  * This is a SubmitButton component that renders a button with text and an optional icon.
  * Note: "type" attribute was omitted, most of the button attrs are omitted
@@ -7,26 +7,21 @@ import { FCProps, IButtonElement } from '@/types'
  * @param {string} [textStatus='Processing...'] - The text to display when the button is in a submitted state.
  * @param {string} [iconName] - The name of the icon to display on the button (optional).
  */
-export const SubmitButton: FCProps<IButtonElement> = ({
+export function SubmitButton({
+	props: { variant = 'primary', submitted = false, disabled = false, textStatus, iconName },
 	children,
 	className,
-	variant = 'primary',
-	submitted = false,
-	disabled = false,
-	textStatus,
-	iconName,
-	...props
-}) => {
+	...rest
+}: IButtonElement) {
 	return (
 		<button
 			data-testid="submit"
 			type={variant !== 'primary' ? 'button' : 'submit'}
-			className={`button-style submit ${variant === 'primary' ? 'accent-bg' : ''} ${
-				className ? className : ''
-			}`}
+			className={`button-style submit ${variant === 'primary' ? 'accent-bg' : ''} ${className ? className : ''
+				}`}
 			disabled={disabled}
-			onClick={props.onClick}
-			{...props}
+			onClick={rest.onClick}
+			{...rest}
 		>
 			{submitted ? (
 				<div className="center">

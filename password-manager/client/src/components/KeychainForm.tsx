@@ -72,9 +72,9 @@ export function KeychainForm({
 				</Link>
 			</div>
 
-			<div className={`keychain-item details ${(userNameClipboard.isCopied || passwordClipboard.isCopied) && ''} vr`}>
+			<div className="keychain-item details vr">
 				<div className="keychain-item-description">
-					<p className='keychain-label'>User Name</p>
+					<p className="keychain-label">User Name</p>
 					<div>
 						<input
 							className="keychain-info"
@@ -91,7 +91,7 @@ export function KeychainForm({
 						/>
 					</div>
 
-					<p className='keychain-label'>Password</p>
+					<p className="keychain-label">Password</p>
 					<div>
 						<input
 							className="keychain-info"
@@ -110,7 +110,6 @@ export function KeychainForm({
 						/>
 					</div>
 					<PasswordStrength password={password} />
-
 				</div>
 
 				{(userNameClipboard.isCopied || passwordClipboard.isCopied) && (
@@ -125,10 +124,12 @@ export function KeychainForm({
 			</div>
 
 			<SubmitButton
-				variant="default"
-				iconName="fa-pencil"
-				submitted={false}
-				disabled={false}
+				props={{
+					variant: 'default',
+					iconName: 'fa-pencil',
+					submitted: false,
+					disabled: false,
+				}}
 				onClick={() => {
 					handleBackToKeychains()
 					updateCallback(keychainId)
