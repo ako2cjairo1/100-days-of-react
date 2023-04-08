@@ -14,7 +14,7 @@ describe('SubmitButton', () => {
 			<SubmitButton
 				props={{
 					iconName,
-					submitted: false
+					submitted: false,
 				}}
 			/>
 		)

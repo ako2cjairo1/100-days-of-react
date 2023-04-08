@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import '@/assets/modules/Keychain.css'
-import { Header, KeychainContainer, KeychainForm, Modal, NewKeychainForm, Toolbar } from '@/components'
+import {
+	Header,
+	KeychainContainer,
+	KeychainForm,
+	Modal,
+	NewKeychainForm,
+	Menubar,
+} from '@/components'
 import { useAuthContext } from '@/hooks'
 import { IKeychainItem, TKeychain, TStatus } from '@/types'
 import { KEYCHAIN_CONST } from '@/services/constants'
@@ -55,7 +62,7 @@ export function Keychain() {
 			})
 
 		setKeychain(info)
-		isEdit ? toggleAddKeychainForm(true) : setShowKeychain(true)
+		isEdit ? toggleAddKeychainForm.open() : setShowKeychain(true)
 	}
 
 	const updateKeychainFormCallback = (keychainId?: string) => {
@@ -69,20 +76,24 @@ export function Keychain() {
 		}
 	}
 
-	const toggleAddKeychainForm = (isShow: boolean) => {
-		setShowModalForm(isShow)
-
-		// set the keychain to initial state
-		if (!isShow) {
-			setKeychain(KEYCHAIN)
-			setShowKeychain(false)
+	const toggleAddKeychainForm = (() => {
+		return {
+			open: () => setShowModalForm(true),
+			close: () => {
+				setShowModalForm(false)
+				// set the keychain to initial state
+				setKeychain(KEYCHAIN)
+				setShowKeychain(false)
+			},
+			toggle: (toggle: boolean) =>
+				toggle ? toggleAddKeychainForm.open() : toggleAddKeychainForm.close(),
 		}
-	}
+	})()
 
 	return (
 		<div className="vault-container">
-			<Toolbar>
-				<Toolbar.Item
+			<Menubar>
+				<Menubar.Item
 					name="Logout"
 					iconName="fa fa-sign-out"
 					navigateTo="/login"
@@ -94,15 +105,15 @@ export function Keychain() {
 					}
 				/>
 
-				<Toolbar.Item
+				<Menubar.Item
 					name="add item"
 					iconName="fa fa-plus"
 					onClick={() => {
 						setKeychain(KEYCHAIN)
-						toggleAddKeychainForm(true)
+						toggleAddKeychainForm.open()
 					}}
 				/>
-			</Toolbar>
+			</Menubar>
 
 			<KeychainContainer>
 				<Header>
@@ -122,15 +133,13 @@ export function Keychain() {
 					/>
 				)}
 				<Modal
-					props={{
-						isOpen: showModalForm,
-						onClose: () => toggleAddKeychainForm(false),
-						hideCloseButton: false,
-						clickBackdropToClose: false,
-					}}
+					isOpen={showModalForm}
+					onClose={toggleAddKeychainForm.open}
+					hideCloseButton={false}
+					clickBackdropToClose={false}
 				>
 					<NewKeychainForm
-						showForm={toggleAddKeychainForm}
+						showForm={toggleAddKeychainForm.toggle}
 						keychainInfo={keychain}
 					/>
 				</Modal>

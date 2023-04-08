@@ -85,13 +85,18 @@ export function KeychainForm({
 							readOnly
 						/>
 						<i
-							className={`fa fa-clone small action-button rounded-right ${!userNameClipboard.isCopied && 'active'
-								}`}
+							className={`fa fa-clone small action-button rounded-right ${
+								!userNameClipboard.isCopied && 'active'
+							}`}
 							onClick={() => handleClipboards('email')}
 						/>
 					</div>
 
-					<p className="keychain-label">Password</p>
+					<div>
+						<p className="keychain-label">Password</p>
+						<PasswordStrength password={password} />
+					</div>
+
 					<div>
 						<input
 							className="keychain-info"
@@ -104,12 +109,12 @@ export function KeychainForm({
 							onClick={() => setRevealPassword(prev => !prev)}
 						/>
 						<i
-							className={`fa fa-clone small action-button rounded-right ${!passwordClipboard.isCopied && 'active'
-								}`}
+							className={`fa fa-clone small action-button rounded-right ${
+								!passwordClipboard.isCopied && 'active'
+							}`}
 							onClick={() => handleClipboards('password')}
 						/>
 					</div>
-					<PasswordStrength password={password} />
 				</div>
 
 				{(userNameClipboard.isCopied || passwordClipboard.isCopied) && (

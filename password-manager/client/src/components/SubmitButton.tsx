@@ -17,8 +17,9 @@ export function SubmitButton({
 		<button
 			data-testid="submit"
 			type={variant !== 'primary' ? 'button' : 'submit'}
-			className={`button-style submit ${variant === 'primary' ? 'accent-bg' : ''} ${className ? className : ''
-				}`}
+			className={`button-style submit ${variant === 'primary' ? 'accent-bg' : ''} ${
+				className ? className : ''
+			}`}
 			disabled={disabled}
 			onClick={rest.onClick}
 			{...rest}

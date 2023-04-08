@@ -1,5 +1,5 @@
 import '@/assets/modules/Modal.css'
-import { FCProps, IModal } from '@/types'
+import { IModal } from '@/types'
 import { createPortal } from 'react-dom'
 
 /**
@@ -14,10 +14,14 @@ import { createPortal } from 'react-dom'
  *
  * returns A React Portal containing the modal if isOpen is true, otherwise null.
  */
-export const Modal: FCProps<IModal> = ({
+export function Modal({
 	children,
-	props: { isOpen, onClose, noBackdrop = false, hideCloseButton, clickBackdropToClose = true },
-}) => {
+	isOpen,
+	onClose,
+	noBackdrop = false,
+	hideCloseButton,
+	clickBackdropToClose = true,
+}: IModal) {
 	if (!isOpen) {
 		return null
 	}

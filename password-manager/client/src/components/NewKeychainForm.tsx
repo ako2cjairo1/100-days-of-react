@@ -38,14 +38,18 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 	})
 
 	const websiteInputRef = useRef<HTMLInputElement>(null)
+	const initInputActionRef = useRef(true)
 
 	useEffect(() => {
-		inputAction.mutate({
-			...keychainInfo,
-			keychainId: keychainInfo?.keychainId ? keychainInfo.keychainId : GenerateUUID(),
-			password: keychainInfo?.password ? keychainInfo.password : GeneratePassword(),
-		})
-	}, [keychainInfo])
+		if (initInputActionRef.current) {
+			inputAction.mutate({
+				...keychainInfo,
+				keychainId: keychainInfo?.keychainId ? keychainInfo.keychainId : GenerateUUID(),
+				password: keychainInfo?.password ? keychainInfo.password : GeneratePassword(),
+			})
+			initInputActionRef.current = false
+		}
+	}, [inputAction, keychainInfo])
 
 	useEffect(() => {
 		if (!keychainStatus.success) websiteInputRef.current?.focus()
@@ -65,13 +69,15 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 				// simulate api post request
 				RunAfterSomeTime(() => {
 					inputAction.submit(false)
-					setKeychainStatus(STATUS)
 					setKeychainStatus({ success: true, message: 'Password Saved!' })
-					inputAction.resetInput()
 
 					// close the modal after sometime
 					RunAfterSomeTime(() => {
-						showForm(false)
+						setKeychainStatus(STATUS)
+						showForm(true)
+
+						// invoke resetInput
+						// inputAction.resetInput()
 					}, 3)
 				}, 3)
 			} catch (error) {
@@ -128,6 +134,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							value={website}
 							disabled={isSubmitted}
 							required
+							className={`${isSubmitted ? 'disabled' : ''}`}
 							{...{ onChange, onFocus, onBlur }}
 						/>
 					</div>
@@ -148,6 +155,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						value={username}
 						disabled={isSubmitted}
 						required
+						className={`${isSubmitted ? 'disabled' : ''}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 					<i
@@ -191,6 +199,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							value={password}
 							disabled={isSubmitted}
 							required
+							className={`${isSubmitted ? 'disabled' : ''}`}
 							{...{ onChange, onFocus, onBlur }}
 						/>
 
@@ -218,15 +227,17 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 								}}
 							/>
 							<i
-								className={`fa fa-refresh small action-button active`}
+								className={`fa fa-refresh small action-button ${!isSubmitted && 'active'}`}
 								style={{
 									padding: '5px',
 									borderRadius: '20px',
 								}}
 								onClick={() => {
-									passwordClipboard.clear()
-									setRevealPassword(true)
-									inputAction.mutate({ password: GeneratePassword() })
+									if (!isSubmitted) {
+										passwordClipboard.clear()
+										setRevealPassword(true)
+										inputAction.mutate({ password: GeneratePassword() })
+									}
 								}}
 							/>
 							<i
@@ -258,7 +269,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						props={{
 							variant: 'cancel',
 							submitted: false,
-							disabled: false,
+							disabled: isSubmitted,
 						}}
 						onClick={() => {
 							setRevealPassword(false)

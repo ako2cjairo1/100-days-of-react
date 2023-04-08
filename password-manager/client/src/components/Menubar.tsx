@@ -17,12 +17,12 @@ interface IMenuItem {
  *
  * returns {JSX.Element} A Link component with an optional icon
  */
-const Item = ({ name, navigateTo, onClick, iconName = 'fa fa-bars' }: Partial<IMenuItem>) => {
+function Item({ name, navigateTo = '', onClick, iconName = 'fa fa-bars' }: Partial<IMenuItem>) {
 	return (
 		<Link
 			title={name}
 			className="button-style menu descend"
-			to={navigateTo ?? ''}
+			to={navigateTo}
 			onClick={onClick}
 		>
 			{iconName && (
@@ -41,8 +41,8 @@ const Item = ({ name, navigateTo, onClick, iconName = 'fa fa-bars' }: Partial<IM
  *
  * returns {JSX.Element} A section element with the class "form-container vault-menu" containing the children elements
  */
-export const Toolbar = ({ children }: IChildren) => {
+export function Menubar({ children }: IChildren) {
 	return <section className="form-container vault-menu">{children}</section>
 }
 
-Toolbar.Item = Item
+Menubar.Item = Item

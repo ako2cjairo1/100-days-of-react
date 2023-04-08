@@ -16,7 +16,7 @@ afterAll(() => {
 describe('Modal component', () => {
 	it('renders the modal content when isOpen is true', () => {
 		const { getByText } = render(
-			<Modal props={{ isOpen: true, onClose: () => {} }}>
+			<Modal isOpen={true}>
 				<div>Modal content</div>
 			</Modal>
 		)
@@ -25,7 +25,7 @@ describe('Modal component', () => {
 
 	it('does not render the modal content when isOpen is false', () => {
 		const { queryByText } = render(
-			<Modal props={{ isOpen: false, onClose: () => {} }}>
+			<Modal isOpen={false}>
 				<div>Modal content</div>
 			</Modal>
 		)
@@ -35,7 +35,10 @@ describe('Modal component', () => {
 	it('calls the onClose callback when the close button is clicked', () => {
 		const onClose = vi.fn()
 		const { getByTestId } = render(
-			<Modal props={{ isOpen: true, onClose }}>
+			<Modal
+				isOpen={true}
+				onClose={onClose}
+			>
 				<div>Modal content</div>
 			</Modal>
 		)

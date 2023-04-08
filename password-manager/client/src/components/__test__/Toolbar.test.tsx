@@ -1,4 +1,4 @@
-import { Toolbar } from '@/components'
+import { Menubar } from '@/components'
 import { fireEvent, render } from '@/services/Utils/test.util'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -6,7 +6,7 @@ describe('Item', () => {
 	it('renders a Link with the given name as title', () => {
 		const { getByTitle } = render(
 			<MemoryRouter>
-				<Toolbar.Item name="Test" />
+				<Menubar.Item name="Test" />
 			</MemoryRouter>
 		)
 		expect(getByTitle('Test')).toBeInTheDocument()
@@ -16,7 +16,7 @@ describe('Item', () => {
 		const navigateTo = '/test'
 		const { getByTitle } = render(
 			<MemoryRouter>
-				<Toolbar.Item
+				<Menubar.Item
 					name="Test"
 					navigateTo={navigateTo}
 				/>
@@ -30,7 +30,7 @@ describe('Item', () => {
 		const menuCb = vi.fn()
 		const { getByTitle } = render(
 			<MemoryRouter>
-				<Toolbar.Item
+				<Menubar.Item
 					name="Test"
 					onClick={menuCb}
 				/>
@@ -44,7 +44,7 @@ describe('Item', () => {
 		const iconName = 'fa fa-test'
 		const { getByTestId } = render(
 			<MemoryRouter>
-				<Toolbar.Item
+				<Menubar.Item
 					name="Test"
 					iconName={iconName}
 				/>

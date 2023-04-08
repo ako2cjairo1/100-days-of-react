@@ -77,11 +77,9 @@ export interface IKeychainItem extends Omit<TKeychain, 'password'> {
 }
 
 export interface IModal extends IChildren {
-	props: {
-		isOpen: boolean
-		noBackdrop?: boolean
-		clickBackdropToClose?: boolean
-		onClose?: TFunction
-		hideCloseButton?: boolean
-	}
+	isOpen: boolean
+	noBackdrop?: boolean
+	clickBackdropToClose?: boolean
+	onClose?: TFunction
+	hideCloseButton?: boolean
 }
