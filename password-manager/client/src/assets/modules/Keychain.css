@@ -7,9 +7,10 @@
 
 .keychain-info {
 	display: block;
-	height: 31px;
+	height: 35px;
 	width: 100%;
 	margin: 5px 0px;
+	margin-bottom: 15px;
 	padding: 5px;
 	border-radius: 5px;
 	border-top-right-radius: 0 !important;
@@ -34,6 +35,7 @@
 }
 
 .keychain-item + .details {
+	flex-direction: column;
 	background: transparent !important;
 	cursor: default !important;
 }
@@ -104,7 +106,7 @@
 }
 
 .keychain-item-header {
-	width: 100%;
+	width: 68%;
 	padding: inherit;
 	text-align: start;
 }
@@ -117,11 +119,11 @@
 }
 .keychain-item-description div {
 	display: flex;
-	place-items: center;
+	place-items: baseline;
 }
 
 .keychain-label {
-	width: 90px;
+	width: 100%;
 }
 
 /* .keychain-item-description div > input:nth-child(1) {
@@ -163,7 +165,7 @@
 
 .action-button {
 	border: 1px solid var(--background-color);
-	padding: 8px;
+	padding: 11px;
 	text-align: center;
 	background-color: var(--background-color);
 	opacity: 0.4;
@@ -188,7 +190,7 @@
 }
 
 .clipboard-status {
-	position: absolute;
+	/* position: absolute; */
 	width: 100%;
 	display: flex;
 	top: 100%;
@@ -199,9 +201,13 @@
 .clipboard-status p {
 	color: currentColor;
 	padding: 0 5px !important;
+	margin-left: 5px;
 	border-radius: 10px;
 	background-color: rgba(255, 255, 255, 0.07);
+	/* background-color: rgb(88, 182, 117, 0.2); */
+
 	border: 1px solid rgba(255, 255, 255, 0.1);
+	gap: 5px;
 }
 
 @media (max-width: 500px) {

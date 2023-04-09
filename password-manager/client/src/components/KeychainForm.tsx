@@ -17,9 +17,9 @@ export function KeychainForm({
 	updateCallback,
 }: IKeychainForm) {
 	const [revealPassword, setRevealPassword] = useState(false)
-	const userNameClipboard = useTimedCopyToClipboard({ message: 'User Name copied to clipboard!' })
+	const userNameClipboard = useTimedCopyToClipboard({ message: 'User Name copied!' })
 	const passwordClipboard = useTimedCopyToClipboard({
-		message: 'Password copied to clipboard!',
+		message: 'Password copied!',
 		callbackFn: () => setRevealPassword(false),
 	})
 
@@ -72,7 +72,7 @@ export function KeychainForm({
 				</Link>
 			</div>
 
-			<div className="keychain-item details vr">
+			<div className="keychain-item details">
 				<div className="keychain-item-description">
 					<p className="keychain-label">User Name</p>
 					<div>
@@ -116,10 +116,9 @@ export function KeychainForm({
 						/>
 					</div>
 				</div>
-
 				{(userNameClipboard.isCopied || passwordClipboard.isCopied) && (
 					<div className="clipboard-status">
-						<i className="fa fa-check scale-up" />
+						<i className="fa fa-info-circle fa-beat-fade" />
 						<p className="center x-small descend">
 							{userNameClipboard.statusMessage}
 							{passwordClipboard.statusMessage}
@@ -131,7 +130,7 @@ export function KeychainForm({
 			<SubmitButton
 				props={{
 					variant: 'default',
-					iconName: 'fa-pencil',
+					iconName: 'fa-pen-to-square',
 					submitted: false,
 					disabled: false,
 				}}

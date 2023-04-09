@@ -222,7 +222,7 @@ export const Login = () => {
 							<SubmitButton
 								props={{
 									variant: 'primary',
-									textStatus: 'Processing...',
+									textStatus: 'Logging in...',
 									iconName: isInputEmail ? '' : 'fa-sign-in',
 									submitted: isSubmitted,
 									disabled:

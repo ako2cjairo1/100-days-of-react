@@ -62,7 +62,7 @@ export function Keychain() {
 			})
 
 		setKeychain(info)
-		isEdit ? toggleAddKeychainForm.open() : setShowKeychain(true)
+		isEdit ? addKeychainModal.open() : setShowKeychain(true)
 	}
 
 	const updateKeychainFormCallback = (keychainId?: string) => {
@@ -76,19 +76,16 @@ export function Keychain() {
 		}
 	}
 
-	const toggleAddKeychainForm = (() => {
-		return {
-			open: () => setShowModalForm(true),
-			close: () => {
-				setShowModalForm(false)
-				// set the keychain to initial state
-				setKeychain(KEYCHAIN)
-				setShowKeychain(false)
-			},
-			toggle: (toggle: boolean) =>
-				toggle ? toggleAddKeychainForm.open() : toggleAddKeychainForm.close(),
-		}
-	})()
+	const addKeychainModal = {
+		open: () => setShowModalForm(true),
+		close: () => {
+			setShowModalForm(false)
+			// set the keychain to initial state
+			setKeychain(KEYCHAIN)
+			setShowKeychain(false)
+		},
+		toggle: (toggle: boolean) => (toggle ? addKeychainModal.open() : addKeychainModal.close()),
+	}
 
 	return (
 		<div className="vault-container">
@@ -110,7 +107,7 @@ export function Keychain() {
 					iconName="fa fa-plus"
 					onClick={() => {
 						setKeychain(KEYCHAIN)
-						toggleAddKeychainForm.open()
+						addKeychainModal.open()
 					}}
 				/>
 			</Menubar>
@@ -132,18 +129,19 @@ export function Keychain() {
 						updateCallback={updateKeychainFormCallback}
 					/>
 				)}
-				<Modal
-					isOpen={showModalForm}
-					onClose={toggleAddKeychainForm.open}
-					hideCloseButton={false}
-					clickBackdropToClose={false}
-				>
-					<NewKeychainForm
-						showForm={toggleAddKeychainForm.toggle}
-						keychainInfo={keychain}
-					/>
-				</Modal>
 			</KeychainContainer>
+
+			<Modal
+				isOpen={showModalForm}
+				onClose={addKeychainModal.close}
+				hideCloseButton={false}
+				clickBackdropToClose={false}
+			>
+				<NewKeychainForm
+					showForm={addKeychainModal.toggle}
+					keychainInfo={keychain}
+				/>
+			</Modal>
 		</div>
 	)
 }

@@ -1,3 +1,4 @@
+import { useDelayToggle } from '@/hooks'
 import { IChildren, IHeaderProps } from '@/types'
 
 /** 
@@ -37,6 +38,9 @@ function Title({
 }
 
 function Status({ children, status }: Pick<IHeaderProps, 'children' | 'status'>) {
+	const isSuccessfulWithMessage = Object.values(status ? status : {}).every(Boolean)
+	const delaySuccess = useDelayToggle(isSuccessfulWithMessage)
+
 	return (
 		<>
 			{status && (
@@ -44,21 +48,22 @@ function Status({ children, status }: Pick<IHeaderProps, 'children' | 'status'>)
 					className={`center fdc ${status.message ? 'fade-in' : ''}`}
 					style={{ opacity: `${status.message ? 1 : 0}` }}
 				>
-					{Object.values(status).every(Boolean) ? (
-						<>
-							<i className="fa fa-check scale-up" />
-							<p className="center x-small descend">{status.message}</p>
-						</>
-					) : (
-						status.message && (
-							<>
-								{!status.success && (
-									<i className="fa-solid fa-triangle-exclamation fa-fade error regular" />
-								)}
-								<p className="center x-small descend error">{status.message}</p>
-							</>
-						)
-					)}
+					{isSuccessfulWithMessage
+						? delaySuccess && (
+								<>
+									<i className="fa fa-check scale-up" />
+									<p className="center x-small descend">{status.message}</p>
+								</>
+						  )
+						: delaySuccess &&
+						  status.message && (
+								<>
+									{!status.success && (
+										<i className="fa-solid fa-triangle-exclamation fa-fade error regular" />
+									)}
+									<p className="center x-small descend error">{status.message}</p>
+								</>
+						  )}
 				</div>
 			)}
 			{children}

@@ -1,3 +1,4 @@
+import { useDelayToggle } from '@/hooks'
 import { IRequiredLabelProps } from '@/types'
 /**
  * This function returns a label element with the given properties.
@@ -19,6 +20,9 @@ export function RequiredLabel({
 	isOptional = false,
 	...rest
 }: IRequiredLabelProps) {
+	// use to delay animation of check icon (isFulfilled)
+	const delayedToggle = useDelayToggle(isFulfilled)
+
 	return (
 		<label
 			{...rest}
@@ -26,7 +30,7 @@ export function RequiredLabel({
 		>
 			{`${label} `}
 			{!isOptional ? (
-				<i className={`${isFulfilled ? 'fa fa-check scale-up' : 'x-small'}`}>
+				<i className={`${isFulfilled ? `${delayedToggle && 'fa fa-check'} scale-up` : 'x-small'}`}>
 					{subLabel}
 					{!isFulfilled && ' (required)'}
 				</i>

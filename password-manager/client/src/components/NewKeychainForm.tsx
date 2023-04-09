@@ -6,11 +6,11 @@ import {
 	CreateError,
 	GeneratePassword,
 	GenerateUUID,
-	Log,
 	MergeRegExObj,
 	RunAfterSomeTime,
 } from '@/services/Utils/password-manager.helper'
 import { REGISTER_STATE, KEYCHAIN_CONST } from '@/services/constants'
+import { Link } from 'react-router-dom'
 
 interface INewKeychainForm {
 	showForm: TFunction<boolean>
@@ -71,11 +71,10 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 					inputAction.submit(false)
 					setKeychainStatus({ success: true, message: 'Password Saved!' })
 
-					// close the modal after sometime
+					// after sometime, reset status and close modal
 					RunAfterSomeTime(() => {
 						setKeychainStatus(STATUS)
-						showForm(true)
-
+						showForm(false)
 						// invoke resetInput
 						// inputAction.resetInput()
 					}, 3)
@@ -86,38 +85,91 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 		}
 	}
 
+	const handleAction = {
+		generatePassword: () => {
+			if (!isSubmitted) {
+				passwordClipboard.clear()
+				setRevealPassword(true)
+				inputAction.mutate({ password: GeneratePassword() })
+			}
+		},
+		copyPassword: () => {
+			if (!passwordClipboard.isCopied) {
+				usernameClipboard.clear()
+				passwordClipboard.copy(password)
+			}
+		},
+		copyUserName: () => {
+			if (!usernameClipboard.isCopied) {
+				passwordClipboard.clear()
+				usernameClipboard.copy(username)
+			}
+		},
+		revealPassword: () => {
+			if (password) {
+				setRevealPassword(prev => !prev)
+			}
+		},
+		deletePassword: () => {
+			setKeychainStatus({ success: false, message: '[Not implemenmted]' })
+
+			RunAfterSomeTime(() => setKeychainStatus({ success: false, message: '' }), 5)
+		},
+	}
+
+	const isEdit = Object.values(keychainInfo || {}).some(Boolean)
+
 	return (
 		<>
 			<Header>
-				{!Object.values(keychainInfo || {}).some(Boolean) ? (
+				{!isEdit ? (
 					<Header.Title
 						title="Add Password"
 						subTitle="We will save this password in your session storage and cloud account"
 					/>
 				) : (
-					<div className="keychain-item">
-						<img
-							className="header"
-							src={keychainInfo?.logo}
-							alt={keychainInfo?.website}
+					<>
+						{/* <Header.Logo /> */}
+						<Header.Title
+							title="Edit Password"
+							subTitle=""
 						/>
-						<div className="keychain-item-header">
-							<a
-								href={`//${keychainInfo?.website}`}
-								rel="noreferrer"
-								target="_blank"
-							>
-								{keychainInfo?.website}
-							</a>
-							<p>Last modified </p>
-						</div>
-					</div>
+						<Header.Status status={keychainStatus} />
+					</>
 				)}
-				<Header.Status status={keychainStatus} />
+
+				<div className="keychain-item">
+					<img
+						className="header"
+						src={keychainInfo?.logo}
+						alt={keychainInfo?.website}
+					/>
+					<div
+						className="keychain-item-header"
+						onClick={() => window.open(`//${keychainInfo?.website}`, '_blank')}
+					>
+						<a
+							href={`//${keychainInfo?.website}`}
+							rel="noreferrer"
+							target="_blank"
+						>
+							{keychainInfo?.website}
+						</a>
+						<p>Last modified </p>
+					</div>
+					<Link
+						to="/keychain"
+						title="Delete"
+						className="menu descend"
+						onClick={handleAction.deletePassword}
+					>
+						<i className="fa fa-trash fa-shake regular" />
+					</Link>
+				</div>
 			</Header>
 
 			<FormGroup onSubmit={submitKeychainForm}>
-				{!Object.values(keychainInfo || {}).some(Boolean) && (
+				{!isEdit && (
 					<div className="input-row">
 						<FormGroup.Label
 							props={{
@@ -159,8 +211,9 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						{...{ onChange, onFocus, onBlur }}
 					/>
 					<i
-						className={`fa fa-clone small action-button ${!usernameClipboard.isCopied && username && 'active'
-							}`}
+						className={`fa fa-clone small action-button ${
+							!usernameClipboard.isCopied && username && 'active'
+						}`}
 						style={{
 							position: 'absolute',
 							padding: '5px',
@@ -168,13 +221,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							bottom: '10px',
 							borderRadius: '20px',
 						}}
-						onClick={() => {
-							if (!usernameClipboard.isCopied) {
-								passwordClipboard.clear()
-								usernameClipboard.copy(username)
-								setKeychainStatus({ success: true, message: usernameClipboard.statusMessage })
-							}
-						}}
+						onClick={handleAction.copyUserName}
 					/>
 				</div>
 
@@ -214,53 +261,49 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							}}
 						>
 							<i
-								className={`fa fa-eye${revealPassword ? '-slash' : ''} small action-button ${password && 'active'
-									}`}
+								className={`fa fa-eye${revealPassword ? '-slash' : ''} small action-button ${
+									password && 'active'
+								}`}
 								style={{
 									padding: '5px',
 									borderRadius: '20px',
 								}}
-								onClick={() => {
-									if (password) {
-										setRevealPassword(prev => !prev)
-									}
-								}}
+								onClick={handleAction.revealPassword}
 							/>
 							<i
-								className={`fa fa-refresh small action-button ${!isSubmitted && 'active'}`}
+								className={`fa fa-refresh fa-spin small action-button ${!isSubmitted && 'active'}`}
 								style={{
 									padding: '5px',
 									borderRadius: '20px',
 								}}
-								onClick={() => {
-									if (!isSubmitted) {
-										passwordClipboard.clear()
-										setRevealPassword(true)
-										inputAction.mutate({ password: GeneratePassword() })
-									}
-								}}
+								onClick={handleAction.generatePassword}
 							/>
 							<i
-								className={`fa fa-clone small action-button ${!passwordClipboard.isCopied && password && 'active'
-									}`}
+								className={`fa fa-clone small action-button ${
+									!passwordClipboard.isCopied && password && 'active'
+								}`}
 								style={{
 									padding: '5px',
 									borderRadius: '20px',
 								}}
-								onClick={() => {
-									if (!passwordClipboard.isCopied) {
-										usernameClipboard.clear()
-										passwordClipboard.copy(password)
-										Log(passwordClipboard.statusMessage)
-										setKeychainStatus({ success: true, message: passwordClipboard.statusMessage })
-									}
-								}}
+								onClick={handleAction.copyPassword}
 							/>
 						</div>
-						<p className="center small">
+
+						<p className="center small descend">
 							Adding the password here saves it only to your registered account. Make sure the
 							password you save here matches your password for the website.
 						</p>
+						{(usernameClipboard.isCopied || passwordClipboard.isCopied) && (
+							<div className="clipboard-status">
+								<i className="fa fa-info-circle fa-beat-fade" />
+								<p className="center x-small descend">
+									{usernameClipboard.isCopied
+										? usernameClipboard.statusMessage
+										: passwordClipboard.statusMessage}
+								</p>
+							</div>
+						)}
 					</div>
 				</div>
 
@@ -288,7 +331,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						}}
 						disabled={isSubmitted || !WEBSITE_REGEX.test(website) || !username || !password}
 					>
-						Save
+						{isEdit ? 'Done' : 'Add Password'}
 					</SubmitButton>
 				</div>
 			</FormGroup>
