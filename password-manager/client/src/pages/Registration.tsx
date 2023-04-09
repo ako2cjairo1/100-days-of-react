@@ -19,6 +19,7 @@ import {
 	FormGroup,
 	ValidationMessage,
 	PasswordStrength,
+	AnimatedIcon,
 } from '@/components'
 
 export const Registration = () => {
@@ -136,7 +137,10 @@ export const Registration = () => {
 			<div className="form-container">
 				{success ? (
 					<Header>
-						<i className="fa fa-check-circle scale-up" />
+						<AnimatedIcon
+							className="scale-up"
+							iconName="fa fa-check-circle"
+						/>
 						<Header.Title title="Registration completed!">
 							<LinkLabel
 								linkRef={loginRef}

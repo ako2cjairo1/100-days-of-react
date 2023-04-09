@@ -1,5 +1,6 @@
 import { useDelayToggle } from '@/hooks'
 import { IChildren, IHeaderProps } from '@/types'
+import { AnimatedIcon } from './AnimatedIcon'
 
 /** 
 The `Header` component is a React functional component that renders a header element with optional title, subtitle, and status.
@@ -16,8 +17,14 @@ The `Header` component is a React functional component that renders a header ele
 function Logo({ children }: IChildren) {
 	return (
 		<h1 className="scale-up">
-			<i className="fa fa-key logo-key fade-in" />
-			<i className="fa fa-shield logo-shield scale-up" />
+			<AnimatedIcon
+				className="logo-key fade-in"
+				iconName="fa fa-key"
+			/>
+			<AnimatedIcon
+				className="logo-shield scale-up"
+				iconName="fa fa-shield"
+			/>
 			{children}
 		</h1>
 	)
@@ -51,7 +58,10 @@ function Status({ children, status }: Pick<IHeaderProps, 'children' | 'status'>)
 					{isSuccessfulWithMessage
 						? delaySuccess && (
 								<>
-									<i className="fa fa-check scale-up" />
+									<AnimatedIcon
+										className="scale-up"
+										iconName="fa fa-check"
+									/>
 									<p className="center x-small descend">{status.message}</p>
 								</>
 						  )
@@ -59,7 +69,12 @@ function Status({ children, status }: Pick<IHeaderProps, 'children' | 'status'>)
 						  status.message && (
 								<>
 									{!status.success && (
-										<i className="fa-solid fa-triangle-exclamation fa-fade error regular" />
+										<AnimatedIcon
+											className="regular error"
+											iconName="fa-solid fa-triangle-exclamation"
+											animation="fa-beat-fade"
+											animateOnLoad
+										/>
 									)}
 									<p className="center x-small descend error">{status.message}</p>
 								</>

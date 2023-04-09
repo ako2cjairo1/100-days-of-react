@@ -1,5 +1,13 @@
+import '@/assets/modules/NewKeychainForm.css'
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import { Header, FormGroup, PasswordStrength, SubmitButton } from '.'
+import {
+	Header,
+	FormGroup,
+	PasswordStrength,
+	SubmitButton,
+	AnimatedIcon,
+	InlineNotification,
+} from '.'
 import { useInput, useTimedCopyToClipboard } from '@/hooks'
 import { TFunction, TKeychain, TStatus } from '@/types'
 import {
@@ -111,9 +119,11 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 			}
 		},
 		deletePassword: () => {
-			setKeychainStatus({ success: false, message: '[Not implemenmted]' })
+			if (!isSubmitted) {
+				setKeychainStatus({ success: false, message: '[Not implemenmted]' })
 
-			RunAfterSomeTime(() => setKeychainStatus({ success: false, message: '' }), 5)
+				RunAfterSomeTime(() => setKeychainStatus({ success: false, message: '' }), 5)
+			}
 		},
 	}
 
@@ -123,49 +133,55 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 		<>
 			<Header>
 				{!isEdit ? (
-					<Header.Title
-						title="Add Password"
-						subTitle="We will save this password in your session storage and cloud account"
-					/>
+					<>
+						<Header.Title
+							title="Add Password"
+							subTitle="We will save this password in your session storage and cloud account"
+						/>
+						<Header.Status status={keychainStatus} />
+					</>
 				) : (
 					<>
-						{/* <Header.Logo /> */}
 						<Header.Title
 							title="Edit Password"
 							subTitle=""
 						/>
 						<Header.Status status={keychainStatus} />
+
+						<div className="keychain-item">
+							<img
+								className="header"
+								src={keychainInfo?.logo}
+								alt={keychainInfo?.website}
+							/>
+							<div
+								className="keychain-item-header"
+								onClick={() => window.open(`//${keychainInfo?.website}`, '_blank')}
+							>
+								<a
+									href={`//${keychainInfo?.website}`}
+									rel="noreferrer"
+									target="_blank"
+								>
+									{keychainInfo?.website}
+								</a>
+								<p>Last modified </p>
+							</div>
+							<Link
+								to="/keychain"
+								title="Delete"
+								className="menu descend"
+								onClick={handleAction.deletePassword}
+							>
+								<AnimatedIcon
+									className={`regular ${isSubmitted ? 'disabled' : ''}`}
+									iconName="fa fa-trash"
+									animation="fa-shake"
+								/>
+							</Link>
+						</div>
 					</>
 				)}
-
-				<div className="keychain-item">
-					<img
-						className="header"
-						src={keychainInfo?.logo}
-						alt={keychainInfo?.website}
-					/>
-					<div
-						className="keychain-item-header"
-						onClick={() => window.open(`//${keychainInfo?.website}`, '_blank')}
-					>
-						<a
-							href={`//${keychainInfo?.website}`}
-							rel="noreferrer"
-							target="_blank"
-						>
-							{keychainInfo?.website}
-						</a>
-						<p>Last modified </p>
-					</div>
-					<Link
-						to="/keychain"
-						title="Delete"
-						className="menu descend"
-						onClick={handleAction.deletePassword}
-					>
-						<i className="fa fa-trash fa-shake regular" />
-					</Link>
-				</div>
 			</Header>
 
 			<FormGroup onSubmit={submitKeychainForm}>
@@ -210,17 +226,10 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						className={`${isSubmitted ? 'disabled' : ''}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
-					<i
-						className={`fa fa-clone small action-button ${
-							!usernameClipboard.isCopied && username && 'active'
-						}`}
-						style={{
-							position: 'absolute',
-							padding: '5px',
-							right: '8px',
-							bottom: '10px',
-							borderRadius: '20px',
-						}}
+					<AnimatedIcon
+						className={`action-button copy-username small ${!usernameClipboard.isCopied && username && 'active'
+							}`}
+						iconName="fa fa-clone"
 						onClick={handleAction.copyUserName}
 					/>
 				</div>
@@ -250,42 +259,22 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							{...{ onChange, onFocus, onBlur }}
 						/>
 
-						<div
-							style={{
-								position: 'absolute',
-								right: '5px',
-								top: '47px',
-								display: 'flex',
-								justifyContent: 'space-around',
-								width: '85px',
-							}}
-						>
-							<i
-								className={`fa fa-eye${revealPassword ? '-slash' : ''} small action-button ${
-									password && 'active'
-								}`}
-								style={{
-									padding: '5px',
-									borderRadius: '20px',
-								}}
+						<div className="action-container">
+							<AnimatedIcon
+								className={`action-button small ${password && 'active'}`}
+								iconName={`fa fa-eye${revealPassword ? '-slash' : ''}`}
 								onClick={handleAction.revealPassword}
 							/>
-							<i
-								className={`fa fa-refresh fa-spin small action-button ${!isSubmitted && 'active'}`}
-								style={{
-									padding: '5px',
-									borderRadius: '20px',
-								}}
+							<AnimatedIcon
+								className={`action-button small ${!isSubmitted && 'active'}`}
+								iconName="fa fa-refresh"
+								animation="fa-spin"
 								onClick={handleAction.generatePassword}
 							/>
-							<i
-								className={`fa fa-clone small action-button ${
-									!passwordClipboard.isCopied && password && 'active'
-								}`}
-								style={{
-									padding: '5px',
-									borderRadius: '20px',
-								}}
+							<AnimatedIcon
+								className={`action-button small ${!passwordClipboard.isCopied && password && 'active'
+									}`}
+								iconName="fa fa-clone"
 								onClick={handleAction.copyPassword}
 							/>
 						</div>
@@ -295,19 +284,16 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							password you save here matches your password for the website.
 						</p>
 						{(usernameClipboard.isCopied || passwordClipboard.isCopied) && (
-							<div className="clipboard-status">
-								<i className="fa fa-info-circle fa-beat-fade" />
-								<p className="center x-small descend">
-									{usernameClipboard.isCopied
-										? usernameClipboard.statusMessage
-										: passwordClipboard.statusMessage}
-								</p>
-							</div>
+							<InlineNotification>
+								{usernameClipboard.isCopied
+									? usernameClipboard.statusMessage
+									: passwordClipboard.statusMessage}
+							</InlineNotification>
 						)}
 					</div>
 				</div>
 
-				<div style={{ display: 'flex', gap: '8px' }}>
+				<div className='center'>
 					<SubmitButton
 						props={{
 							variant: 'cancel',

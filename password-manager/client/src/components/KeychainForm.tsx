@@ -4,6 +4,8 @@ import { TKeychain } from '@/types'
 import { useTimedCopyToClipboard } from '@/hooks'
 import { useState } from 'react'
 import { SubmitButton } from './SubmitButton'
+import { AnimatedIcon } from './AnimatedIcon'
+import { InlineNotification } from './InlineNotification'
 
 interface IKeychainForm extends Partial<TKeychain> {
 	updateCallback: (param?: string) => void
@@ -68,7 +70,10 @@ export function KeychainForm({
 					className="menu descend"
 					onClick={handleBackToKeychains}
 				>
-					<i className="fa fa-chevron-left small" />
+					<AnimatedIcon
+						className="small"
+						iconName="fa fa-chevron-left"
+					/>
 				</Link>
 			</div>
 
@@ -83,11 +88,6 @@ export function KeychainForm({
 							placeholder="User Name"
 							value={username}
 							readOnly
-						/>
-						<i
-							className={`fa fa-clone small action-button rounded-right ${
-								!userNameClipboard.isCopied && 'active'
-							}`}
 							onClick={() => handleClipboards('email')}
 						/>
 					</div>
@@ -103,27 +103,21 @@ export function KeychainForm({
 							type={revealPassword ? 'text' : 'password'}
 							value={password}
 							readOnly
-						/>
-						<i
-							className={`fa fa-eye${revealPassword ? '-slash' : ''} small action-button active`}
-							onClick={() => setRevealPassword(prev => !prev)}
-						/>
-						<i
-							className={`fa fa-clone small action-button rounded-right ${
-								!passwordClipboard.isCopied && 'active'
-							}`}
 							onClick={() => handleClipboards('password')}
+						/>
+						<AnimatedIcon
+							className={`action-button small active`}
+							iconName={`fa fa-eye${revealPassword ? '-slash' : ''}`}
+							onClick={() => setRevealPassword(prev => !prev)}
 						/>
 					</div>
 				</div>
 				{(userNameClipboard.isCopied || passwordClipboard.isCopied) && (
-					<div className="clipboard-status">
-						<i className="fa fa-info-circle fa-beat-fade" />
-						<p className="center x-small descend">
-							{userNameClipboard.statusMessage}
-							{passwordClipboard.statusMessage}
-						</p>
-					</div>
+					<InlineNotification>
+						{userNameClipboard.isCopied
+							? userNameClipboard.statusMessage
+							: passwordClipboard.statusMessage}
+					</InlineNotification>
 				)}
 			</div>
 

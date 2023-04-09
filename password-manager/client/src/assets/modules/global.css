@@ -206,6 +206,7 @@ button,
 	place-content: center;
 	place-items: center;
 	text-align: center;
+	gap: 8px;
 }
 .fdc {
 	flex-direction: column;

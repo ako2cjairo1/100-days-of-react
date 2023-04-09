@@ -1,6 +1,7 @@
 import '@/assets/modules/Modal.css'
 import { IModal } from '@/types'
 import { createPortal } from 'react-dom'
+import { AnimatedIcon } from './AnimatedIcon'
 
 /**
  * This is a Modal component that displays its children when isOpen is true.
@@ -44,7 +45,10 @@ export function Modal({
 						className="close-icon modal-close"
 						onClick={onClose}
 					>
-						<i className="fa fa-close spins" />
+						<AnimatedIcon
+							className="spins"
+							iconName="fa fa-close"
+						/>
 					</div>
 				)}
 

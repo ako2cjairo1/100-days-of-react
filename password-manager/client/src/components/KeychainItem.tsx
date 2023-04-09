@@ -1,5 +1,6 @@
 import { IKeychainItem } from '@/types'
 import { Link } from 'react-router-dom'
+import { AnimatedIcon } from './AnimatedIcon'
 
 /**
  * This is a functional component that represents a keychain item in a vault.
@@ -43,7 +44,10 @@ export function KeychainItem({
 				className="menu descend"
 				onClick={() => onClick(keychainId)}
 			>
-				<i className="fa fa-chevron-right small" />
+				<AnimatedIcon
+					className="small"
+					iconName="fa fa-chevron-right"
+				/>
 			</Link>
 		</div>
 	)

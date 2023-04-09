@@ -18,6 +18,7 @@ import {
 	Toggle,
 	FormGroup,
 	ValidationMessage,
+	AnimatedIcon,
 } from '@/components'
 
 export const Login = () => {
@@ -128,7 +129,10 @@ export const Login = () => {
 			<div className="form-container">
 				{success ? (
 					<Header>
-						<i className="fa fa-check-circle scale-up" />
+						<AnimatedIcon
+							className="scale-up"
+							iconName="fa fa-check-circle"
+						/>
 						<Header.Title title="You are logged in!">
 							<LinkLabel
 								linkRef={vaultLinkRef}
