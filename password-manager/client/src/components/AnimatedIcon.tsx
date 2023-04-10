@@ -37,6 +37,8 @@ export function AnimatedIcon({
 			onClick={onClick}
 			onMouseOver={() => !disabled && setHover(true)}
 			onMouseLeave={() => setHover(false)}
-		>{children}</i>
+		>
+			{children}
+		</i>
 	)
 }

@@ -104,6 +104,10 @@ export const Registration = () => {
 		}
 	}
 
+	const checkIf = {
+		validConfirmation: isValidPassword && password === confirm,
+	}
+
 	const { emailReq, passwordReq, confirmReq } = {
 		emailReq: [{ isValid: isValidEmail, message: 'Input is not a valid email address.' }],
 		passwordReq: [
@@ -126,7 +130,7 @@ export const Registration = () => {
 		],
 		confirmReq: [
 			{
-				isValid: isValidPassword && password === confirm,
+				isValid: checkIf.validConfirmation,
 				message: 'Master password confirmation does not match.',
 			},
 		],
@@ -224,7 +228,7 @@ export const Registration = () => {
 									props={{
 										label: 'Confirm Master Password',
 										labelFor: 'confirm',
-										isFulfilled: !isFocus.confirm && isValidPassword && password === confirm,
+										isFulfilled: !isFocus.confirm && checkIf.validConfirmation,
 									}}
 								/>
 
@@ -238,17 +242,16 @@ export const Registration = () => {
 									className={
 										isFocus.confirm
 											? ''
-											: isValidPassword && password === confirm
+											: checkIf.validConfirmation
 											? 'valid'
-											: 'invalid'
+											: password.length > 0
+											? 'invalid'
+											: ''
 									}
 								/>
 
 								<ValidationMessage
-									isVisible={
-										!isFocus.confirm &&
-										!(!isFocus.confirm && isValidPassword && password === confirm)
-									}
+									isVisible={!isFocus.confirm && !checkIf.validConfirmation && password.length > 0}
 									validations={confirmReq}
 								/>
 							</div>

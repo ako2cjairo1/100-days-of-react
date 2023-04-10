@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
 import { TCredentials, TStatus } from '@/types/global.type'
-import { useInput, useAuthContext } from '@/hooks'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
+import { useInput, useAuthContext } from '@/hooks'
 import {
 	CreateError,
 	ExtractValFromRegEx,
@@ -34,33 +34,34 @@ export const Login = () => {
 	const { email, password, isRemember } = inputStates
 	const [loginStatus, setLoginStatus] = useState<TStatus>(LOGIN_STATE.Status)
 	// destructure states
-	const { success, message } = loginStatus
+	// const { success } = loginStatus
 	const emailInputRef = useRef<HTMLInputElement>(null)
 	const passwordInputRef = useRef<HTMLInputElement>(null)
-	const vaultLinkRef = useRef<HTMLAnchorElement>(null)
+	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const savedEmailRef = useRef(true)
-	const [isInputEmail, setIsInputEmail] = useState(true)
+	const [isTypingEmail, setIsTypingEmail] = useState(true)
 	const { updateAuthInfo } = useAuthContext()
 
 	useEffect(() => {
 		if (savedEmailRef.current) {
-			const cachedEmail = LocalStorage.read('password_manager_email')
+			const savedEmailFromLocalStorage = LocalStorage.read('password_manager_email')
 			inputAction.mutate({
-				...inputStates,
-				email: cachedEmail,
-				isRemember: cachedEmail ? true : false,
+				email: savedEmailFromLocalStorage,
+				isRemember: savedEmailFromLocalStorage ? true : false,
 			})
 			savedEmailRef.current = false
 		}
 	}, [inputStates, inputAction])
 
 	useEffect(() => {
-		if (isInputEmail) emailInputRef.current?.focus()
-		else if (success) vaultLinkRef.current?.focus()
-		else passwordInputRef.current?.focus()
-
-		vaultLinkRef.current?.focus()
-	}, [success, isInputEmail, isSubmitted])
+		if (isTypingEmail) {
+			emailInputRef.current?.focus()
+		} else if (loginStatus.success) {
+			securedVaultLinkRef.current?.focus()
+		} else {
+			passwordInputRef.current?.focus()
+		}
+	}, [loginStatus.success, isTypingEmail, isSubmitted])
 
 	useEffect(() => {
 		setLoginStatus(prev => ({ ...prev, message: '' }))
@@ -70,8 +71,8 @@ export const Login = () => {
 		e.preventDefault()
 
 		setLoginStatus(prev => ({ ...prev, message: '' }))
-		if (isInputEmail) {
-			setIsInputEmail(false)
+		if (isTypingEmail) {
+			setIsTypingEmail(false)
 			if (isRemember) LocalStorage.write('password_manager_email', email)
 			else LocalStorage.remove('password_manager_email')
 
@@ -104,19 +105,23 @@ export const Login = () => {
 		return true
 	}
 
-	const handleChangeEmail = () => {
+	const handleChangeLoginEmail = () => {
+		// clear the password (if any)
 		inputAction.resetInput('password')
-		setIsInputEmail(true)
+		// then go back to login email
+		setIsTypingEmail(true)
 	}
 
-	const isMinLength = minLength.test(password)
-	const isValidEmail = EMAIL_REGEX.test(email)
+	const checkIf = {
+		minLengthPassed: minLength.test(password),
+		isValidEmail: EMAIL_REGEX.test(email),
+	}
 
 	const { emailValidation, passwordValidation } = {
-		emailValidation: [{ isValid: isValidEmail, message: 'Input is not a valid email' }],
+		emailValidation: [{ isValid: checkIf.isValidEmail, message: 'Input is not a valid email' }],
 		passwordValidation: [
 			{
-				isValid: isMinLength,
+				isValid: checkIf.minLengthPassed,
 				message: `Input must be at least
 				${ExtractValFromRegEx(minLength.source)}
 				characters long.`,
@@ -127,7 +132,7 @@ export const Login = () => {
 	return (
 		<section>
 			<div className="form-container">
-				{success ? (
+				{loginStatus.success ? (
 					<Header>
 						<AnimatedIcon
 							className="scale-up"
@@ -135,7 +140,7 @@ export const Login = () => {
 						/>
 						<Header.Title title="You are logged in!">
 							<LinkLabel
-								linkRef={vaultLinkRef}
+								linkRef={securedVaultLinkRef}
 								routeTo="/keychain"
 								preText="Proceed to your"
 							>
@@ -155,13 +160,13 @@ export const Login = () => {
 						</Header>
 
 						<FormGroup onSubmit={handleSubmit}>
-							{isInputEmail ? (
+							{isTypingEmail ? (
 								<div className="input-row vr">
 									<FormGroup.Label
 										props={{
 											label: 'Email Address',
 											labelFor: 'email',
-											isFulfilled: isValidEmail && !message,
+											isFulfilled: checkIf.isValidEmail,
 										}}
 									/>
 									<FormGroup.Input
@@ -173,22 +178,22 @@ export const Login = () => {
 										required
 										value={email}
 										linkRef={emailInputRef}
-										disabled={!isInputEmail || isSubmitted}
-										className={!isFocus.email && (message || !isValidEmail) ? 'invalid' : ''}
+										disabled={isSubmitted}
+										className={!checkIf.isValidEmail ? (!isFocus.email ? 'invalid' : '') : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
-										isVisible={!isFocus.email && !(isValidEmail && !message)}
-										validations={!message ? emailValidation : []}
+										isVisible={email.length > 0 && !checkIf.isValidEmail}
+										validations={emailValidation}
 									/>
 								</div>
 							) : (
-								<div className={`input-row vr ${!isInputEmail ? 'descend' : ''}`}>
+								<div className={`input-row vr ${!isTypingEmail ? 'descend' : ''}`}>
 									<FormGroup.Label
 										props={{
 											label: 'Master Password',
 											labelFor: 'password',
-											isFulfilled: isMinLength && !message,
+											isFulfilled: checkIf.minLengthPassed,
 										}}
 									/>
 									<FormGroup.Input
@@ -199,21 +204,20 @@ export const Login = () => {
 										value={password}
 										linkRef={passwordInputRef}
 										disabled={isSubmitted}
-										className={!isFocus.password && (message || !isMinLength) ? 'invalid' : ''}
+										className={!checkIf.minLengthPassed ? (!isFocus.password ? 'invalid' : '') : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
-										isVisible={!isFocus.password && !(isMinLength && !message)}
-										validations={!message ? passwordValidation : []}
+										isVisible={password.length > 0 && !checkIf.minLengthPassed}
+										validations={passwordValidation}
 									/>
 								</div>
 							)}
 
-							{isInputEmail && (
+							{isTypingEmail && (
 								<Toggle
 									id="isRemember"
 									checked={isRemember}
-									// disabled={!(email.length > 0) && !isValidEmail}
 									{...{ onChange, onFocus, onBlur }}
 								>
 									<Toggle.Description checked={isRemember}>Remember email?</Toggle.Description>
@@ -227,17 +231,18 @@ export const Login = () => {
 								props={{
 									variant: 'primary',
 									textStatus: 'Logging in...',
-									iconName: isInputEmail ? '' : 'fa-sign-in',
+									iconName: isTypingEmail ? '' : 'fa-sign-in',
 									submitted: isSubmitted,
 									disabled:
-										isSubmitted || (isInputEmail ? !isValidEmail : !(isValidEmail && isMinLength)),
+										isSubmitted ||
+										(isTypingEmail ? !checkIf.isValidEmail : !checkIf.minLengthPassed),
 								}}
 							>
-								{isInputEmail ? 'Continue' : 'Log in with Master Password'}
+								{isTypingEmail ? 'Continue' : 'Log in with Master Password'}
 							</SubmitButton>
 						</FormGroup>
 
-						{isInputEmail ? (
+						{isTypingEmail ? (
 							<LinkLabel
 								routeTo="/registration"
 								preText="New around here?"
@@ -248,7 +253,7 @@ export const Login = () => {
 							<LinkLabel
 								routeTo="/login"
 								preText={`Logging in as ${email}`}
-								onClick={handleChangeEmail}
+								onClick={handleChangeLoginEmail}
 							>
 								Not you?
 							</LinkLabel>

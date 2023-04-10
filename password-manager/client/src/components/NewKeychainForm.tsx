@@ -80,7 +80,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 				// simulate api post request
 				RunAfterSomeTime(() => {
 					inputAction.submit(false)
-					setKeychainStatus({ success: true, message: 'Password Saved!' })
+					setKeychainStatus({ success: true, message: 'The changes have been saved' })
 
 					// after sometime, reset status and close modal
 					RunAfterSomeTime(() => {
@@ -105,13 +105,13 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 			}
 		},
 		copyPassword: () => {
-			if (!passwordClipboard.isCopied) {
+			if (checkIf.canCopyPassword) {
 				usernameClipboard.clear()
 				passwordClipboard.copy()
 			}
 		},
 		copyUserName: () => {
-			if (!usernameClipboard.isCopied) {
+			if (checkIf.canCopyUsername) {
 				passwordClipboard.clear()
 				usernameClipboard.copy()
 			}
