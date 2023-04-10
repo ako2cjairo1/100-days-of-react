@@ -1,4 +1,4 @@
-import { useDelayToggle } from '@/hooks'
+import { useDebounceToggle } from '@/hooks'
 import { IChildren, IHeaderProps } from '@/types'
 import { AnimatedIcon } from './AnimatedIcon'
 
@@ -46,7 +46,7 @@ function Title({
 
 function Status({ children, status }: Pick<IHeaderProps, 'children' | 'status'>) {
 	const isSuccessfulWithMessage = Object.values(status ? status : {}).every(Boolean)
-	const delaySuccess = useDelayToggle(isSuccessfulWithMessage)
+	const delaySuccess = useDebounceToggle(isSuccessfulWithMessage)
 
 	return (
 		<>

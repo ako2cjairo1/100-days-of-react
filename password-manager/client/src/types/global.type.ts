@@ -50,10 +50,10 @@ export type TAuthProvider = TCredentials & {
 
 export type TAuthContext<T> = {
 	authInfo: T
-	updateAuthInfo: (authInfo: T) => void
+	mutateAuth: TFunction<[authInfo: Partial<T>], void>
 }
 
-export type TFunction<T = [], RT = void> = T extends T[]
+export type TFunction<T = [], RT = void> = T extends unknown[]
 	? (...params: T) => RT
 	: T extends true | false
 	? (param: boolean) => RT

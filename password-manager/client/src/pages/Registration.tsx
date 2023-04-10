@@ -42,8 +42,7 @@ export const Registration = () => {
 	// destructure states
 	const emailRef = useRef<HTMLInputElement>(null)
 	const loginRef = useRef<HTMLAnchorElement>(null)
-	// const [submit, setSubmit] = useState(false)
-	const { authInfo, updateAuthInfo } = useAuthContext()
+	const { authInfo, mutateAuth } = useAuthContext()
 
 	const inputValidationCb = useCallback(() => {
 		const validPassword = {
@@ -89,7 +88,7 @@ export const Registration = () => {
 				if (Object.values(loginValidation).every(Boolean)) {
 					// TODO: use custom API to handle registration
 
-					updateAuthInfo({ ...inputStates, accessToken: 'fakeToken' })
+					mutateAuth({ ...inputStates, accessToken: 'fakeToken' })
 					resetRegistration()
 					setRegistrationStatus({ success: true, message: '' })
 				} else {

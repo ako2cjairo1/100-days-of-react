@@ -40,7 +40,7 @@ export const Login = () => {
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const savedEmailRef = useRef(true)
 	const [isTypingEmail, setIsTypingEmail] = useState(true)
-	const { updateAuthInfo } = useAuthContext()
+	const { mutateAuth: updateAuthInfo } = useAuthContext()
 
 	useEffect(() => {
 		if (savedEmailRef.current) {

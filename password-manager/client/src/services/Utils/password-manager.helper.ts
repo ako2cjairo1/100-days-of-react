@@ -1,4 +1,4 @@
-import { IRegExObj, TConvertToStringUnion } from '@/types'
+import { IRegExObj, TConvertToStringUnion, TFunction } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
 import { REGISTER_STATE } from '../constants'
 
@@ -44,7 +44,7 @@ const TimerType = {
  * Return value: timerId (ID of the timer)
  */
 export function RunAfterSomeTime(
-	callbackFn: () => void,
+	callbackFn: TFunction,
 	seconds: number,
 	timerType: TConvertToStringUnion<typeof TimerType> = TimerType.timeout
 ) {
@@ -202,9 +202,9 @@ export function CreateError(error: unknown) {
 }
 
 interface ILocalStorage {
-	write: (key: string, value: string) => void
-	read: (key: string) => string | null extends infer T ? (T extends null ? string : T) : never
-	remove: (key: string) => void
+	write: TFunction<[key: string, value: string]>
+	read: TFunction<[key: string], string>
+	remove: TFunction<[key: string]>
 }
 export const LocalStorage: ILocalStorage = {
 	write: (key, value) => localStorage.setItem(key, value),

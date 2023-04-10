@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { TKeychain } from '@/types'
-import { useTimedCopyToClipboard } from '@/hooks'
+import { useDebounceToggle, useTimedCopyToClipboard } from '@/hooks'
 import { SubmitButton } from './SubmitButton'
 import { AnimatedIcon } from './AnimatedIcon'
 import { PasswordStrength } from './PasswordStrength'
@@ -28,6 +28,8 @@ export function KeychainForm({
 		message: 'Password copied!',
 		callbackFn: () => setRevealPassword(false),
 	})
+	const debounceCopyUserName = useDebounceToggle(userNameClipboard.isCopied, 2)
+	const debounceCopyPassword = useDebounceToggle(passwordClipboard.isCopied, 2)
 
 	const handleAction = {
 		copyUserName: () => {
@@ -85,7 +87,9 @@ export function KeychainForm({
 						>
 							<AnimatedIcon
 								className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
-								iconName="fa fa-clone"
+								iconName={`fa ${
+									!checkIf.canCopyUsername && debounceCopyUserName ? 'fa-check' : 'fa-clone'
+								}`}
 								onClick={handleAction.copyUserName}
 							/>
 						</div>
@@ -115,7 +119,9 @@ export function KeychainForm({
 							/>
 							<AnimatedIcon
 								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
-								iconName="fa fa-clone"
+								iconName={`fa ${
+									!checkIf.canCopyPassword && debounceCopyPassword ? 'fa-check' : 'fa-clone'
+								}`}
 								onClick={handleAction.copyPassword}
 							/>
 						</div>

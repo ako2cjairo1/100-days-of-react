@@ -3,7 +3,7 @@ import { KeychainCard } from './KeychainCard'
 
 interface IKeychainList {
 	keychains: Array<IKeychainItem>
-	onClick: TFunction<string>
+	onClick: TFunction<[keychainId: string]>
 }
 
 /**

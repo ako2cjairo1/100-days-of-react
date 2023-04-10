@@ -1,4 +1,4 @@
-import { useDelayToggle } from '@/hooks'
+import { useDebounceToggle } from '@/hooks'
 import { IRequiredLabelProps } from '@/types'
 /**
  * This function returns a label element with the given properties.
@@ -21,7 +21,7 @@ export function RequiredLabel({
 	...rest
 }: IRequiredLabelProps) {
 	// use to delay animation of check icon (isFulfilled)
-	const delayedToggle = useDelayToggle(isFulfilled)
+	const delayedToggle = useDebounceToggle(isFulfilled)
 
 	return (
 		<label

@@ -6,5 +6,5 @@ export const AUTH_CONTEXT = {
 		password: '',
 		accessToken: '',
 	},
-	updateAuthInfo: () => null,
+	mutateAuth: () => null,
 } satisfies TAuthContext<TAuthProvider>

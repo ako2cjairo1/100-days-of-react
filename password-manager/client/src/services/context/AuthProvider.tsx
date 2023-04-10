@@ -10,13 +10,9 @@ export const AuthContext = createContext<TAuthContext<TAuthProvider> | null>(nul
  * @returns {JSX.Element} The AuthContext provider with the given children components.
  */
 export const AuthProvider: FCWithChildren = ({ children }) => {
-	const [auth, setAuth] = useState<TAuthProvider>(AUTH_CONTEXT.authInfo)
+	const [authInfo, setAuth] = useState<TAuthProvider>(AUTH_CONTEXT.authInfo)
 
-	const updateAuthCb = (auth: TAuthProvider) => setAuth(auth)
+	const mutateAuth = (auth: Partial<TAuthProvider>) => setAuth(prev => ({ ...prev, ...auth }))
 
-	return (
-		<AuthContext.Provider value={{ authInfo: auth, updateAuthInfo: updateAuthCb }}>
-			{children}
-		</AuthContext.Provider>
-	)
+	return <AuthContext.Provider value={{ authInfo, mutateAuth }}>{children}</AuthContext.Provider>
 }

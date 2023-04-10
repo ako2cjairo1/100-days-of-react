@@ -1,7 +1,7 @@
 import { RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
 import { useEffect, useState } from 'react'
 
-export function useDelayToggle(toggle: boolean) {
+export function useDebounceToggle(toggle: boolean, delay?: number) {
 	const [isFulfilled, setIsFulfilled] = useState(true)
 
 	// use to delay animation of check icon (isFulfilled)
@@ -11,9 +11,9 @@ export function useDelayToggle(toggle: boolean) {
 
 			RunAfterSomeTime(() => {
 				setIsFulfilled(false)
-			}, 3)
+			}, delay || 3)
 		}
-	}, [toggle])
+	}, [toggle, delay])
 
 	return isFulfilled
 }

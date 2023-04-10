@@ -9,7 +9,7 @@ import {
 	InlineNotification,
 	KeychainCard,
 } from '.'
-import { useInput, useTimedCopyToClipboard } from '@/hooks'
+import { useDebounceToggle, useInput, useTimedCopyToClipboard } from '@/hooks'
 import { TFunction, TKeychain, TStatus } from '@/types'
 import {
 	CreateError,
@@ -47,6 +47,8 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 		message: 'Password copied!',
 		callbackFn: () => setKeychainStatus(STATUS),
 	})
+	const debounceCopyUserName = useDebounceToggle(usernameClipboard.isCopied, 2)
+	const debounceCopyPassword = useDebounceToggle(passwordClipboard.isCopied, 2)
 
 	const websiteInputRef = useRef<HTMLInputElement>(null)
 	const initInputActionRef = useRef(true)
@@ -96,6 +98,18 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 		}
 	}
 
+	// conditional rendering
+	const checkIf = {
+		isEditing: Object.values(keychainInfo || {}).some(Boolean),
+		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
+		canDisableSubmit: isSubmitted || keychainStatus.success || !WEBSITE_REGEX.test(website) || !username || !password,
+		canCopyUsername: !usernameClipboard.isCopied && username.length > 0,
+		canCopyPassword: !passwordClipboard.isCopied && password.length > 0,
+		canUpdatePassword: !isSubmitted && !keychainStatus.success,
+		debounceUsernameClipboard: debounceCopyUserName && usernameClipboard.isCopied && username.length > 0,
+		debouncePasswordClipboard: debounceCopyPassword && passwordClipboard.isCopied && password.length > 0
+	}
+
 	const handleAction = {
 		generatePassword: () => {
 			if (!isSubmitted) {
@@ -122,21 +136,12 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 			}
 		},
 		deletePassword: () => {
-			if (!isSubmitted) {
-				setKeychainStatus({ success: false, message: '[Not implemenmted]' })
+			if (checkIf.canUpdatePassword) {
+				setKeychainStatus({ success: false, message: '[Not implemented]' })
 
 				RunAfterSomeTime(() => setKeychainStatus({ success: false, message: '' }), 5)
 			}
 		},
-	}
-
-	// conditional rendering
-	const checkIf = {
-		isEditing: Object.values(keychainInfo || {}).some(Boolean),
-		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
-		canDisableSubmit: isSubmitted || !WEBSITE_REGEX.test(website) || !username || !password,
-		canCopyUsername: !usernameClipboard.isCopied && username,
-		canCopyPassword: !passwordClipboard.isCopied && password,
 	}
 
 	return (
@@ -170,7 +175,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 								onClick={handleAction.deletePassword}
 							>
 								<AnimatedIcon
-									className={`regular ${isSubmitted ? 'disabled' : ''}`}
+									className={`regular ${isSubmitted || keychainStatus.success ? 'disabled' : ''}`}
 									iconName="fa fa-trash"
 									animation="fa-shake danger"
 								/>
@@ -225,7 +230,8 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 					<div className="action-container">
 						<AnimatedIcon
 							className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
-							iconName="fa fa-clone fa-thin"
+							iconName={`fa ${checkIf.debounceUsernameClipboard ? 'fa-check' : 'fa-clone'
+								}`}
 							onClick={handleAction.copyUserName}
 						/>
 					</div>
@@ -263,14 +269,15 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 								onClick={handleAction.revealPassword}
 							/>
 							<AnimatedIcon
-								className={`action-button small ${!isSubmitted && 'active'}`}
+								className={`action-button small ${checkIf.canUpdatePassword && 'active'}`}
 								iconName="fa fa-refresh"
 								animation="fa-spin"
 								onClick={handleAction.generatePassword}
 							/>
 							<AnimatedIcon
 								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
-								iconName="fa fa-clone"
+								iconName={`fa ${checkIf.debouncePasswordClipboard ? 'fa-check' : 'fa-clone'
+									}`}
 								onClick={handleAction.copyPassword}
 							/>
 						</div>

@@ -26,7 +26,7 @@ export function Keychain() {
 	const [showKeychain, setShowKeychain] = useState(false)
 	const [keychain, setKeychain] = useState<IKeychainItem>(KEYCHAIN)
 	const [clipboardStatus, setClipboardStatus] = useState<TStatus>(STATUS)
-	const { authInfo, updateAuthInfo } = useAuthContext()
+	const { authInfo, mutateAuth } = useAuthContext()
 
 	const keychains: Array<TKeychain> = [
 		{
@@ -94,12 +94,7 @@ export function Keychain() {
 					name="Logout"
 					iconName="fa fa-sign-out"
 					navigateTo="/login"
-					onClick={() =>
-						updateAuthInfo({
-							...authInfo,
-							accessToken: '',
-						})
-					}
+					onClick={() => mutateAuth({ accessToken: '' })}
 				/>
 
 				<Menubar.Item
