@@ -7,6 +7,7 @@ import {
 	SubmitButton,
 	AnimatedIcon,
 	InlineNotification,
+	KeychainCard,
 } from '.'
 import { useInput, useTimedCopyToClipboard } from '@/hooks'
 import { TFunction, TKeychain, TStatus } from '@/types'
@@ -37,10 +38,12 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 	const [revealPassword, setRevealPassword] = useState(false)
 	const [keychainStatus, setKeychainStatus] = useState<TStatus>(STATUS)
 	const usernameClipboard = useTimedCopyToClipboard({
+		text: username,
 		message: 'User Name copied!',
 		callbackFn: () => setKeychainStatus(STATUS),
 	})
 	const passwordClipboard = useTimedCopyToClipboard({
+		text: password,
 		message: 'Password copied!',
 		callbackFn: () => setKeychainStatus(STATUS),
 	})
@@ -104,13 +107,13 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 		copyPassword: () => {
 			if (!passwordClipboard.isCopied) {
 				usernameClipboard.clear()
-				passwordClipboard.copy(password)
+				passwordClipboard.copy()
 			}
 		},
 		copyUserName: () => {
 			if (!usernameClipboard.isCopied) {
 				passwordClipboard.clear()
-				usernameClipboard.copy(username)
+				usernameClipboard.copy()
 			}
 		},
 		revealPassword: () => {
@@ -127,12 +130,19 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 		},
 	}
 
-	const isEdit = Object.values(keychainInfo || {}).some(Boolean)
+	// conditional rendering
+	const checkIf = {
+		isEditing: Object.values(keychainInfo || {}).some(Boolean),
+		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
+		canDisableSubmit: isSubmitted || !WEBSITE_REGEX.test(website) || !username || !password,
+		canCopyUsername: !usernameClipboard.isCopied && username,
+		canCopyPassword: !passwordClipboard.isCopied && password,
+	}
 
 	return (
 		<>
 			<Header>
-				{!isEdit ? (
+				{!checkIf.isEditing ? (
 					<>
 						<Header.Title
 							title="Add Password"
@@ -146,27 +156,13 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							title="Edit Password"
 							subTitle=""
 						/>
+
 						<Header.Status status={keychainStatus} />
 
-						<div className="keychain-item">
-							<img
-								className="header"
-								src={keychainInfo?.logo}
-								alt={keychainInfo?.website}
-							/>
-							<div
-								className="keychain-item-header"
-								onClick={() => window.open(`//${keychainInfo?.website}`, '_blank')}
-							>
-								<a
-									href={`//${keychainInfo?.website}`}
-									rel="noreferrer"
-									target="_blank"
-								>
-									{keychainInfo?.website}
-								</a>
-								<p>Last modified </p>
-							</div>
+						<KeychainCard
+							logo={keychainInfo?.logo}
+							website={keychainInfo?.website}
+						>
 							<Link
 								to="/keychain"
 								title="Delete"
@@ -176,16 +172,16 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 								<AnimatedIcon
 									className={`regular ${isSubmitted ? 'disabled' : ''}`}
 									iconName="fa fa-trash"
-									animation="fa-shake"
+									animation="fa-shake danger"
 								/>
 							</Link>
-						</div>
+						</KeychainCard>
 					</>
 				)}
 			</Header>
 
 			<FormGroup onSubmit={submitKeychainForm}>
-				{!isEdit && (
+				{!checkIf.isEditing && (
 					<div className="input-row">
 						<FormGroup.Label
 							props={{
@@ -226,12 +222,13 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						className={`${isSubmitted ? 'disabled' : ''}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
-					<AnimatedIcon
-						className={`action-button copy-username small ${!usernameClipboard.isCopied && username && 'active'
-							}`}
-						iconName="fa fa-clone"
-						onClick={handleAction.copyUserName}
-					/>
+					<div className="action-container">
+						<AnimatedIcon
+							className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
+							iconName="fa fa-clone fa-thin"
+							onClick={handleAction.copyUserName}
+						/>
+					</div>
 				</div>
 
 				<div className="input-row vr">
@@ -272,8 +269,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 								onClick={handleAction.generatePassword}
 							/>
 							<AnimatedIcon
-								className={`action-button small ${!passwordClipboard.isCopied && password && 'active'
-									}`}
+								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
 								iconName="fa fa-clone"
 								onClick={handleAction.copyPassword}
 							/>
@@ -283,7 +279,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							Adding the password here saves it only to your registered account. Make sure the
 							password you save here matches your password for the website.
 						</p>
-						{(usernameClipboard.isCopied || passwordClipboard.isCopied) && (
+						{checkIf.isClipboardTriggered && (
 							<InlineNotification>
 								{usernameClipboard.isCopied
 									? usernameClipboard.statusMessage
@@ -293,7 +289,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 					</div>
 				</div>
 
-				<div className='center'>
+				<div className="center">
 					<SubmitButton
 						props={{
 							variant: 'cancel',
@@ -315,9 +311,9 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							textStatus: 'Saving',
 							submitted: isSubmitted,
 						}}
-						disabled={isSubmitted || !WEBSITE_REGEX.test(website) || !username || !password}
+						disabled={checkIf.canDisableSubmit}
 					>
-						{isEdit ? 'Done' : 'Add Password'}
+						{checkIf.isEditing ? 'Done' : 'Add Password'}
 					</SubmitButton>
 				</div>
 			</FormGroup>

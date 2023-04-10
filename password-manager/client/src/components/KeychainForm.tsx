@@ -1,11 +1,11 @@
-import { Link } from 'react-router-dom'
-import { PasswordStrength } from './PasswordStrength'
+import { useState } from 'react'
 import { TKeychain } from '@/types'
 import { useTimedCopyToClipboard } from '@/hooks'
-import { useState } from 'react'
 import { SubmitButton } from './SubmitButton'
 import { AnimatedIcon } from './AnimatedIcon'
+import { PasswordStrength } from './PasswordStrength'
 import { InlineNotification } from './InlineNotification'
+import { KeychainCard } from './KeychainCard'
 
 interface IKeychainForm extends Partial<TKeychain> {
 	updateCallback: (param?: string) => void
@@ -19,20 +19,29 @@ export function KeychainForm({
 	updateCallback,
 }: IKeychainForm) {
 	const [revealPassword, setRevealPassword] = useState(false)
-	const userNameClipboard = useTimedCopyToClipboard({ message: 'User Name copied!' })
+	const userNameClipboard = useTimedCopyToClipboard({
+		text: username,
+		message: 'User Name copied!',
+	})
 	const passwordClipboard = useTimedCopyToClipboard({
+		text: password,
 		message: 'Password copied!',
 		callbackFn: () => setRevealPassword(false),
 	})
 
-	const handleClipboards = (type: 'email' | 'password') => {
-		if (type === 'email' && !userNameClipboard.isCopied) {
-			passwordClipboard.clear()
-			userNameClipboard.copy(username)
-		} else if (type === 'password' && !passwordClipboard.isCopied) {
-			userNameClipboard.clear()
-			passwordClipboard.copy(password)
-		}
+	const handleAction = {
+		copyUserName: () => {
+			if (!userNameClipboard.isCopied) {
+				passwordClipboard.clear()
+				userNameClipboard.copy()
+			}
+		},
+		copyPassword: () => {
+			if (!passwordClipboard.isCopied) {
+				userNameClipboard.clear()
+				passwordClipboard.copy()
+			}
+		},
 	}
 
 	const handleBackToKeychains = () => {
@@ -43,53 +52,43 @@ export function KeychainForm({
 		updateCallback()
 	}
 
+	const checkIf = {
+		isClipboardTriggered: userNameClipboard.isCopied || passwordClipboard.isCopied,
+		canCopyPassword: !passwordClipboard.isCopied && password,
+		canCopyUsername: !userNameClipboard.isCopied && username,
+	}
+
 	return (
 		<>
-			<div className="keychain-item">
-				<img
-					className="header"
-					src={logo}
-					alt={website}
-				/>
-				<div
-					className="keychain-item-header"
-					onClick={handleBackToKeychains}
-				>
-					<a
-						href={`//${website}`}
-						rel="noreferrer"
-						target="_blank"
-					>
-						{website}
-					</a>
-					<p>Last modified </p>
-				</div>
-				<Link
-					to="/keychain"
-					title="back to keychain"
-					className="menu descend"
-					onClick={handleBackToKeychains}
-				>
-					<AnimatedIcon
-						className="small"
-						iconName="fa fa-chevron-left"
-					/>
-				</Link>
-			</div>
+			<KeychainCard
+				{...{ logo, website }}
+				subText="Last updated "
+				onClick={handleBackToKeychains}
+			/>
 
-			<div className="keychain-item details">
+			<div className="keychain-item details vr">
 				<div className="keychain-item-description">
 					<p className="keychain-label">User Name</p>
 					<div>
 						<input
 							className="keychain-info"
-							type="email"
+							type="text"
 							autoComplete="false"
 							placeholder="User Name"
 							value={username}
 							readOnly
-							onClick={() => handleClipboards('email')}
+							onClick={handleAction.copyUserName}
 						/>
+						<div
+							className="action-container"
+							style={{ top: '53px', right: '8px' }}
+						>
+							<AnimatedIcon
+								className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
+								iconName="fa fa-clone"
+								onClick={handleAction.copyUserName}
+							/>
+						</div>
 					</div>
 
 					<div>
@@ -103,16 +102,26 @@ export function KeychainForm({
 							type={revealPassword ? 'text' : 'password'}
 							value={password}
 							readOnly
-							onClick={() => handleClipboards('password')}
+							onClick={handleAction.copyPassword}
 						/>
-						<AnimatedIcon
-							className={`action-button small active`}
-							iconName={`fa fa-eye${revealPassword ? '-slash' : ''}`}
-							onClick={() => setRevealPassword(prev => !prev)}
-						/>
+						<div
+							className="action-container"
+							style={{ top: '140px', right: '8px' }}
+						>
+							<AnimatedIcon
+								className={`action-button small active`}
+								iconName={`fa fa-eye${revealPassword ? '-slash' : ''}`}
+								onClick={() => setRevealPassword(prev => !prev)}
+							/>
+							<AnimatedIcon
+								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
+								iconName="fa fa-clone"
+								onClick={handleAction.copyPassword}
+							/>
+						</div>
 					</div>
 				</div>
-				{(userNameClipboard.isCopied || passwordClipboard.isCopied) && (
+				{checkIf.isClipboardTriggered && (
 					<InlineNotification>
 						{userNameClipboard.isCopied
 							? userNameClipboard.statusMessage

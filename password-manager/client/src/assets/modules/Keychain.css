@@ -7,11 +7,11 @@
 
 .keychain-info {
 	display: block;
-	height: 35px;
+	height: 45px;
 	width: 100%;
 	margin: 5px 0px;
 	margin-bottom: 15px;
-	padding: 5px;
+	padding: 5px 15px;
 	border-radius: 5px;
 	background-color: rgba(255, 255, 255, 0.07);
 	border: 2px solid rgba(255, 255, 255, 0.1);
@@ -132,15 +132,7 @@
 	width: 100%;
 }
 
-/* .keychain-item-description div > input:nth-child(1) {
-	width: 62% !important;
-} */
-/* .keychain-item-description div > input:nth-child(2) {
-	width: auto;
-} */
-
 .details > div > p {
-	/* margin: 15px 5px; */
 	padding: 5px;
 }
 
@@ -170,10 +162,8 @@
 }
 
 .action-button {
-	border: 1px solid var(--background-color);
 	padding: 10px;
 	text-align: center;
-	background-color: var(--background-color);
 	opacity: 0.4;
 	color: currentColor;
 	transition: var(--transition);
@@ -185,7 +175,6 @@
 }
 
 .action-button.active {
-	background-color: var(--background-color);
 	cursor: pointer;
 	opacity: 1;
 }
@@ -196,10 +185,10 @@
 }
 
 .clipboard-status {
-	/* position: absolute; */
+	position: absolute;
 	width: 100%;
 	display: flex;
-	top: 100%;
+	top: 95%;
 	align-items: center;
 	justify-content: center;
 }
@@ -210,8 +199,6 @@
 	margin-left: 5px;
 	border-radius: 10px;
 	background-color: rgba(255, 255, 255, 0.07);
-	/* background-color: rgb(88, 182, 117, 0.2); */
-
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	gap: 5px;
 }

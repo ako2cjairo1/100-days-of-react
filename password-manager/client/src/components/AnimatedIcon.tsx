@@ -1,13 +1,26 @@
+import { IChildren, TFunction } from '@/types'
 import { useState } from 'react'
 
-interface IAnimatedIcon {
+type TAnimation =
+	| 'fa-shake'
+	| 'fa-spin'
+	| 'fa-beat-fade'
+	| 'spinner'
+	| 'pulse'
+	| 'scale-up'
+	| 'scale-down'
+	| 'fade-in'
+	| 'spins'
+	| 'descend'
+interface IAnimatedIcon extends IChildren {
 	className?: string
 	iconName: string
-	animation?: 'fa-shake' | 'fa-spin' | 'fa-beat-fade'
+	animation?: TAnimation | (string & { animation?: string })
 	animateOnLoad?: boolean
-	onClick?: () => void
+	onClick?: TFunction
 }
 export function AnimatedIcon({
+	children,
 	className,
 	iconName,
 	animation,
@@ -24,6 +37,6 @@ export function AnimatedIcon({
 			onClick={onClick}
 			onMouseOver={() => !disabled && setHover(true)}
 			onMouseLeave={() => setHover(false)}
-		/>
+		>{children}</i>
 	)
 }

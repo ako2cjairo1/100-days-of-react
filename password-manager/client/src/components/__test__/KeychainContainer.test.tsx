@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 describe('Keychain components', () => {
 	it('renders a list of KeychainItem components', () => {
-		const keychain = [
+		const keychains = [
 			{ keychainId: '1', logo: 'logo1', website: 'link1', username: 'username1' },
 			{ keychainId: '2', logo: 'logo2', website: 'link2', username: 'username2' },
 		]
@@ -12,7 +12,7 @@ describe('Keychain components', () => {
 		const { container } = render(
 			<MemoryRouter>
 				<KeychainContainer>
-					<KeychainContainer.Keychain {...{ keychains: keychain, onClick: listEvent }} />
+					<KeychainContainer.Keychain {...{ keychains, onClick: listEvent }} />
 				</KeychainContainer>
 			</MemoryRouter>
 		)
@@ -20,23 +20,34 @@ describe('Keychain components', () => {
 	})
 
 	it('triggers the listEvent callback when a KeychainItem is clicked', () => {
-		const keychain = [
+		const keychains = [
 			{ keychainId: '1', logo: 'logo1', website: 'link1', username: 'username1' },
 			{ keychainId: '2', logo: 'logo2', website: 'link2', username: 'username2' },
 		]
 		const listEvent = vi.fn()
-		const { container } = render(
+		const { container, queryAllByRole } = render(
 			<MemoryRouter>
 				<KeychainContainer>
-					<KeychainContainer.Keychain {...{ keychains: keychain, onClick: listEvent }} />
+					<KeychainContainer.Keychain {...{ keychains, onClick: listEvent }} />
 				</KeychainContainer>
 			</MemoryRouter>
 		)
 
-		const keychainItems = container.querySelectorAll('.keychain-item')
+		const keychainItems = container.querySelectorAll('.keychain-item-header')
+		const linkItem = queryAllByRole('link')
+
 		if (keychainItems[0]) {
 			fireEvent.click(keychainItems[0])
+			expect(listEvent).toHaveBeenCalled()
+		} else {
+			expect(listEvent).toHaveBeenCalled()
 		}
-		expect(listEvent).toHaveBeenCalled()
+
+		if (linkItem[0]) {
+			fireEvent.click(linkItem[0])
+			expect(listEvent).toHaveBeenCalled()
+		} else {
+			expect(listEvent).toHaveBeenCalled()
+		}
 	})
 })

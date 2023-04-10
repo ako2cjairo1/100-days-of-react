@@ -1,5 +1,5 @@
 import { IChildren, IKeychainItem, TFunction } from '@/types'
-import { KeychainItem } from './KeychainItem'
+import { KeychainCard } from './KeychainCard'
 
 interface IKeychainList {
 	keychains: Array<IKeychainItem>
@@ -17,10 +17,12 @@ function Keychain({ keychains, onClick }: IKeychainList) {
 	return (
 		<>
 			{keychains.map(({ keychainId, logo, website, username }) => (
-				<KeychainItem
+				<KeychainCard
 					key={keychainId}
-					onClick={onClick}
-					{...{ keychainId, logo, website, username }}
+					{...{ logo, website }}
+					subText={username}
+					iconName="fa fa-chevron-right"
+					onClick={() => onClick(keychainId)}
 				/>
 			))}
 		</>
