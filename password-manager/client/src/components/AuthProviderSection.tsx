@@ -9,10 +9,10 @@ import { TFunction } from '@/types'
 interface IAuthProviderSection {
 	cb?: TFunction
 }
-export function AuthProviderSection({ cb }: IAuthProviderSection) {
+export function AuthProviderSection({ cb = () => null }: IAuthProviderSection) {
 	const handleExternalAuth = () => {
 		alert('TODO: Implement external authentication.')
-		cb && cb()
+		cb()
 	}
 	return (
 		<div

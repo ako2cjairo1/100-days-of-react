@@ -179,7 +179,7 @@ export const Login = () => {
 										value={email}
 										linkRef={emailInputRef}
 										disabled={isSubmitted}
-										className={!checkIf.isValidEmail ? (!isFocus.email ? 'invalid' : '') : ''}
+										className={!checkIf.isValidEmail ? (!isFocus.email ? 'invalid' : '') : 'valid'}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
@@ -204,7 +204,9 @@ export const Login = () => {
 										value={password}
 										linkRef={passwordInputRef}
 										disabled={isSubmitted}
-										className={!checkIf.minLengthPassed ? (!isFocus.password ? 'invalid' : '') : ''}
+										className={
+											!checkIf.minLengthPassed ? (!isFocus.password ? 'invalid' : '') : 'valid'
+										}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage

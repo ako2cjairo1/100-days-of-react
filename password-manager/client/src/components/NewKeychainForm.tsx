@@ -73,6 +73,8 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 
 		if (!isSubmitted) {
 			inputAction.submit(true)
+			// clear the status before proceed
+			setKeychainStatus(STATUS)
 			inputAction.mutate({
 				// get the logo from website
 				// logo: await GetLogoUrlAsync(website),
@@ -100,14 +102,24 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 
 	// conditional rendering
 	const checkIf = {
+		isValidWebsite: WEBSITE_REGEX.test(website),
+		isValidUsernameLength: username.trim().length > 2 ? true : false,
+		isValidPasswordLength: password.length > 2 ? true : false,
 		isEditing: Object.values(keychainInfo || {}).some(Boolean),
 		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
-		canDisableSubmit: isSubmitted || keychainStatus.success || !WEBSITE_REGEX.test(website) || !username || !password,
+		canDisableSubmit:
+			isSubmitted ||
+			keychainStatus.success ||
+			!WEBSITE_REGEX.test(website) ||
+			!username ||
+			!password,
 		canCopyUsername: !usernameClipboard.isCopied && username.length > 0,
 		canCopyPassword: !passwordClipboard.isCopied && password.length > 0,
 		canUpdatePassword: !isSubmitted && !keychainStatus.success,
-		debounceUsernameClipboard: debounceCopyUserName && usernameClipboard.isCopied && username.length > 0,
-		debouncePasswordClipboard: debounceCopyPassword && passwordClipboard.isCopied && password.length > 0
+		debounceUsernameClipboard:
+			debounceCopyUserName && usernameClipboard.isCopied && username.length > 0,
+		debouncePasswordClipboard:
+			debounceCopyPassword && passwordClipboard.isCopied && password.length > 0,
 	}
 
 	const handleAction = {
@@ -192,18 +204,20 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							props={{
 								label: 'Website',
 								labelFor: 'website',
-								isFulfilled: WEBSITE_REGEX.test(website),
+								isFulfilled: checkIf.isValidWebsite,
 							}}
 						/>
 						<FormGroup.Input
 							id="website"
 							type="text"
-							linkRef={websiteInputRef}
 							placeholder="ex: outlook.com"
+							linkRef={websiteInputRef}
 							value={website}
 							disabled={isSubmitted}
 							required
-							className={`${isSubmitted ? 'disabled' : ''}`}
+							className={`${
+								isSubmitted ? 'disabled' : checkIf.isValidWebsite ? 'valid' : 'invalid'
+							}`}
 							{...{ onChange, onFocus, onBlur }}
 						/>
 					</div>
@@ -214,7 +228,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						props={{
 							label: 'User Name',
 							labelFor: 'username',
-							isFulfilled: username.trim() ? true : false,
+							isFulfilled: checkIf.isValidUsernameLength,
 						}}
 					/>
 					<FormGroup.Input
@@ -224,14 +238,15 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						value={username}
 						disabled={isSubmitted}
 						required
-						className={`${isSubmitted ? 'disabled' : ''}`}
+						className={`${
+							isSubmitted ? 'disabled' : checkIf.isValidUsernameLength ? 'valid' : 'invalid'
+						}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 					<div className="action-container">
 						<AnimatedIcon
 							className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
-							iconName={`fa ${checkIf.debounceUsernameClipboard ? 'fa-check' : 'fa-clone'
-								}`}
+							iconName={`fa ${checkIf.debounceUsernameClipboard ? 'fa-check' : 'fa-clone'}`}
 							onClick={handleAction.copyUserName}
 						/>
 					</div>
@@ -242,7 +257,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						props={{
 							label: 'Password',
 							labelFor: 'password',
-							isFulfilled: password.trim() ? true : false,
+							isFulfilled: checkIf.isValidPasswordLength,
 						}}
 					>
 						<PasswordStrength
@@ -258,7 +273,9 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							value={password}
 							disabled={isSubmitted}
 							required
-							className={`${isSubmitted ? 'disabled' : ''}`}
+							className={`${
+								isSubmitted ? 'disabled' : checkIf.isValidPasswordLength ? 'valid' : 'invalid'
+							}`}
 							{...{ onChange, onFocus, onBlur }}
 						/>
 
@@ -276,8 +293,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							/>
 							<AnimatedIcon
 								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
-								iconName={`fa ${checkIf.debouncePasswordClipboard ? 'fa-check' : 'fa-clone'
-									}`}
+								iconName={`fa ${checkIf.debouncePasswordClipboard ? 'fa-check' : 'fa-clone'}`}
 								onClick={handleAction.copyPassword}
 							/>
 						</div>
@@ -317,8 +333,8 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							variant: 'primary',
 							textStatus: 'Saving',
 							submitted: isSubmitted,
+							disabled: checkIf.canDisableSubmit,
 						}}
-						disabled={checkIf.canDisableSubmit}
 					>
 						{checkIf.isEditing ? 'Done' : 'Add Password'}
 					</SubmitButton>

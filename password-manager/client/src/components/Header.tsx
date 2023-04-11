@@ -60,7 +60,7 @@ function Status({ children, status }: Pick<IHeaderProps, 'children' | 'status'>)
 								<>
 									<AnimatedIcon
 										className="scale-up"
-										iconName="fa fa-check"
+										iconName="fa fa-check-circle"
 									/>
 									<p className="center x-small descend">{status.message}</p>
 								</>

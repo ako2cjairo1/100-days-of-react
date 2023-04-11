@@ -9,16 +9,16 @@ function Description({ children, checked }: IDescription) {
 }
 
 interface IToggle extends IChildren, IInputElement {}
-export function Toggle({ children, ...inputProps }: IToggle) {
+export function Toggle({ children, ...rest }: IToggle) {
 	return (
 		<div className="toggle-container">
 			<input
 				type="checkbox"
+				{...rest}
 				className="input"
-				{...inputProps}
 			/>
 			<label
-				htmlFor={inputProps.id}
+				htmlFor={rest.id}
 				className="label"
 			>
 				<span className="button" />

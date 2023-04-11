@@ -26,7 +26,7 @@ export interface IRequiredLabelProps extends Omit<TLabelAttrs, 'htmlFor' | 'form
 }
 
 export interface IButtonElement
-	extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+	extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'disabled'> {
 	props: {
 		variant?: 'primary' | 'cancel' | 'default'
 		submitted: boolean
@@ -38,9 +38,11 @@ export interface IButtonElement
 export interface IInputElement
 	extends Omit<
 		React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
-		'type' | 'id' | 'ref' | 'itemRef'
+		'type' | 'id' | 'ref' | 'itemRef' | 'autoFocus'
 	> {
 	id: string // override id as required
+	type?: React.HTMLInputTypeAttribute
+	linkRef?: React.Ref<HTMLInputElement>
 }
 export interface IValidationMessage<T = TValidation> {
 	isVisible: boolean

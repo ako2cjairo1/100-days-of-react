@@ -1,6 +1,6 @@
 import { REGISTER_STATE } from '@/services/constants'
 import { MergeRegExObj } from '@/services/Utils/password-manager.helper'
-import { FCProps, IFormInput, IRequiredLabelProps, IValidationMessage } from '@/types'
+import { IFormInput } from '@/types'
 import { ValidationMessage, RequiredLabel, PasswordStrength } from '.'
 
 /**
@@ -13,12 +13,14 @@ import { ValidationMessage, RequiredLabel, PasswordStrength } from '.'
  * returns {JSX.Element} The FormInput component.
  */
 const { PASSWORD_REGEX } = REGISTER_STATE
-
-export const FormInput: FCProps<
-	IFormInput &
-		Pick<IRequiredLabelProps, 'label' | 'subLabel' | 'isOptional'> &
-		Pick<IValidationMessage, 'title' | 'validations'>
-> = ({ isFocused, isValid, linkRef, validations, havePasswordMeter, ...rest }) => {
+export function FormInput({
+	isFocused,
+	isValid,
+	linkRef,
+	validations,
+	havePasswordMeter,
+	...rest
+}: IFormInput) {
 	return (
 		<div className="input-row">
 			{rest.label && (

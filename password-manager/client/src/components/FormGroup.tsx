@@ -1,4 +1,4 @@
-import { FCProps, IChildren, IInputElement, IRequiredLabelProps } from '@/types'
+import { IChildren, IInputElement, IRequiredLabelProps, TFunction } from '@/types'
 import { RequiredLabel } from './RequiredLabel'
 
 interface ILabel extends IChildren {
@@ -11,18 +11,10 @@ interface ILabel extends IChildren {
  *
  * returns A div element with the class "password-label" containing a RequiredLabel component and the child components
  */
-const Label = ({ children, props }: ILabel) => {
-	const { labelFor, label, subLabel, isOptional, isFulfilled } = props
-
+function Label({ children, props }: ILabel) {
 	return (
 		<div className="password-label">
-			<RequiredLabel
-				label={label}
-				labelFor={labelFor}
-				subLabel={subLabel}
-				isOptional={isOptional}
-				isFulfilled={isFulfilled}
-			/>
+			<RequiredLabel {...props} />
 			{children}
 		</div>
 	)
@@ -35,13 +27,7 @@ const Label = ({ children, props }: ILabel) => {
  *
  * returns An input element with the given props and ref
  */
-const Input: FCProps<
-	IInputElement & {
-		id: string
-		type: React.HTMLInputTypeAttribute
-		linkRef?: React.Ref<HTMLInputElement>
-	}
-> = ({ linkRef, ...rest }) => {
+function Input({ linkRef, ...rest }: IInputElement) {
 	return (
 		<input
 			{...rest}
@@ -52,7 +38,7 @@ const Input: FCProps<
 }
 
 interface IFormGroup extends IChildren {
-	onSubmit: (e: React.FormEvent) => unknown
+	onSubmit: TFunction<[e: React.FormEvent]> //(e: React.FormEvent) => unknown
 }
 /**
  * Renders a form element

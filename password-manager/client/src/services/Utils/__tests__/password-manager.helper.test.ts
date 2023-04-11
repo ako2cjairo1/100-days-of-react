@@ -2,11 +2,16 @@ import {
 	ConvertPropsToBool,
 	CreateError,
 	ExtractValFromRegEx,
+	GeneratePassword,
+	GenerateUUID,
+	GetLogoUrlAsync,
 	GetRandomItem,
+	LocalStorage,
 	MergeRegExObj,
 	OverrideEventTarget,
 	RunAfterSomeTime,
 } from '@/services/Utils/password-manager.helper'
+import { REGISTER_STATE } from '@/services/constants'
 import { ChangeEvent, FocusEvent } from 'react'
 
 describe('MergeRegExObj', () => {
@@ -203,5 +208,57 @@ describe('CreateError', () => {
 			message: 'An unknown error occurred.',
 			unknownError: input,
 		})
+	})
+})
+
+describe('LocalStorage', () => {
+	it('should write and read a value from local storage', () => {
+		const key = 'testKey'
+		const value = 'testValue'
+		LocalStorage.write(key, value)
+		expect(LocalStorage.read(key)).toBe(value)
+	})
+
+	it('should remove a value from local storage', () => {
+		const key = 'testKey'
+		LocalStorage.remove(key)
+		expect(LocalStorage.read(key)).toBe('')
+	})
+})
+
+describe('GeneratePassword', () => {
+	it('should generate a password that matches the provided regular expression', () => {
+		const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+		const password = GeneratePassword(regex)
+		expect(regex.test(password)).toBe(true)
+	})
+
+	it('should generate a password that matches the default regular expression', () => {
+		const regex = MergeRegExObj(REGISTER_STATE.PASSWORD_REGEX)
+		const password = GeneratePassword()
+		expect(regex.test(password)).toBe(true)
+	})
+})
+
+describe('GenerateUUID', () => {
+	it('should generate a UUID in the correct format', () => {
+		const uuid = GenerateUUID()
+		expect(uuid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/)
+	})
+})
+
+describe('GetLogoUrlAsync', () => {
+	it('should return the correct favicon URL for a given website', async () => {
+		const siteUrl = 'https://www.youtube.com/'
+		const expectedFaviconUrl = 'https://www.youtube.com/s/desktop/932eb6a8/img/favicon.ico'
+		const faviconUrl = await GetLogoUrlAsync(siteUrl)
+		expect(faviconUrl).toBe(expectedFaviconUrl)
+	})
+
+	it('should return an empty string if no favicon is found', async () => {
+		const siteUrl = 'https://www.example.com'
+		const expectedFaviconUrl = ''
+		const faviconUrl = await GetLogoUrlAsync(siteUrl)
+		expect(faviconUrl).toBe(expectedFaviconUrl)
 	})
 })

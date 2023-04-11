@@ -21,9 +21,9 @@ interface IAnimatedIcon extends IChildren {
 }
 export function AnimatedIcon({
 	children,
-	className,
-	iconName,
-	animation,
+	className = '',
+	iconName = '',
+	animation = '',
 	animateOnLoad = false,
 	onClick,
 }: IAnimatedIcon) {
@@ -33,6 +33,7 @@ export function AnimatedIcon({
 
 	return (
 		<i
+			data-testid="animated-icon"
 			className={`${className} ${iconName} ${(animateOnLoad || hover) && animation}`}
 			onClick={onClick}
 			onMouseOver={() => !disabled && setHover(true)}

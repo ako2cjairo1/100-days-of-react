@@ -201,6 +201,12 @@ export function CreateError(error: unknown) {
 	return result
 }
 
+/**
+ * LocalStorage object provides an interface for interacting with the browser's local storage.
+ * param write - Function that takes a key and value and stores it in local storage.
+ * param read - Function that takes a key and returns the value associated with it from local storage.
+ * param remove - Function that takes a key and removes it from local storage.
+ */
 interface ILocalStorage {
 	write: TFunction<[key: string, value: string]>
 	read: TFunction<[key: string], string>
@@ -212,6 +218,11 @@ export const LocalStorage: ILocalStorage = {
 	remove: key => localStorage.removeItem(key),
 }
 
+/**
+ * GeneratePassword function generates a random password that matches the provided regular expression.
+ * param regex - Regular expression to match the generated password against. Default value is the result of calling MergeRegExObj with REGISTER_STATE.PASSWORD_REGEX.
+ * returns A string representing the generated password.
+ */
 export function GeneratePassword(regex: RegExp = MergeRegExObj(REGISTER_STATE.PASSWORD_REGEX)) {
 	let resultCombination = ''
 	const characters =
@@ -232,6 +243,11 @@ export function GeneratePassword(regex: RegExp = MergeRegExObj(REGISTER_STATE.PA
 	return resultCombination
 }
 
+/**
+ * Generates a universally unique identifier (UUID) using a cryptographically secure random number generator.
+ *
+ * returns {string} A UUID in the format 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.
+ */
 export function GenerateUUID() {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
 		const r = (Math.random() * 16) | 0
@@ -240,6 +256,12 @@ export function GenerateUUID() {
 	})
 }
 
+/**
+ * Asynchronously retrieves the URL of the favicon of a website.
+ *
+ * param {string} siteUrl - The URL of the website to retrieve the favicon from.
+ * returns {Promise<string>} A promise that resolves to the URL of the favicon or an empty string if no favicon is found.
+ */
 export async function GetLogoUrlAsync(siteUrl: string) {
 	const response = await fetch(siteUrl)
 	const text = await response.text()
@@ -249,6 +271,11 @@ export async function GetLogoUrlAsync(siteUrl: string) {
 	return logoElement ? (logoElement as HTMLLinkElement).href : ''
 }
 
+/**
+ * Asynchronously copies a string to the clipboard.
+ *
+ * param {string} value - The string to copy to the clipboard.
+ */
 export async function CopyToClipboard(value: string) {
 	try {
 		await navigator.clipboard.writeText(value)
@@ -258,6 +285,11 @@ export async function CopyToClipboard(value: string) {
 	}
 }
 
+/**
+ * Copies a string to the clipboard on iOS devices.
+ *
+ * param {string} text - The string to copy to the clipboard.
+ */
 function CopyToClipboardiOS(text: string): void {
 	const textArea = document.createElement('textarea')
 	textArea.value = text
