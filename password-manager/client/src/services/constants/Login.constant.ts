@@ -1,14 +1,13 @@
-import { TCredentials, TStatus } from '@/types'
+import { TInputLogin, TStatus } from '@/types'
 
 export const LOGIN_STATE = {
 	Credential: {
 		email: '',
 		password: '',
-		confirm: '',
 		isRemember: false,
 	},
 	Status: {
 		success: false,
 		message: '',
 	},
-} satisfies Record<'Credential', TCredentials> & Record<'Status', TStatus>
+} satisfies Record<'Credential', TInputLogin> & Record<'Status', TStatus>
