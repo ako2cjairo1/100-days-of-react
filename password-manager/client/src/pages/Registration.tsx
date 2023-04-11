@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useRef, useState, useCallback } from 'react'
 import '@/assets/modules/Login.css'
-import { TCredentials, TStatus, TPassword, TInputValidation } from '@/types/global.type'
+import { TStatus, TPassword, TInputValidation, TInputRegistration } from '@/types/global.type'
 import { REGISTER_STATE } from '@/services/constants/Registration.constant'
 import {
 	RunAfterSomeTime,
@@ -28,7 +28,7 @@ export const Registration = () => {
 		REGISTER_STATE
 	const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
 	// form controlled inputs
-	const { inputAttribute, inputAction } = useInput<TCredentials>(CREDENTIALS)
+	const { inputAttribute, inputAction } = useInput<TInputRegistration>(CREDENTIALS)
 	// destructure
 	const { inputStates, onChange, onFocus, onBlur, isFocus, isSubmitted } = inputAttribute
 	const { password, email, confirm, isTermsAgreed } = inputStates

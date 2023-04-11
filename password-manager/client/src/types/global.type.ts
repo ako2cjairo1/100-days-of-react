@@ -4,9 +4,15 @@ import { TConvertToStringUnion } from '@/types'
 export type TCredentials = {
 	email: string
 	password: string
-	confirm?: string
-	isRemember?: boolean
-	isTermsAgreed?: boolean
+}
+
+export type TInputLogin = TCredentials & {
+	isRemember: boolean
+}
+
+export type TInputRegistration = TCredentials & {
+	confirm: string
+	isTermsAgreed: boolean
 }
 
 export type TKeychain = {

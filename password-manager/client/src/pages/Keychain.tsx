@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import '@/assets/modules/Keychain.css'
 import {
 	Header,
@@ -12,9 +12,7 @@ import { useAuthContext } from '@/hooks'
 import { IKeychainItem, TKeychain, TStatus } from '@/types'
 import { KEYCHAIN_CONST } from '@/services/constants'
 
-import google from '@/assets/google.png'
-import apple from '@/assets/apple.png'
-import github from '@/assets/github.png'
+import { LocalStorage } from '@/services/Utils/password-manager.helper'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 /**
@@ -26,31 +24,43 @@ export function Keychain() {
 	const [showKeychain, setShowKeychain] = useState(false)
 	const [keychain, setKeychain] = useState<IKeychainItem>(KEYCHAIN)
 	const [clipboardStatus, setClipboardStatus] = useState<TStatus>(STATUS)
-	const { authInfo, mutateAuth } = useAuthContext()
+	const { mutateAuth } = useAuthContext()
+	const [keychains, setKeychains] = useState<Array<TKeychain>>([])
 
-	const keychains: Array<TKeychain> = [
-		{
-			keychainId: '1',
-			logo: apple,
-			website: 'apple.com',
-			username: 'ako2cjairo@icloud.com',
-			password: '123234',
-		},
-		{
-			keychainId: '2',
-			logo: google,
-			website: 'google.com',
-			username: 'ako2cjairo@gmail.com',
-			password: 'January231990',
-		},
-		{
-			keychainId: '3',
-			logo: github,
-			website: 'github.com',
-			username: 'ako2cjairo@gmail.com',
-			password: 'password123',
-		},
-	]
+	useEffect(() => {
+		setKeychains(JSON.parse(LocalStorage.read('password_manager_data') || '[]'))
+	}, [])
+
+	const updateLocalStorage = (info: TKeychain[]) =>
+		LocalStorage.write('password_manager_data', JSON.stringify(info))
+
+	const updateKeychains = (keychainUpdate: TKeychain, type?: 'add' | 'update' | 'delete') => {
+		if (
+			type !== 'delete' &&
+			keychains.find(
+				keychainItem =>
+					keychainItem.username === keychainUpdate.username &&
+					keychainItem.website === keychainUpdate.website
+			)
+		) {
+			return {
+				success: false,
+				message: 'You`ve already added this username for this site.',
+			}
+		}
+		const previousKeychains = keychains.filter(
+			keychain => keychain.keychainId !== keychainUpdate.keychainId
+		)
+		const updatedKeychains =
+			type === 'delete' ? previousKeychains : [...previousKeychains, { ...keychainUpdate }]
+
+		setKeychains(updatedKeychains)
+		updateLocalStorage(updatedKeychains)
+		return {
+			success: true,
+			message: 'Successfully added',
+		}
+	}
 
 	const openKeychain = (keychainId: string, isEdit?: boolean) => {
 		const info = keychains.find(info => info.keychainId === keychainId)
@@ -135,6 +145,7 @@ export function Keychain() {
 				<NewKeychainForm
 					showForm={addKeychainModal.toggle}
 					keychainInfo={keychain}
+					updateCallback={updateKeychains}
 				/>
 			</Modal>
 		</div>

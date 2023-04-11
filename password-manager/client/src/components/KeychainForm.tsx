@@ -88,7 +88,9 @@ export function KeychainForm({
 							<AnimatedIcon
 								className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
 								iconName={`fa ${
-									!checkIf.canCopyUsername && debounceCopyUserName ? 'fa-check' : 'fa-clone'
+									!checkIf.canCopyUsername && debounceCopyUserName
+										? 'fa-check scale-up'
+										: 'fa-clone'
 								}`}
 								onClick={handleAction.copyUserName}
 							/>
@@ -114,13 +116,15 @@ export function KeychainForm({
 						>
 							<AnimatedIcon
 								className={`action-button small active`}
-								iconName={`fa fa-eye${revealPassword ? '-slash' : ''}`}
+								iconName={`fa fa-eye${revealPassword ? '-slash scale-up' : ' scale-down'}`}
 								onClick={() => setRevealPassword(prev => !prev)}
 							/>
 							<AnimatedIcon
 								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
 								iconName={`fa ${
-									!checkIf.canCopyPassword && debounceCopyPassword ? 'fa-check' : 'fa-clone'
+									!checkIf.canCopyPassword && debounceCopyPassword
+										? 'fa-check scale-up'
+										: 'fa-clone'
 								}`}
 								onClick={handleAction.copyPassword}
 							/>
@@ -148,7 +152,7 @@ export function KeychainForm({
 					updateCallback(keychainId)
 				}}
 			>
-				Edit
+				Edit Password
 			</SubmitButton>
 		</>
 	)

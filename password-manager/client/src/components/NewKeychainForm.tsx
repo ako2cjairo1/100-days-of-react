@@ -24,15 +24,19 @@ import { Link } from 'react-router-dom'
 interface INewKeychainForm {
 	showForm: TFunction<boolean>
 	keychainInfo?: Partial<TKeychain>
+	updateCallback: TFunction<
+		[updatedKeychain: TKeychain, type?: 'add' | 'update' | 'delete'],
+		TStatus
+	>
 }
 const { PASSWORD_REGEX } = REGISTER_STATE
 const { STATUS, KEYCHAIN, WEBSITE_REGEX } = KEYCHAIN_CONST
 
-export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
+export function NewKeychainForm({ showForm, keychainInfo, updateCallback }: INewKeychainForm) {
 	// form controlled inputs
 	const { inputAttribute, inputAction } = useInput<TKeychain>(KEYCHAIN)
 	// destructure
-	const { inputStates, onChange, onFocus, onBlur, isSubmitted } = inputAttribute
+	const { inputStates, onChange, onFocus, onBlur, isSubmitted, isFocus } = inputAttribute
 	const { website, username, password } = inputStates
 
 	const [revealPassword, setRevealPassword] = useState(false)
@@ -68,6 +72,10 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 		if (!keychainStatus.success) websiteInputRef.current?.focus()
 	}, [keychainStatus.success])
 
+	useEffect(() => {
+		setKeychainStatus(prev => ({ ...prev, message: '' }))
+	}, [inputStates])
+
 	const submitKeychainForm = async (e: FormEvent) => {
 		e.preventDefault()
 
@@ -75,15 +83,18 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 			inputAction.submit(true)
 			// clear the status before proceed
 			setKeychainStatus(STATUS)
-			inputAction.mutate({
-				// get the logo from website
-				// logo: await GetLogoUrlAsync(website),
-			})
 
 			try {
-				// simulate api post request
+				// simulate api post request to update/add the keychain info
 				RunAfterSomeTime(() => {
 					inputAction.submit(false)
+					const update = updateCallback(inputStates)
+
+					if (!update.success) {
+						return setKeychainStatus(update)
+					}
+
+					// show success status before closing the modal
 					setKeychainStatus({ success: true, message: 'The changes have been saved' })
 
 					// after sometime, reset status and close modal
@@ -91,7 +102,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						setKeychainStatus(STATUS)
 						showForm(false)
 						// invoke resetInput
-						// inputAction.resetInput()
+						inputAction.resetInput()
 					}, 3)
 				}, 3)
 			} catch (error) {
@@ -149,9 +160,22 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 		},
 		deletePassword: () => {
 			if (checkIf.canUpdatePassword) {
-				setKeychainStatus({ success: false, message: '[Not implemented]' })
+				const update = updateCallback(inputStates, 'delete')
+				if (!update.success) {
+					return setKeychainStatus(update)
+				}
 
-				RunAfterSomeTime(() => setKeychainStatus({ success: false, message: '' }), 5)
+				// RunAfterSomeTime(() => setKeychainStatus({ success: false, message: '' }), 5)
+				// show success status before closing the modal
+				setKeychainStatus({ success: true, message: 'Password Deleted!' })
+
+				// after sometime, reset status and close modal
+				RunAfterSomeTime(() => {
+					setKeychainStatus(STATUS)
+					showForm(false)
+					// invoke resetInput
+					inputAction.resetInput()
+				}, 3)
 			}
 		},
 	}
@@ -215,9 +239,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							value={website}
 							disabled={isSubmitted}
 							required
-							className={`${
-								isSubmitted ? 'disabled' : checkIf.isValidWebsite ? 'valid' : 'invalid'
-							}`}
+							className={`${isSubmitted ? 'disabled' : checkIf.isValidWebsite ? '' : 'invalid'}`}
 							{...{ onChange, onFocus, onBlur }}
 						/>
 					</div>
@@ -239,14 +261,20 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						disabled={isSubmitted}
 						required
 						className={`${
-							isSubmitted ? 'disabled' : checkIf.isValidUsernameLength ? 'valid' : 'invalid'
+							isSubmitted
+								? 'disabled'
+								: checkIf.isValidUsernameLength
+								? ''
+								: !isFocus.username && 'invalid'
 						}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 					<div className="action-container">
 						<AnimatedIcon
 							className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
-							iconName={`fa ${checkIf.debounceUsernameClipboard ? 'fa-check' : 'fa-clone'}`}
+							iconName={`fa ${
+								checkIf.debounceUsernameClipboard ? 'fa-check scale-up' : 'fa-clone'
+							}`}
 							onClick={handleAction.copyUserName}
 						/>
 					</div>
@@ -274,7 +302,11 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							disabled={isSubmitted}
 							required
 							className={`${
-								isSubmitted ? 'disabled' : checkIf.isValidPasswordLength ? 'valid' : 'invalid'
+								isSubmitted
+									? 'disabled'
+									: checkIf.isValidPasswordLength
+									? ''
+									: !isFocus.password && 'invalid'
 							}`}
 							{...{ onChange, onFocus, onBlur }}
 						/>
@@ -282,7 +314,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 						<div className="action-container">
 							<AnimatedIcon
 								className={`action-button small ${password && 'active'}`}
-								iconName={`fa fa-eye${revealPassword ? '-slash' : ''}`}
+								iconName={`fa fa-eye${revealPassword ? '-slash scale-up' : ' scale-down'}`}
 								onClick={handleAction.revealPassword}
 							/>
 							<AnimatedIcon
@@ -293,7 +325,9 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							/>
 							<AnimatedIcon
 								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
-								iconName={`fa ${checkIf.debouncePasswordClipboard ? 'fa-check' : 'fa-clone'}`}
+								iconName={`fa ${
+									checkIf.debouncePasswordClipboard ? 'fa-check scale-up' : 'fa-clone'
+								}`}
 								onClick={handleAction.copyPassword}
 							/>
 						</div>
@@ -336,7 +370,7 @@ export function NewKeychainForm({ showForm, keychainInfo }: INewKeychainForm) {
 							disabled: checkIf.canDisableSubmit,
 						}}
 					>
-						{checkIf.isEditing ? 'Done' : 'Add Password'}
+						{checkIf.isEditing ? 'Save' : 'Add Password'}
 					</SubmitButton>
 				</div>
 			</FormGroup>

@@ -50,6 +50,16 @@
 	width: 50px !important;
 	height: 50px !important;
 }
+.card-icon {
+	font-size: 30px;
+	padding: 3px 10px;
+	margin: 0 5px;
+	aspect-ratio: auto;
+	border-radius: 8px;
+	background: var(--background-color);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	box-shadow: 0px 0px 20px 1px #ffbb763f;
+}
 
 .keychain-item:hover:not(:disabled) {
 	background-color: rgba(255, 255, 255, 0.2);
@@ -83,7 +93,6 @@
 .keychain-item a {
 	color: currentColor;
 	margin: unset;
-	width: fit-content;
 	overflow: hidden;
 }
 
@@ -112,7 +121,7 @@
 }
 
 .keychain-item-header {
-	width: 68%;
+	width: 72%;
 	padding: inherit;
 	text-align: start;
 }

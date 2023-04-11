@@ -1,5 +1,6 @@
 import { IChildren, IKeychainItem, TFunction } from '@/types'
 import { KeychainCard } from './KeychainCard'
+import { AnimatedIcon } from './AnimatedIcon'
 
 interface IKeychainList {
 	keychains: Array<IKeychainItem>
@@ -16,15 +17,27 @@ interface IKeychainList {
 function Keychain({ keychains, onClick }: IKeychainList) {
 	return (
 		<>
-			{keychains.map(({ keychainId, logo, website, username }) => (
-				<KeychainCard
-					key={keychainId}
-					{...{ logo, website }}
-					subText={username}
-					iconName="fa fa-chevron-right"
-					onClick={() => onClick(keychainId)}
-				/>
-			))}
+			{keychains.length > 0 ? (
+				keychains.map(({ keychainId, logo, website, username }) => (
+					<KeychainCard
+						key={keychainId}
+						{...{ logo, website }}
+						subText={username}
+						iconName="fa fa-chevron-right"
+						onClick={() => onClick(keychainId)}
+					/>
+				))
+			) : (
+				<div className="center">
+					<AnimatedIcon
+						className="regular"
+						iconName="fa fa-face-rolling-eyes"
+						animation="fa-beat-fade"
+						animateOnLoad
+					/>
+					<p className="center descend">There are no items to list.</p>
+				</div>
+			)}
 		</>
 	)
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
-import { TCredentials, TStatus } from '@/types/global.type'
+import { TInputLogin, TStatus } from '@/types/global.type'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
 import { useInput, useAuthContext } from '@/hooks'
 import {
@@ -26,11 +26,9 @@ export const Login = () => {
 	const { minLength } = PASSWORD_REGEX
 	// constants
 	// custom form input hook
-	const { inputAttribute: inputAttributes, inputAction } = useInput<TCredentials>(
-		LOGIN_STATE.Credential
-	)
+	const { inputAttribute, inputAction } = useInput<TInputLogin>(LOGIN_STATE.Credential)
 	// destructure
-	const { inputStates, isFocus, onChange, onFocus, onBlur, isSubmitted } = inputAttributes
+	const { inputStates, isFocus, onChange, onFocus, onBlur, isSubmitted } = inputAttribute
 	const { email, password, isRemember } = inputStates
 	const [loginStatus, setLoginStatus] = useState<TStatus>(LOGIN_STATE.Status)
 	// destructure states
@@ -179,7 +177,7 @@ export const Login = () => {
 										value={email}
 										linkRef={emailInputRef}
 										disabled={isSubmitted}
-										className={!checkIf.isValidEmail ? (!isFocus.email ? 'invalid' : '') : 'valid'}
+										className={!checkIf.isValidEmail ? (!isFocus.email ? 'invalid' : '') : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
@@ -204,9 +202,7 @@ export const Login = () => {
 										value={password}
 										linkRef={passwordInputRef}
 										disabled={isSubmitted}
-										className={
-											!checkIf.minLengthPassed ? (!isFocus.password ? 'invalid' : '') : 'valid'
-										}
+										className={!checkIf.minLengthPassed ? (!isFocus.password ? 'invalid' : '') : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage

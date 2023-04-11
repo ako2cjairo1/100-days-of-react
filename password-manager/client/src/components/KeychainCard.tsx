@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { AnimatedIcon } from './AnimatedIcon'
 import { IChildren, TFunction, TKeychain } from '@/types'
+import { GetDomainUrl } from '@/services/Utils/password-manager.helper'
 
 interface IKeychainCard extends IChildren, Partial<Pick<TKeychain, 'logo' | 'website'>> {
 	iconName?: string
@@ -9,37 +10,46 @@ interface IKeychainCard extends IChildren, Partial<Pick<TKeychain, 'logo' | 'web
 }
 export function KeychainCard({
 	children,
-	logo,
-	website,
-	iconName,
-	subText,
+	logo = '',
+	website = '',
+	iconName = 'fa fa-chevron-left',
+	subText = '',
 	onClick,
 }: IKeychainCard) {
 	return (
 		<div className="keychain-item">
-			<img
-				className="header"
-				src={logo}
-				alt={website}
-				onClick={onClick}
-			/>
+			{logo ? (
+				<img
+					className="header"
+					src={logo}
+					alt={logo}
+					onClick={onClick}
+				/>
+			) : (
+				<i
+					data-testid="animated-icon"
+					className="card-icon"
+					onClick={onClick}
+				>
+					{website.slice(0, 1).toUpperCase()}
+				</i>
+			)}
 			<div
 				className="keychain-item-header"
 				onClick={onClick}
 			>
 				<a
-					href={`//${website}`}
+					href={website}
 					rel="noreferrer"
 					target="_blank"
 				>
-					{website}
+					{GetDomainUrl(website)}
 				</a>
 				<p>{subText}</p>
 			</div>
 			{onClick && (
 				<Link
 					to="/keychain"
-					// title="back to keychain"
 					className="menu descend"
 					onClick={onClick}
 				>

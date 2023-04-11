@@ -271,6 +271,20 @@ export async function GetLogoUrlAsync(siteUrl: string) {
 	return logoElement ? (logoElement as HTMLLinkElement).href : ''
 }
 
+export function GetDomainUrl(siteUrl: string) {
+	const domain = siteUrl
+
+	try {
+		const url = new URL(siteUrl)
+		const hostname = url.hostname
+		return hostname.split('.').slice(-2).join('.')
+	} catch (error) {
+		Log(CreateError(error).message)
+	}
+
+	return domain
+}
+
 /**
  * Asynchronously copies a string to the clipboard.
  *
