@@ -209,6 +209,7 @@ export const Registration = () => {
 								<FormGroup.Input
 									id="password"
 									type="password"
+									placeholder="Enter Master Password"
 									value={password}
 									disabled={isSubmitted}
 									required
@@ -234,6 +235,7 @@ export const Registration = () => {
 								<FormGroup.Input
 									id="confirm"
 									type="password"
+									placeholder="Confirm Your Master Password"
 									value={confirm}
 									disabled={isSubmitted}
 									required
