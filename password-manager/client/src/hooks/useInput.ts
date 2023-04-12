@@ -1,5 +1,6 @@
-import { ChangeEvent, FocusEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, FocusEvent, useCallback, useEffect, useState } from 'react'
 import { ConvertPropsToBool, Log } from '@/services/Utils/password-manager.helper'
+import { useStateObj } from './useStateObj'
 
 /**
  * A custom hook that manages input states and focus events.
@@ -14,57 +15,53 @@ type TUseInputFocus<T> = Record<keyof T, boolean> | { [key: string]: boolean }
 type TInputEvent = FocusEvent<HTMLInputElement> | ChangeEvent<HTMLInputElement>
 
 export function useInput<T>(initState: T) {
-	const [inputStates, setInputStates] = useState<T>(initState)
-	const [isFocus, setIsFocus] = useState<TUseInputFocus<T>>({})
+	const { objState: inputStates, mutate: setInputStates } = useStateObj<T>(initState)
+	const { objState: isFocus, mutate: mutateIsFocus } = useStateObj<TUseInputFocus<T>>({})
 	const [isSubmitted, setSubmit] = useState(false)
-	const initFocus = useRef(true)
 
 	// Resets inputStates and focusEvents to their initial values
 	const resetInput = useCallback(
 		(id?: string) => {
-			// reset specific state using id arg
-			if (id) setInputStates(prev => ({ ...prev, [id]: '' }))
+			// reset specific state using dynamic id as arg
+			if (id) setInputStates({ [id]: '' })
 			// reset all input state
 			else setInputStates(initState)
 			// initialize focus states to true
-			setIsFocus(ConvertPropsToBool(initState, true))
+			mutateIsFocus(ConvertPropsToBool(initState, true))
 		},
-		[initState]
+		[initState, setInputStates, mutateIsFocus]
 	)
 
-	const onChange = <T extends TInputEvent>(e: T) => {
+	const onChange = <T extends TInputEvent>(event: T) => {
+		const { type, id, value, checked } = event.target
 		// set the input state using id as key to set a value
-		if (e.target.type === 'checkbox') {
-			setInputStates(prev => ({ ...prev, [e.target.id]: e.target.checked }))
-		} else setInputStates(prev => ({ ...prev, [e.target.id]: e.target.value }))
+		if (type === 'checkbox') {
+			setInputStates({ [id]: checked })
+		} else setInputStates({ [id]: value })
 
 		// set the focus to false to trigger input validations
-		setIsFocus(prev => ({ ...prev, [e.target.id]: false }))
+		mutateIsFocus({ [id]: false })
 	}
 
 	useEffect(() => {
 		// used to create and initialize focus states to "true"
-		if (initFocus.current) {
-			// initialize focus states to true
-			setIsFocus(ConvertPropsToBool(initState, true))
-			initFocus.current = false
-		}
-	}, [initState])
+		mutateIsFocus(ConvertPropsToBool(initState, true))
+	}, [initState, mutateIsFocus])
 
 	// Object containing state and actions of this hook
 	return {
 		inputAction: {
 			resetInput,
 			submit: (value: boolean) => setSubmit(value),
-			mutate: (state: Partial<T>) => setInputStates(prev => ({ ...prev, ...state })),
+			mutate: (update: Partial<T>) => setInputStates(update),
 		},
 		inputAttribute: {
 			inputStates,
 			isFocus,
 			isSubmitted,
 			onChange,
-			onBlur: (e: TInputEvent) => setIsFocus(prev => ({ ...prev, [e.target.id]: false })),
-			onFocus: (e: TInputEvent) => Log(`"${e.target.id}" focused`),
+			onBlur: (event: TInputEvent) => mutateIsFocus({ [event.target.id]: false }),
+			onFocus: (event: TInputEvent) => Log(`"${event.target.id}" focused`),
 		},
 	}
 }

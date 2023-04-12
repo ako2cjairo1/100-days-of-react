@@ -43,6 +43,7 @@
 .keychain-item + .details {
 	flex-direction: column;
 	background: transparent !important;
+	padding: 0;
 	cursor: default !important;
 }
 
@@ -52,10 +53,10 @@
 }
 .card-icon {
 	font-size: 30px;
-	padding: 3px 10px;
+	padding: 3px 12px;
 	margin: 0 5px;
 	aspect-ratio: auto;
-	border-radius: 8px;
+	border-radius: 10px;
 	background: var(--background-color);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	box-shadow: 0px 0px 20px 1px #ffbb763f;
@@ -166,10 +167,24 @@
 	animation-delay: 0.4s;
 }
 
-.vault-container > section > *:last-child {
+.vault-container > section > *:nth-child(5) {
 	animation-delay: 0.5s;
 }
-
+.vault-container > section > *:nth-child(6) {
+	animation-delay: 0.6s;
+}
+.vault-container > section > *:nth-child(7) {
+	animation-delay: 0.7s;
+}
+.vault-container > section > *:nth-child(8) {
+	animation-delay: 0.8s;
+}
+.vault-container > section > *:nth-child(9) {
+	animation-delay: 0.9s;
+}
+.vault-container > section > *:nth-child(10) {
+	animation-delay: 1s;
+}
 .action-button {
 	padding: 10px;
 	text-align: center;
@@ -197,7 +212,7 @@
 	position: absolute;
 	width: 100%;
 	display: flex;
-	top: 95%;
+	top: 96%;
 	align-items: center;
 	justify-content: center;
 }

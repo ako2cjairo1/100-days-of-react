@@ -1,4 +1,4 @@
-import { PasswordStatus } from '@/services/constants'
+import { RequestType, PasswordStatus, VaultContent } from '@/services/constants'
 import { TConvertToStringUnion } from '@/types'
 
 export type TCredentials = {
@@ -21,6 +21,7 @@ export type TKeychain = {
 	website: string
 	username: string
 	password: string
+	timeAgo?: string
 }
 
 export type TStatus = {
@@ -64,3 +65,7 @@ export type TFunction<T = [], RT = void> = T extends unknown[]
 	: T extends true | false
 	? (param: boolean) => RT
 	: (param: T) => RT
+
+export type TRequestType = TConvertToStringUnion<typeof RequestType>
+
+export type TVaultContent = TConvertToStringUnion<typeof VaultContent>

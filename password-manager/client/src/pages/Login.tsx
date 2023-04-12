@@ -139,7 +139,7 @@ export const Login = () => {
 						<Header.Title title="You are logged in!">
 							<LinkLabel
 								linkRef={securedVaultLinkRef}
-								routeTo="/keychain"
+								routeTo="/vault"
 								preText="Proceed to your"
 							>
 								secured vault

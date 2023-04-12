@@ -74,7 +74,10 @@ export interface IRegExObj {
 	[key: string]: RegExp
 }
 
-export interface IKeychainItem extends Omit<TKeychain, 'password'> {
+export interface IKeychain extends Partial<TKeychain> {
+	actionCallback: TFunction<[keychainId?: string]> //(keychainId?: string) => void
+}
+export interface IKeychainItem extends Omit<TKeychain, 'password' | 'timeAgo'> {
 	onClick?: TFunction<string>
 }
 

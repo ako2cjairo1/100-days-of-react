@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import { Login, Registration, Keychain } from '@/pages'
+import { Login, Registration, Vault } from '@/pages'
 import { RotatingBackdrop } from './components'
 
 const App = () => {
@@ -20,8 +20,8 @@ const App = () => {
 					element={<Registration />}
 				/>
 				<Route
-					path="/keychain"
-					element={<Keychain />}
+					path="/vault"
+					element={<Vault />}
 				/>
 			</Routes>
 		</main>

@@ -2,8 +2,8 @@ import { IChildren, IKeychainItem, TFunction } from '@/types'
 import { KeychainCard } from './KeychainCard'
 import { AnimatedIcon } from './AnimatedIcon'
 
-interface IKeychainList {
-	keychains: Array<IKeychainItem>
+interface IVault {
+	vault: Array<IKeychainItem>
 	onClick: TFunction<[keychainId: string]>
 }
 
@@ -14,17 +14,17 @@ interface IKeychainList {
  *
  * returns A React fragment containing a list of KeychainItem components
  */
-function Keychain({ keychains, onClick }: IKeychainList) {
+function Vault({ vault, onClick }: IVault) {
 	return (
 		<>
-			{keychains.length > 0 ? (
-				keychains.map(({ keychainId, logo, website, username }) => (
+			{vault.length > 0 ? (
+				vault.map(({ keychainId, logo, website, username }) => (
 					<KeychainCard
-						key={keychainId}
-						{...{ logo, website }}
-						subText={username}
 						iconName="fa fa-chevron-right"
+						key={keychainId}
+						subText={username}
 						onClick={() => onClick(keychainId)}
+						{...{ logo, website }}
 					/>
 				))
 			) : (
@@ -41,15 +41,14 @@ function Keychain({ keychains, onClick }: IKeychainList) {
 		</>
 	)
 }
-
 /**
  * Renders a container for Keychain components
  * param children - The child components to be rendered inside the container
  *
  * returns A section element with the class "form-container" containing the child components
  */
-export function KeychainContainer({ children }: IChildren) {
+export function VaultContainer({ children }: IChildren) {
 	return <section className="form-container">{children}</section>
 }
 
-KeychainContainer.Keychain = Keychain
+VaultContainer.Vault = Vault

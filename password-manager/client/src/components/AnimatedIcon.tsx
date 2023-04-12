@@ -14,7 +14,7 @@ type TAnimation =
 	| 'descend'
 interface IAnimatedIcon extends IChildren {
 	className?: string
-	iconName: string
+	iconName?: string
 	animation?: TAnimation | (string & { animation?: string })
 	animateOnLoad?: boolean
 	onClick?: TFunction

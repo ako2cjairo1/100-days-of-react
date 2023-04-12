@@ -8,7 +8,7 @@ import {
 	Log,
 	MergeRegExObj,
 } from '@/services/Utils/password-manager.helper'
-import { useInput, useAuthContext } from '@/hooks'
+import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import {
 	Header,
 	LinkLabel,
@@ -32,9 +32,10 @@ export const Registration = () => {
 	// destructure
 	const { inputStates, onChange, onFocus, onBlur, isFocus, isSubmitted } = inputAttribute
 	const { password, email, confirm, isTermsAgreed } = inputStates
-	const [registrationStatus, setRegistrationStatus] = useState<TStatus>(STATUS)
+	const { objState: registrationStatus, mutate: mutateRegistrationStatus } =
+		useStateObj<TStatus>(STATUS)
 	// destructure
-	const { success, message } = registrationStatus
+	const { success } = registrationStatus
 	const [loginValidation, setLoginValidation] = useState<TInputValidation>(INPUT_VALIDATION)
 	// destructure
 	const { isValidEmail, isValidPassword } = loginValidation
@@ -44,7 +45,7 @@ export const Registration = () => {
 	const loginRef = useRef<HTMLAnchorElement>(null)
 	const { authInfo, mutateAuth } = useAuthContext()
 
-	const inputValidationCb = useCallback(() => {
+	const validateInput = useCallback(() => {
 		const validPassword = {
 			minLength: minLength.test(password),
 			alphabet: alphabet.test(password),
@@ -65,14 +66,13 @@ export const Registration = () => {
 	}, [success])
 
 	useEffect(() => {
-		inputValidationCb()
-
-		setRegistrationStatus(prev => ({ ...prev, message: '' }))
-	}, [inputValidationCb])
+		mutateRegistrationStatus({ message: '' })
+		validateInput()
+	}, [validateInput, mutateRegistrationStatus])
 
 	const resetRegistration = () => {
 		inputAction.resetInput()
-		setRegistrationStatus(STATUS)
+		mutateRegistrationStatus(STATUS)
 		setLoginValidation(INPUT_VALIDATION)
 		setTestPassword(VALID_PASSWORD)
 		Log(authInfo)
@@ -82,17 +82,17 @@ export const Registration = () => {
 		e.preventDefault()
 
 		if (!isSubmitted) {
-			setRegistrationStatus(prev => ({ ...prev, message: '' }))
+			mutateRegistrationStatus({ message: '' })
 			inputAction.submit(true)
+
 			RunAfterSomeTime(() => {
 				if (Object.values(loginValidation).every(Boolean)) {
 					// TODO: use custom API to handle registration
-
 					mutateAuth({ ...inputStates, accessToken: 'fakeToken' })
 					resetRegistration()
-					setRegistrationStatus({ success: true, message: '' })
+					mutateRegistrationStatus({ success: true, message: '' })
 				} else {
-					setRegistrationStatus({
+					mutateRegistrationStatus({
 						success: false,
 						message: 'Registration Failed!',
 					})
@@ -170,7 +170,7 @@ export const Registration = () => {
 									props={{
 										label: 'Email Address',
 										labelFor: 'email',
-										isFulfilled: isValidEmail && !message,
+										isFulfilled: isValidEmail,
 									}}
 								/>
 								<FormGroup.Input
@@ -188,7 +188,7 @@ export const Registration = () => {
 									{...{ onChange, onFocus, onBlur }}
 								/>
 								<ValidationMessage
-									isVisible={!isFocus.email && !(isValidEmail && !message)}
+									isVisible={!isFocus.email && !isValidEmail}
 									validations={emailReq}
 								/>
 							</div>
@@ -198,7 +198,7 @@ export const Registration = () => {
 									props={{
 										label: 'Master Password',
 										labelFor: 'password',
-										isFulfilled: isValidPassword && !message,
+										isFulfilled: isValidPassword,
 									}}
 								>
 									<PasswordStrength
@@ -218,7 +218,7 @@ export const Registration = () => {
 								/>
 								<ValidationMessage
 									title="Your master password must contain:"
-									isVisible={!isFocus.password && !(isValidPassword && !message)}
+									isVisible={!isFocus.password && !isValidPassword}
 									validations={passwordReq}
 								/>
 							</div>
@@ -228,7 +228,7 @@ export const Registration = () => {
 									props={{
 										label: 'Confirm Master Password',
 										labelFor: 'confirm',
-										isFulfilled: !isFocus.confirm && checkIf.validConfirmation,
+										isFulfilled: checkIf.validConfirmation,
 									}}
 								/>
 
@@ -307,10 +307,9 @@ export const Registration = () => {
 						<footer>
 							<AuthProviderSection
 								cb={() =>
-									setRegistrationStatus(prev => ({
-										...prev,
+									mutateRegistrationStatus({
 										message: 'TODO: Implement external authentication.',
-									}))
+									})
 								}
 							/>
 						</footer>

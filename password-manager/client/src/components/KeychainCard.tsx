@@ -16,23 +16,26 @@ export function KeychainCard({
 	subText = '',
 	onClick,
 }: IKeychainCard) {
+	const websiteDomain = GetDomainUrl(website)
+	const domainLogo = websiteDomain.slice(0, 1).toUpperCase()
 	return (
 		<div className="keychain-item">
 			{logo ? (
 				<img
 					className="header"
 					src={logo}
-					alt={logo}
+					loading="lazy"
+					alt={domainLogo}
 					onClick={onClick}
 				/>
 			) : (
-				<i
-					data-testid="animated-icon"
+				<AnimatedIcon
 					className="card-icon"
+					animation="fa-beat-fade"
 					onClick={onClick}
 				>
-					{website.slice(0, 1).toUpperCase()}
-				</i>
+					{domainLogo}
+				</AnimatedIcon>
 			)}
 			<div
 				className="keychain-item-header"
@@ -43,13 +46,13 @@ export function KeychainCard({
 					rel="noreferrer"
 					target="_blank"
 				>
-					{GetDomainUrl(website)}
+					{websiteDomain}
 				</a>
 				<p>{subText}</p>
 			</div>
 			{onClick && (
 				<Link
-					to="/keychain"
+					to="/vault"
 					className="menu descend"
 					onClick={onClick}
 				>

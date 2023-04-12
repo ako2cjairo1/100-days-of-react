@@ -1,4 +1,4 @@
-import { KeychainContainer } from '@/components'
+import { VaultContainer } from '@/components'
 import { fireEvent, render } from '@/services/Utils/test.util'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -11,9 +11,9 @@ describe('Keychain components', () => {
 		const listEvent = vi.fn()
 		const { container } = render(
 			<MemoryRouter>
-				<KeychainContainer>
-					<KeychainContainer.Keychain {...{ keychains, onClick: listEvent }} />
-				</KeychainContainer>
+				<VaultContainer>
+					<VaultContainer.Vault {...{ vault: keychains, onClick: listEvent }} />
+				</VaultContainer>
 			</MemoryRouter>
 		)
 		expect(container.querySelectorAll('.keychain-item')).toHaveLength(2)
@@ -27,9 +27,9 @@ describe('Keychain components', () => {
 		const listEvent = vi.fn()
 		const { container, queryAllByRole } = render(
 			<MemoryRouter>
-				<KeychainContainer>
-					<KeychainContainer.Keychain {...{ keychains, onClick: listEvent }} />
-				</KeychainContainer>
+				<VaultContainer>
+					<VaultContainer.Vault {...{ vault: keychains, onClick: listEvent }} />
+				</VaultContainer>
 			</MemoryRouter>
 		)
 
