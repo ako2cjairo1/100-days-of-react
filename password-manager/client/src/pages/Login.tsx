@@ -90,12 +90,11 @@ export const Login = () => {
 					updateAuthInfo({ ...inputStates, accessToken: 'fake token' })
 					setLoginStatus({ success: true, message: '' })
 					inputAction.resetInput()
-
-					inputAction.submit(true)
 				} catch (error) {
-					inputAction.submit(true)
 					setLoginStatus({ success: false, message: CreateError(error).message })
 					return false
+				} finally {
+					inputAction.submit(false)
 				}
 			}, 3)
 		}
@@ -230,7 +229,7 @@ export const Login = () => {
 									props={{
 										variant: 'primary',
 										textStatus: 'Logging in...',
-										iconName: isTypingEmail ? '' : 'fa-sign-in',
+										iconName: isTypingEmail ? '' : 'fa fa-sign-in',
 										submitted: isSubmitted,
 										disabled:
 											isSubmitted ||

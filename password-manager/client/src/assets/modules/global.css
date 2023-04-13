@@ -110,6 +110,17 @@ p {
 	color: var(--danger-color);
 }
 
+.lit-error {
+	background-color: var(--danger-color);
+	filter: drop-shadow(2px 4px 6px var(--danger-color));
+	box-shadow: 0 0 15px 3px var(--danger-color);
+}
+.lit-info {
+	background-color: rgb(191, 126, 22);
+	box-shadow: 0px 0px 10px 1px rgb(191, 126, 22);
+	/* filter: drop-shadow(0 0 0.75rem rgb(191, 126, 22)); */
+}
+
 .strength {
 	background: rgba(255, 255, 255, 0.2);
 	box-shadow: 0px 0px 15px 1px #ffbb763f;

@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import '@/assets/modules/Vault.css'
-import { Header, VaultContainer, Modal, KeychainForm, Menubar, Keychain } from '@/components'
+import {
+	Header,
+	VaultContainer,
+	Modal,
+	KeychainForm,
+	Menubar,
+	Keychain,
+	AnimatedIcon,
+	SubmitButton,
+} from '@/components'
 import { useAuthContext } from '@/hooks'
 import { LocalStorage } from '@/services/Utils/password-manager.helper'
 import { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
@@ -128,11 +137,32 @@ export function Vault() {
 			</Menubar>
 
 			<VaultContainer>
-				<Header>
-					<Header.Logo />
-					<Header.Title title="Secured Vault" />
-					<Header.Status status={clipboardStatus} />
-				</Header>
+				{vault.some(Boolean) ? (
+					<Header>
+						<Header.Logo />
+						<Header.Title title="Secured Vault" />
+						<Header.Status status={clipboardStatus} />
+					</Header>
+				) : (
+					<Header>
+						<AnimatedIcon
+							iconName="fa fa-face-rolling-eyes"
+							animation="fa-shake"
+						/>
+						<Header.Title
+							title="There are no items to list."
+							subTitle='click "Add Keychain" to start'
+						>
+							<SubmitButton
+								style={{ width: '50%' }}
+								props={{ iconName: 'fa fa-plus regular', variant: 'primary' }}
+								onClick={() => keychainModal.open()}
+							>
+								Add Keychain
+							</SubmitButton>
+						</Header.Title>
+					</Header>
+				)}
 
 				{currentView === vault_content ? (
 					<VaultContainer.Vault

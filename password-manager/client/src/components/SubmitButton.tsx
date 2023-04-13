@@ -45,7 +45,7 @@ export function SubmitButton({
 					{iconName && (
 						<AnimatedIcon
 							data-testid={iconName}
-							iconName={`fa ${iconName}`}
+							iconName={iconName}
 						/>
 					)}{' '}
 					{children}

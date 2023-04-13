@@ -1,6 +1,6 @@
 import { IChildren, IKeychain, TKeychain } from '@/types'
 import { KeychainCard } from './KeychainCard'
-import { AnimatedIcon } from './AnimatedIcon'
+
 interface IVault extends Pick<IKeychain, 'actionCallback'> {
 	vault: Omit<TKeychain, 'password' | 'timeAgo'>[]
 }
@@ -12,30 +12,16 @@ interface IVault extends Pick<IKeychain, 'actionCallback'> {
  * returns A React fragment containing a list of KeychainItem components
  */
 function Vault({ vault, actionCallback }: IVault) {
-	if (!vault.some(Boolean)) {
-		// Empty vault, show animated message
-		return (
-			<div className="center">
-				<AnimatedIcon
-					className="regular"
-					iconName="fa fa-face-rolling-eyes"
-					animation="fa-beat-fade"
-					animateOnLoad
-				/>
-				<p className="center descend">There are no items to list.</p>
-			</div>
-		)
-	}
-
 	return (
 		<>
 			{vault.map(({ keychainId, logo, website, username }) => (
 				<KeychainCard
-					iconName="fa fa-chevron-right"
 					key={keychainId}
+					iconName="fa fa-chevron-right"
 					subText={username}
+					logo={logo}
+					website={website}
 					onClick={() => actionCallback(keychainId)}
-					{...{ logo, website }}
 				/>
 			))}
 		</>

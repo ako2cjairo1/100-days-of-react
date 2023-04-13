@@ -273,7 +273,7 @@ export const Registration = () => {
 								<SubmitButton
 									props={{
 										variant: 'primary',
-										iconName: 'fa-user-plus',
+										iconName: 'fa fa-user-plus',
 										textStatus: 'Processing...',
 										submitted: isSubmitted,
 										disabled:

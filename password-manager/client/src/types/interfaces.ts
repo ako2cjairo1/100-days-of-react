@@ -3,17 +3,14 @@ import { IChildren } from './base.type'
 import { TFunction, TKeychain, TStatus, TValidation } from './global.type'
 
 // Component Interfaces
-type TDetailedHTMLProps<T = HTMLElement> = React.DetailedHTMLProps<React.HTMLAttributes<T>, T>
+export type TDetailedHTMLProps<T = HTMLElement> = React.DetailedHTMLProps<
+	React.HTMLAttributes<T>,
+	T
+>
 export interface IHeaderProps extends IChildren, TDetailedHTMLProps {
 	title?: string
 	subTitle?: string
 	status?: TStatus
-}
-
-export interface ILinkLabel extends Pick<TDetailedHTMLProps, 'className' | 'onClick' | 'children'> {
-	linkRef?: React.Ref<HTMLAnchorElement>
-	routeTo: string
-	preText: string
 }
 
 type TLabelAttrs = TDetailedHTMLProps<HTMLLabelElement>

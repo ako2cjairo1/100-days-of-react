@@ -1,6 +1,11 @@
-import { FCProps, ILinkLabel } from '@/types'
 import { Link } from 'react-router-dom'
+import { IChildren, TDetailedHTMLProps } from '@/types'
 
+interface ILinkLabel extends IChildren, Pick<TDetailedHTMLProps, 'className' | 'onClick'> {
+	linkRef?: React.Ref<HTMLAnchorElement>
+	routeTo: string
+	preText: string
+}
 /**
  * This is a LinkLabel component that displays a link with preText.
  *
@@ -11,26 +16,22 @@ import { Link } from 'react-router-dom'
  * returns {JSX.Element} A Custom LinkLabel component
  */
 
-export const LinkLabel: FCProps<ILinkLabel> = ({
-	children,
-	linkRef,
-	routeTo,
-	preText,
-	className,
-	onClick,
-}) => {
+export function LinkLabel({ children, linkRef, routeTo, preText, className, onClick }: ILinkLabel) {
 	return (
 		<div className={`${className} center small descend`}>
-			<p className="small">
-				{preText}{' '}
-				<Link
-					ref={linkRef} // to handle focus from parent component
-					to={routeTo}
-					onClick={onClick}
-				>
-					{children}
-				</Link>
+			<p
+				className="small"
+				style={{ margin: '0' }}
+			>
+				{preText}
 			</p>
+			<Link
+				ref={linkRef} // to handle focus from parent component
+				to={routeTo}
+				onClick={onClick}
+			>
+				{children}
+			</Link>
 		</div>
 	)
 }

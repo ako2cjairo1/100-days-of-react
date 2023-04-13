@@ -1,5 +1,5 @@
-import '@/assets/modules/NewKeychainForm.css'
 import { FormEvent, useEffect, useRef, useState } from 'react'
+import '@/assets/modules/NewKeychainForm.css'
 import {
 	Header,
 	FormGroup,
@@ -8,9 +8,9 @@ import {
 	AnimatedIcon,
 	InlineNotification,
 	KeychainCard,
+	LinkLabel,
 } from '.'
 import { useDebounceToggle, useInput, useStateObj, useTimedCopyToClipboard } from '@/hooks'
-import { TFunction, TKeychain, TStatus, TRequestType } from '@/types'
 import {
 	CreateError,
 	GeneratePassword,
@@ -19,7 +19,7 @@ import {
 	RunAfterSomeTime,
 } from '@/services/Utils/password-manager.helper'
 import { REGISTER_STATE, KEYCHAIN_CONST, RequestType } from '@/services/constants'
-import { Link } from 'react-router-dom'
+import { TFunction, TKeychain, TStatus, TRequestType } from '@/types'
 
 const { PASSWORD_REGEX } = REGISTER_STATE
 const { STATUS, KEYCHAIN, WEBSITE_REGEX } = KEYCHAIN_CONST
@@ -200,10 +200,10 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						logo={keychainInfo?.logo}
 						website={keychainInfo?.website}
 					>
-						<Link
-							to="/vault"
-							title="Delete"
-							className="menu descend"
+						<LinkLabel
+							preText=""
+							routeTo="/vault"
+							className="menu fdc"
 							onClick={handleAction.deletePassword}
 						>
 							<AnimatedIcon
@@ -211,7 +211,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 								iconName="fa fa-trash"
 								animation="fa-shake danger"
 							/>
-						</Link>
+						</LinkLabel>
 					</KeychainCard>
 				)}
 			</Header>
@@ -343,7 +343,10 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							password you save here matches your password for the website.
 						</p>
 						{checkIf.isClipboardTriggered && (
-							<InlineNotification>
+							<InlineNotification
+								className="lit-info"
+								iconName="fa-solid fa-triangle-exclamation"
+							>
 								{usernameClipboard.isCopied
 									? usernameClipboard.statusMessage
 									: passwordClipboard.statusMessage}

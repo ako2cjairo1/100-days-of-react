@@ -70,7 +70,7 @@ function Status({ children, status }: Pick<IHeaderProps, 'children' | 'status'>)
 								<>
 									{!status.success && (
 										<AnimatedIcon
-											className="regular error"
+											className="regular lit-error"
 											iconName="fa-solid fa-triangle-exclamation"
 											animation="fa-beat-fade"
 											animateOnLoad

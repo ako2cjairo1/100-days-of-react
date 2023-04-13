@@ -134,8 +134,12 @@ export function Keychain({
 						</div>
 					</div>
 				</div>
+
 				{checkIf.isClipboardTriggered && (
-					<InlineNotification>
+					<InlineNotification
+						className="lit-info"
+						iconName="fa-solid fa-triangle-exclamation"
+					>
 						{userNameClipboard.isCopied
 							? userNameClipboard.statusMessage
 							: passwordClipboard.statusMessage}
@@ -146,7 +150,7 @@ export function Keychain({
 			<SubmitButton
 				props={{
 					variant: 'default',
-					iconName: 'fa-pen-to-square',
+					iconName: 'fa fa-pen-to-square',
 				}}
 				onClick={handleAction.modifyKeychain}
 			>

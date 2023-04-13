@@ -37,7 +37,7 @@ export function AnimatedIcon({
 		<i
 			data-testid="animated-icon"
 			title={title}
-			className={`${className} ${iconName} ${(animateOnLoad || hover) && animation}`}
+			className={`${className} ${iconName} ${animateOnLoad || hover ? animation : ''}`}
 			onClick={onClick}
 			onMouseOver={() => !disabled && setHover(true)}
 			onMouseLeave={() => setHover(false)}
