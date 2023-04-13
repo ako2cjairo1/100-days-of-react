@@ -277,6 +277,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					/>
 					<div className="action-container">
 						<AnimatedIcon
+							title="copy to clipboard"
 							className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
 							iconName={`fa ${
 								checkIf.debounceUsernameClipboard ? 'fa-check scale-up' : 'fa-clone'
@@ -319,17 +320,20 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 						<div className="action-container">
 							<AnimatedIcon
+								title={revealPassword ? 'hide' : 'reveal'}
 								className={`action-button small ${password && 'active'}`}
 								iconName={`fa fa-eye${revealPassword ? '-slash scale-up' : ' scale-down'}`}
 								onClick={handleAction.revealPassword}
 							/>
 							<AnimatedIcon
+								title="generate password"
 								className={`action-button small ${checkIf.canUpdatePassword && 'active'}`}
 								iconName="fa fa-refresh"
 								animation="fa-spin"
 								onClick={handleAction.generatePassword}
 							/>
 							<AnimatedIcon
+								title="copy to clipboard"
 								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
 								iconName={`fa ${
 									checkIf.debouncePasswordClipboard ? 'fa-check scale-up' : 'fa-clone'

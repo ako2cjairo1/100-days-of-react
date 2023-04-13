@@ -15,6 +15,7 @@ type TAnimation =
 interface IAnimatedIcon extends IChildren {
 	className?: string
 	iconName?: string
+	title?: string
 	animation?: TAnimation | (string & { animation?: string })
 	animateOnLoad?: boolean
 	onClick?: TFunction
@@ -23,6 +24,7 @@ export function AnimatedIcon({
 	children,
 	className = '',
 	iconName = '',
+	title = '',
 	animation = '',
 	animateOnLoad = false,
 	onClick,
@@ -34,6 +36,7 @@ export function AnimatedIcon({
 	return (
 		<i
 			data-testid="animated-icon"
+			title={title}
 			className={`${className} ${iconName} ${(animateOnLoad || hover) && animation}`}
 			onClick={onClick}
 			onMouseOver={() => !disabled && setHover(true)}

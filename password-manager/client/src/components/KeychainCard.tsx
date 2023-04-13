@@ -8,6 +8,9 @@ interface IKeychainCard extends IChildren, Partial<Pick<TKeychain, 'logo' | 'web
 	subText?: string
 	onClick?: () => void | TFunction<string>
 }
+interface ILogo {
+	websiteLogo?: string
+}
 export function KeychainCard({
 	children,
 	logo = '',
@@ -17,26 +20,39 @@ export function KeychainCard({
 	onClick,
 }: IKeychainCard) {
 	const websiteDomain = GetDomainUrl(website)
-	const domainLogo = websiteDomain.slice(0, 1).toUpperCase()
-	return (
-		<div className="keychain-item">
-			{logo ? (
+
+	const Logo = ({ websiteLogo }: ILogo) => {
+		const domainLogo = websiteDomain.slice(0, 1).toUpperCase()
+
+		if (websiteLogo) {
+			return (
 				<img
 					className="header"
 					src={logo}
 					loading="lazy"
 					alt={domainLogo}
-					onClick={onClick}
+					onClick={onClick} // TODO: should navigate to website
 				/>
-			) : (
-				<AnimatedIcon
-					className="card-icon"
-					animation="fa-beat-fade"
-					onClick={onClick}
-				>
-					{domainLogo}
-				</AnimatedIcon>
-			)}
+			)
+		}
+		return (
+			<AnimatedIcon
+				className="card-icon"
+				animation="fa-beat-fade"
+				onClick={onClick} // TODO: should navigate to website
+			>
+				{domainLogo}
+			</AnimatedIcon>
+		)
+	}
+
+	return (
+		<div
+			className="keychain-item"
+			onClick={onClick}
+		>
+			<Logo websiteLogo={logo} />
+
 			<div
 				className="keychain-item-header"
 				onClick={onClick}
@@ -48,7 +64,7 @@ export function KeychainCard({
 				>
 					{websiteDomain}
 				</a>
-				<p>{subText}</p>
+				<p className="small">{subText}</p>
 			</div>
 			{onClick && (
 				<Link
@@ -56,10 +72,7 @@ export function KeychainCard({
 					className="menu descend"
 					onClick={onClick}
 				>
-					<AnimatedIcon
-						className="small"
-						iconName={`${iconName ? iconName : 'fa fa-chevron-left'}`}
-					/>
+					<AnimatedIcon iconName={iconName} />
 				</Link>
 			)}
 			{children}

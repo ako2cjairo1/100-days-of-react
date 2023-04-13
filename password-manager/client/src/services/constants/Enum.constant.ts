@@ -14,6 +14,6 @@ export const RequestType = {
 } as const
 
 export const VaultContent = {
-	vault: 'vault',
-	keychain: 'keychain',
+	vault_content: 'vault_content',
+	keychain_content: 'keychain_content',
 } as const

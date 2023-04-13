@@ -86,6 +86,7 @@ export function Keychain({
 							style={{ top: '42px', right: '0' }}
 						>
 							<AnimatedIcon
+								title="copy to clipboard"
 								className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
 								iconName={`fa ${
 									!checkIf.canCopyUsername && checkIf.debounceCopyUserName
@@ -115,11 +116,13 @@ export function Keychain({
 							style={{ top: '130px', right: '0' }}
 						>
 							<AnimatedIcon
+								title={revealPassword ? 'hide' : 'reveal'}
 								className={`action-button small active`}
 								iconName={`fa fa-eye${revealPassword ? '-slash scale-up' : ' scale-down'}`}
 								onClick={() => setRevealPassword(prev => !prev)}
 							/>
 							<AnimatedIcon
+								title="copy to clipboard"
 								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
 								iconName={`fa ${
 									!checkIf.canCopyPassword && checkIf.debounceCopyPassword

@@ -47,7 +47,7 @@ export interface IInputElement
 export interface IValidationMessage<T = TValidation> {
 	isVisible: boolean
 	title?: string
-	validations: Array<T>
+	validations: T[]
 }
 
 export interface IFormInput
@@ -61,7 +61,7 @@ export interface IFormInput
 	havePasswordMeter?: boolean
 	isValid?: boolean
 	isFocused?: boolean
-	validations?: Array<TValidation>
+	validations?: TValidation[]
 }
 
 // Helper function interfaces
@@ -75,10 +75,7 @@ export interface IRegExObj {
 }
 
 export interface IKeychain extends Partial<TKeychain> {
-	actionCallback: TFunction<[keychainId?: string]> //(keychainId?: string) => void
-}
-export interface IKeychainItem extends Omit<TKeychain, 'password' | 'timeAgo'> {
-	onClick?: TFunction<string>
+	actionCallback: TFunction<[keychainId?: string]>
 }
 
 export interface IModal extends IChildren {

@@ -3,6 +3,7 @@ import google from '@/assets/google.png'
 import apple from '@/assets/apple.png'
 import github from '@/assets/github.png'
 import { TFunction } from '@/types'
+import { Log } from '@/services/Utils/password-manager.helper'
 /**
  * Renders a section with buttons for external authentication providers.
  */
@@ -11,8 +12,8 @@ interface IAuthProviderSection {
 }
 export function AuthProviderSection({ cb = () => null }: IAuthProviderSection) {
 	const handleExternalAuth = () => {
-		alert('TODO: Implement external authentication.')
 		cb()
+		Log('TODO: Implement external authentication.')
 	}
 	return (
 		<div

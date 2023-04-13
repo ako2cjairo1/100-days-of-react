@@ -1,12 +1,9 @@
-import { IChildren, IKeychainItem, TFunction } from '@/types'
+import { IChildren, IKeychain, TKeychain } from '@/types'
 import { KeychainCard } from './KeychainCard'
 import { AnimatedIcon } from './AnimatedIcon'
-
-interface IVault {
-	vault: Array<IKeychainItem>
-	onClick: TFunction<[keychainId: string]>
+interface IVault extends Pick<IKeychain, 'actionCallback'> {
+	vault: Omit<TKeychain, 'password' | 'timeAgo'>[]
 }
-
 /**
  * Renders a list of KeychainItem components
  * param keychain - An array of IVaultItem objects
@@ -14,30 +11,33 @@ interface IVault {
  *
  * returns A React fragment containing a list of KeychainItem components
  */
-function Vault({ vault, onClick }: IVault) {
+function Vault({ vault, actionCallback }: IVault) {
+	if (!vault.some(Boolean)) {
+		// Empty vault, show animated message
+		return (
+			<div className="center">
+				<AnimatedIcon
+					className="regular"
+					iconName="fa fa-face-rolling-eyes"
+					animation="fa-beat-fade"
+					animateOnLoad
+				/>
+				<p className="center descend">There are no items to list.</p>
+			</div>
+		)
+	}
+
 	return (
 		<>
-			{vault.length > 0 ? (
-				vault.map(({ keychainId, logo, website, username }) => (
-					<KeychainCard
-						iconName="fa fa-chevron-right"
-						key={keychainId}
-						subText={username}
-						onClick={() => onClick(keychainId)}
-						{...{ logo, website }}
-					/>
-				))
-			) : (
-				<div className="center">
-					<AnimatedIcon
-						className="regular"
-						iconName="fa fa-face-rolling-eyes"
-						animation="fa-beat-fade"
-						animateOnLoad
-					/>
-					<p className="center descend">There are no items to list.</p>
-				</div>
-			)}
+			{vault.map(({ keychainId, logo, website, username }) => (
+				<KeychainCard
+					iconName="fa fa-chevron-right"
+					key={keychainId}
+					subText={username}
+					onClick={() => actionCallback(keychainId)}
+					{...{ logo, website }}
+				/>
+			))}
 		</>
 	)
 }

@@ -12,7 +12,10 @@ describe('Keychain components', () => {
 		const { container } = render(
 			<MemoryRouter>
 				<VaultContainer>
-					<VaultContainer.Vault {...{ vault: keychains, onClick: listEvent }} />
+					<VaultContainer.Vault
+						vault={keychains}
+						actionCallback={listEvent}
+					/>
 				</VaultContainer>
 			</MemoryRouter>
 		)
@@ -28,7 +31,10 @@ describe('Keychain components', () => {
 		const { container, queryAllByRole } = render(
 			<MemoryRouter>
 				<VaultContainer>
-					<VaultContainer.Vault {...{ vault: keychains, onClick: listEvent }} />
+					<VaultContainer.Vault
+						vault={keychains}
+						actionCallback={listEvent}
+					/>
 				</VaultContainer>
 			</MemoryRouter>
 		)
