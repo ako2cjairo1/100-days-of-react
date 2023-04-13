@@ -1,4 +1,5 @@
-import { IButtonElement } from '@/types'
+import { ISubmitButton } from '@/types'
+import { AnimatedIcon } from './AnimatedIcon'
 /**
  * This is a SubmitButton component that renders a button with text and an optional icon.
  * Note: "type" attribute was omitted, most of the button attrs are omitted
@@ -8,37 +9,43 @@ import { IButtonElement } from '@/types'
  * @param {string} [iconName] - The name of the icon to display on the button (optional).
  */
 export function SubmitButton({
-	props: { variant = 'primary', submitted = false, disabled = false, textStatus, iconName },
 	children,
 	className,
+	props: {
+		variant = 'primary',
+		submitted = false,
+		disabled = false,
+		textStatus = '',
+		iconName = '',
+	},
 	...rest
-}: IButtonElement) {
+}: ISubmitButton) {
+	const isPrimary = variant === 'primary'
 	return (
 		<button
 			data-testid="submit"
-			type={variant !== 'primary' ? 'button' : 'submit'}
-			className={`button-style submit ${variant === 'primary' ? 'accent-bg' : ''} ${
-				className ? className : ''
-			}`}
+			type={isPrimary ? 'submit' : 'button'}
+			className={`button-style submit ${isPrimary && 'accent-bg'} ${className && className}`}
 			disabled={disabled}
 			onClick={rest.onClick}
 			{...rest}
 		>
 			{submitted ? (
 				<div className="center">
-					<i
-						className="fa fa-spinner fa-spin spinner"
+					<AnimatedIcon
 						data-testid="spinner"
-						aria-hidden="true"
-					></i>
+						animation="fa-spin"
+						animateOnLoad
+						iconName="fa fa-spinner"
+					/>
 					{textStatus}
 				</div>
 			) : (
 				<>
 					{iconName && (
-						<i
+						<AnimatedIcon
 							data-testid={iconName}
-							className={`fa ${iconName}`}
+							iconName={`fa ${iconName}`}
 						/>
 					)}{' '}
 					{children}

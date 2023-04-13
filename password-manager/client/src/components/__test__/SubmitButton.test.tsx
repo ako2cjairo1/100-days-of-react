@@ -9,7 +9,7 @@ describe('SubmitButton', () => {
 	})
 
 	it('renders with an icon if iconName prop is provided', () => {
-		const iconName = 'fa-check'
+		const iconName = 'animated-icon'
 		const { getByTestId } = render(
 			<SubmitButton
 				props={{
@@ -23,7 +23,7 @@ describe('SubmitButton', () => {
 
 	it('renders "spinner" if submitted prop is true', () => {
 		const { getByTestId } = render(<SubmitButton props={{ submitted: true }} />)
-		expect(getByTestId('spinner')).toBeInTheDocument()
+		expect(getByTestId('animated-icon')).toBeInTheDocument()
 	})
 
 	it('calls onClick when clicked with given button text (children)', async () => {

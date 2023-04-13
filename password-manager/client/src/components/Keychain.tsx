@@ -86,7 +86,7 @@ export function Keychain({
 							style={{ top: '42px', right: '0' }}
 						>
 							<AnimatedIcon
-								title="copy to clipboard"
+								title="Copy"
 								className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
 								iconName={`fa ${
 									!checkIf.canCopyUsername && checkIf.debounceCopyUserName
@@ -122,7 +122,7 @@ export function Keychain({
 								onClick={() => setRevealPassword(prev => !prev)}
 							/>
 							<AnimatedIcon
-								title="copy to clipboard"
+								title="Copy"
 								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
 								iconName={`fa ${
 									!checkIf.canCopyPassword && checkIf.debounceCopyPassword
@@ -147,8 +147,6 @@ export function Keychain({
 				props={{
 					variant: 'default',
 					iconName: 'fa-pen-to-square',
-					submitted: false,
-					disabled: false,
 				}}
 				onClick={handleAction.modifyKeychain}
 			>

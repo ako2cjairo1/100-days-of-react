@@ -1,11 +1,10 @@
-import { FormEvent, useEffect, useRef, useState, useCallback } from 'react'
+import { FormEvent, useEffect, useRef } from 'react'
 import '@/assets/modules/Login.css'
-import { TStatus, TPassword, TInputValidation, TInputRegistration } from '@/types/global.type'
+import { TStatus, TInputRegistration } from '@/types/global.type'
 import { REGISTER_STATE } from '@/services/constants/Registration.constant'
 import {
 	RunAfterSomeTime,
 	ExtractValFromRegEx,
-	Log,
 	MergeRegExObj,
 } from '@/services/Utils/password-manager.helper'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
@@ -22,60 +21,72 @@ import {
 	AnimatedIcon,
 } from '@/components'
 
+// constants
+const { CREDENTIALS, STATUS, EMAIL_REGEX, PASSWORD_REGEX } = REGISTER_STATE
+const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
+
 export const Registration = () => {
-	// constants
-	const { CREDENTIALS, STATUS, INPUT_VALIDATION, VALID_PASSWORD, EMAIL_REGEX, PASSWORD_REGEX } =
-		REGISTER_STATE
-	const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
 	// form controlled inputs
 	const { inputAttribute, inputAction } = useInput<TInputRegistration>(CREDENTIALS)
 	// destructure
 	const { inputStates, onChange, onFocus, onBlur, isFocus, isSubmitted } = inputAttribute
 	const { password, email, confirm, isTermsAgreed } = inputStates
+
 	const { objState: registrationStatus, mutate: mutateRegistrationStatus } =
 		useStateObj<TStatus>(STATUS)
-	// destructure
-	const { success } = registrationStatus
-	const [loginValidation, setLoginValidation] = useState<TInputValidation>(INPUT_VALIDATION)
-	// destructure
-	const { isValidEmail, isValidPassword } = loginValidation
-	const [testPassword, setTestPassword] = useState<TPassword>(VALID_PASSWORD)
-	// destructure states
+
 	const emailRef = useRef<HTMLInputElement>(null)
 	const loginRef = useRef<HTMLAnchorElement>(null)
-	const { authInfo, mutateAuth } = useAuthContext()
-
-	const validateInput = useCallback(() => {
-		const validPassword = {
-			minLength: minLength.test(password),
-			alphabet: alphabet.test(password),
-			number: number.test(password),
-			symbol: symbol.test(password),
-		}
-
-		setTestPassword(validPassword)
-		setLoginValidation({
-			isValidEmail: EMAIL_REGEX.test(email),
-			isValidPassword: Object.values(validPassword).every(Boolean),
-		})
-	}, [EMAIL_REGEX, alphabet, email, minLength, number, password, symbol])
+	const { mutateAuth } = useAuthContext()
 
 	useEffect(() => {
-		if (!success) emailRef.current?.focus()
+		if (!registrationStatus.success) emailRef.current?.focus()
 		else loginRef.current?.focus()
-	}, [success])
+	}, [registrationStatus.success])
 
 	useEffect(() => {
 		mutateRegistrationStatus({ message: '' })
-		validateInput()
-	}, [validateInput, mutateRegistrationStatus])
+	}, [inputStates, mutateRegistrationStatus])
 
-	const resetRegistration = () => {
-		inputAction.resetInput()
-		mutateRegistrationStatus(STATUS)
-		setLoginValidation(INPUT_VALIDATION)
-		setTestPassword(VALID_PASSWORD)
-		Log(authInfo)
+	const passwordRequirement = {
+		minLength: minLength.test(password),
+		alphabet: alphabet.test(password),
+		number: number.test(password),
+		symbol: symbol.test(password),
+	}
+
+	const checkIf = {
+		isValidEmail: EMAIL_REGEX.test(email),
+		isValidPassword: Object.values(passwordRequirement).every(Boolean),
+		validConfirmation: password === confirm && Object.values(passwordRequirement).every(Boolean),
+	}
+
+	const { emailReq, passwordReq, confirmReq } = {
+		emailReq: [{ isValid: checkIf.isValidEmail, message: 'Input is not a valid email address.' }],
+		passwordReq: [
+			{
+				isValid: passwordRequirement.alphabet,
+				message: 'an upper and a lower case letter',
+			},
+			{
+				isValid: passwordRequirement.number,
+				message: 'a number',
+			},
+			{
+				isValid: passwordRequirement.minLength,
+				message: `at least ${ExtractValFromRegEx(minLength.source)} characters`,
+			},
+			{
+				isValid: passwordRequirement.symbol,
+				message: `a special character: ${ExtractValFromRegEx(symbol.source)}`,
+			},
+		],
+		confirmReq: [
+			{
+				isValid: checkIf.validConfirmation,
+				message: 'Master password confirmation does not match.',
+			},
+		],
 	}
 
 	const handleSubmit = async (e: FormEvent) => {
@@ -86,10 +97,10 @@ export const Registration = () => {
 			inputAction.submit(true)
 
 			RunAfterSomeTime(() => {
-				if (Object.values(loginValidation).every(Boolean)) {
+				if (!checkIf.isValidPassword) {
 					// TODO: use custom API to handle registration
 					mutateAuth({ ...inputStates, accessToken: 'fakeToken' })
-					resetRegistration()
+					inputAction.resetInput()
 					mutateRegistrationStatus({ success: true, message: '' })
 				} else {
 					mutateRegistrationStatus({
@@ -103,42 +114,10 @@ export const Registration = () => {
 		}
 	}
 
-	const checkIf = {
-		validConfirmation: isValidPassword && password === confirm,
-	}
-
-	const { emailReq, passwordReq, confirmReq } = {
-		emailReq: [{ isValid: isValidEmail, message: 'Input is not a valid email address.' }],
-		passwordReq: [
-			{
-				isValid: testPassword.alphabet,
-				message: 'an upper and a lower case letter',
-			},
-			{
-				isValid: testPassword.number,
-				message: 'a number',
-			},
-			{
-				isValid: testPassword.minLength,
-				message: `at least ${ExtractValFromRegEx(minLength.source)} characters`,
-			},
-			{
-				isValid: testPassword.symbol,
-				message: `a special character: ${ExtractValFromRegEx(symbol.source)}`,
-			},
-		],
-		confirmReq: [
-			{
-				isValid: checkIf.validConfirmation,
-				message: 'Master password confirmation does not match.',
-			},
-		],
-	}
-
 	return (
 		<section>
 			<div className="form-container">
-				{success ? (
+				{registrationStatus.success ? (
 					<Header>
 						<AnimatedIcon
 							className="scale-up"
@@ -170,7 +149,7 @@ export const Registration = () => {
 									props={{
 										label: 'Email Address',
 										labelFor: 'email',
-										isFulfilled: isValidEmail,
+										isFulfilled: checkIf.isValidEmail,
 									}}
 								/>
 								<FormGroup.Input
@@ -184,11 +163,19 @@ export const Registration = () => {
 									linkRef={emailRef}
 									disabled={isSubmitted}
 									required
-									className={isFocus.email ? '' : isValidEmail ? 'valid' : 'invalid'}
 									{...{ onChange, onFocus, onBlur }}
+									className={
+										isFocus.email
+											? ''
+											: checkIf.isValidEmail
+											? 'valid'
+											: email.length > 0
+											? 'invalid'
+											: ''
+									}
 								/>
 								<ValidationMessage
-									isVisible={!isFocus.email && !isValidEmail}
+									isVisible={!isFocus.email && !checkIf.isValidEmail && email.length > 0}
 									validations={emailReq}
 								/>
 							</div>
@@ -198,7 +185,7 @@ export const Registration = () => {
 									props={{
 										label: 'Master Password',
 										labelFor: 'password',
-										isFulfilled: isValidPassword,
+										isFulfilled: checkIf.isValidPassword,
 									}}
 								>
 									<PasswordStrength
@@ -214,11 +201,19 @@ export const Registration = () => {
 									disabled={isSubmitted}
 									required
 									{...{ onChange, onFocus, onBlur }}
-									className={isFocus.password ? '' : isValidPassword ? 'valid' : 'invalid'}
+									className={
+										isFocus.password
+											? ''
+											: checkIf.isValidPassword
+											? 'valid'
+											: password.length > 0
+											? 'invalid'
+											: ''
+									}
 								/>
 								<ValidationMessage
 									title="Your master password must contain:"
-									isVisible={!isFocus.password && !isValidPassword}
+									isVisible={!isFocus.password && !checkIf.isValidPassword && password.length > 0}
 									validations={passwordReq}
 								/>
 							</div>
@@ -252,7 +247,7 @@ export const Registration = () => {
 								/>
 
 								<ValidationMessage
-									isVisible={!isFocus.confirm && !checkIf.validConfirmation && password.length > 0}
+									isVisible={!isFocus.confirm && !checkIf.validConfirmation && confirm.length > 0}
 									validations={confirmReq}
 								/>
 							</div>
@@ -274,23 +269,26 @@ export const Registration = () => {
 								</div>
 							</Toggle>
 
-							<SubmitButton
-								props={{
-									variant: 'primary',
-									iconName: 'fa-user-plus',
-									submitted: isSubmitted,
-									disabled:
-										!isTermsAgreed ||
-										isSubmitted ||
-										!isValidEmail ||
-										!isValidPassword ||
-										password !== confirm,
-								}}
-								className="accent-bg"
-								onClick={() => console.log('Submit button triggered!')}
-							>
-								Create account
-							</SubmitButton>
+							<div className="center">
+								<SubmitButton
+									props={{
+										variant: 'primary',
+										iconName: 'fa-user-plus',
+										textStatus: 'Processing...',
+										submitted: isSubmitted,
+										disabled:
+											!isTermsAgreed ||
+											isSubmitted ||
+											!checkIf.isValidEmail ||
+											!checkIf.isValidPassword ||
+											password !== confirm,
+									}}
+									className="accent-bg"
+									onClick={() => console.log('Submit button triggered!')}
+								>
+									Create account
+								</SubmitButton>
+							</div>
 						</FormGroup>
 
 						<LinkLabel
@@ -300,9 +298,10 @@ export const Registration = () => {
 							Log in
 						</LinkLabel>
 
-						<Separator>OR</Separator>
-
-						<p className="center small">Continue with...</p>
+						<div>
+							<Separator>OR</Separator>
+							<p className="center small">Continue with...</p>
+						</div>
 
 						<footer>
 							<AuthProviderSection

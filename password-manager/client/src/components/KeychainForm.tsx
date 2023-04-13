@@ -37,31 +37,27 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 	const { inputStates, onChange, onFocus, onBlur, isSubmitted, isFocus } = inputAttribute
 	const { website, username, password } = inputStates
 
+	const websiteInputRef = useRef<HTMLInputElement>(null)
+	const initInputActionRef = useRef(true)
 	const [revealPassword, setRevealPassword] = useState(false)
 	const { objState: keychainStatus, mutate: updateKeychainStatus } = useStateObj<TStatus>(STATUS)
+
 	const usernameClipboard = useTimedCopyToClipboard({
 		text: username,
 		message: 'User Name copied!',
-		callbackFn: () => updateKeychainStatus(STATUS),
 	})
 	const passwordClipboard = useTimedCopyToClipboard({
 		text: password,
 		message: 'Password copied!',
-		callbackFn: () => updateKeychainStatus(STATUS),
 	})
-	const debounceCopyUserName = useDebounceToggle(usernameClipboard.isCopied, 2)
-	const debounceCopyPassword = useDebounceToggle(passwordClipboard.isCopied, 2)
-
-	const websiteInputRef = useRef<HTMLInputElement>(null)
-	const initInputActionRef = useRef(true)
 
 	// conditional rendering
 	const checkIf = {
-		isValidWebsite: () => WEBSITE_REGEX.test(website),
 		isValidUsernameLength: username.trim().length > 2 ? true : false,
 		isValidPasswordLength: password.length > 2 ? true : false,
 		isEditing: Object.values(keychainInfo || {}).some(Boolean),
 		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
+		isValidWebsite: () => WEBSITE_REGEX.test(website),
 		canDisableSubmit: () =>
 			isSubmitted ||
 			keychainStatus.success ||
@@ -72,9 +68,13 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 		canCopyPassword: !passwordClipboard.isCopied && password.length > 0,
 		canUpdatePassword: !isSubmitted && !keychainStatus.success,
 		debounceUsernameClipboard:
-			debounceCopyUserName && usernameClipboard.isCopied && username.length > 0,
+			useDebounceToggle(usernameClipboard.isCopied, 2) &&
+			usernameClipboard.isCopied &&
+			username.length > 0,
 		debouncePasswordClipboard:
-			debounceCopyPassword && passwordClipboard.isCopied && password.length > 0,
+			useDebounceToggle(passwordClipboard.isCopied, 2) &&
+			passwordClipboard.isCopied &&
+			password.length > 0,
 	}
 
 	useEffect(() => {
@@ -126,12 +126,12 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 		},
 		deletePassword: () => {
 			if (checkIf.canUpdatePassword) {
-				const update = updateCallback(inputStates, remove)
-				if (!update.success) {
-					return updateKeychainStatus(update)
+				// TODO: implement in server component, simulate api post request to update/add the keychain info
+				const removeResult = updateCallback(inputStates, remove)
+				if (!removeResult.success) {
+					return updateKeychainStatus(removeResult)
 				}
 
-				// RunAfterSomeTime(() => setKeychainStatus({ success: false, message: '' }), 5)
 				// show success status before closing the modal
 				updateKeychainStatus({ success: true, message: 'Password Deleted!' })
 
@@ -148,22 +148,25 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 			e.preventDefault()
 
 			if (!isSubmitted) {
+				// set to submit and reset status
 				inputAction.submit(true)
-				// clear the status before proceed
 				updateKeychainStatus(STATUS)
 
 				try {
-					// simulate api post request to update/add the keychain info
+					// TODO: implement in server component, simulate api post request to update/add the keychain info
 					RunAfterSomeTime(() => {
 						inputAction.submit(false)
-						const update = updateCallback(inputStates, checkIf.isEditing ? modify : add)
+						const updateResult = updateCallback(inputStates, checkIf.isEditing ? modify : add)
 
-						if (!update.success) {
-							return updateKeychainStatus(update)
+						if (!updateResult.success) {
+							return updateKeychainStatus(updateResult)
 						}
 
+						const successMessage = checkIf.isEditing
+							? 'The changes have been saved'
+							: 'Password Saved!'
 						// show success status before closing the modal
-						updateKeychainStatus({ success: true, message: 'The changes have been saved' })
+						updateKeychainStatus({ success: true, message: successMessage })
 
 						// after sometime, reset status and close modal
 						RunAfterSomeTime(() => {
@@ -183,41 +186,33 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 	return (
 		<>
 			<Header>
-				{!checkIf.isEditing ? (
-					<>
-						<Header.Title
-							title="Add Password"
-							subTitle="We will save this password in your session storage and cloud account"
-						/>
-						<Header.Status status={keychainStatus} />
-					</>
-				) : (
-					<>
-						<Header.Title
-							title="Edit Password"
-							subTitle=""
-						/>
-
-						<Header.Status status={keychainStatus} />
-
-						<KeychainCard
-							logo={keychainInfo?.logo}
-							website={keychainInfo?.website}
+				<Header.Title
+					title={checkIf.isEditing ? 'Edit Password' : 'Add Password'}
+					subTitle={
+						checkIf.isEditing
+							? ''
+							: 'We will save this password in your session storage and cloud account'
+					}
+				/>
+				<Header.Status status={keychainStatus} />
+				{checkIf.isEditing && (
+					<KeychainCard
+						logo={keychainInfo?.logo}
+						website={keychainInfo?.website}
+					>
+						<Link
+							to="/vault"
+							title="Delete"
+							className="menu descend"
+							onClick={handleAction.deletePassword}
 						>
-							<Link
-								to="/vault"
-								title="Delete"
-								className="menu descend"
-								onClick={handleAction.deletePassword}
-							>
-								<AnimatedIcon
-									className={`regular ${isSubmitted || keychainStatus.success ? 'disabled' : ''}`}
-									iconName="fa fa-trash"
-									animation="fa-shake danger"
-								/>
-							</Link>
-						</KeychainCard>
-					</>
+							<AnimatedIcon
+								className={`regular ${isSubmitted || keychainStatus.success ? 'disabled' : ''}`}
+								iconName="fa fa-trash"
+								animation="fa-shake danger"
+							/>
+						</Link>
+					</KeychainCard>
 				)}
 			</Header>
 
@@ -234,6 +229,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						<FormGroup.Input
 							id="website"
 							type="text"
+							inputMode="url"
 							placeholder="ex: outlook.com"
 							linkRef={websiteInputRef}
 							value={website}
@@ -277,7 +273,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					/>
 					<div className="action-container">
 						<AnimatedIcon
-							title="copy to clipboard"
+							title="Copy"
 							className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
 							iconName={`fa ${
 								checkIf.debounceUsernameClipboard ? 'fa-check scale-up' : 'fa-clone'
@@ -333,7 +329,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 								onClick={handleAction.generatePassword}
 							/>
 							<AnimatedIcon
-								title="copy to clipboard"
+								title="Copy"
 								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
 								iconName={`fa ${
 									checkIf.debouncePasswordClipboard ? 'fa-check scale-up' : 'fa-clone'

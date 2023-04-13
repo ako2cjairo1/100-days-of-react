@@ -225,19 +225,21 @@ export const Login = () => {
 								</Toggle>
 							)}
 
-							<SubmitButton
-								props={{
-									variant: 'primary',
-									textStatus: 'Logging in...',
-									iconName: isTypingEmail ? '' : 'fa-sign-in',
-									submitted: isSubmitted,
-									disabled:
-										isSubmitted ||
-										(isTypingEmail ? !checkIf.isValidEmail : !checkIf.minLengthPassed),
-								}}
-							>
-								{isTypingEmail ? 'Continue' : 'Log in with Master Password'}
-							</SubmitButton>
+							<div className="center">
+								<SubmitButton
+									props={{
+										variant: 'primary',
+										textStatus: 'Logging in...',
+										iconName: isTypingEmail ? '' : 'fa-sign-in',
+										submitted: isSubmitted,
+										disabled:
+											isSubmitted ||
+											(isTypingEmail ? !checkIf.isValidEmail : !checkIf.minLengthPassed),
+									}}
+								>
+									{isTypingEmail ? 'Continue' : 'Log in with Master Password'}
+								</SubmitButton>
+							</div>
 						</FormGroup>
 
 						{isTypingEmail ? (
@@ -257,9 +259,10 @@ export const Login = () => {
 							</LinkLabel>
 						)}
 
-						<Separator>OR</Separator>
-
-						<p className="center small">Continue with...</p>
+						<div>
+							<Separator>OR</Separator>
+							<p className="center small">Continue with...</p>
+						</div>
 
 						<footer>
 							<AuthProviderSection

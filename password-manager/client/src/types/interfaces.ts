@@ -25,11 +25,11 @@ export interface IRequiredLabelProps extends Omit<TLabelAttrs, 'htmlFor' | 'form
 	isOptional?: boolean
 }
 
-export interface IButtonElement
+export interface ISubmitButton
 	extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'disabled'> {
 	props: {
 		variant?: 'primary' | 'cancel' | 'default'
-		submitted: boolean
+		submitted?: boolean
 		disabled?: boolean
 		textStatus?: string
 		iconName?: string

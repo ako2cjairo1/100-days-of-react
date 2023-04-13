@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import '@/assets/modules/Vault.css'
 import { Header, VaultContainer, Modal, KeychainForm, Menubar, Keychain } from '@/components'
 import { useAuthContext } from '@/hooks'
+import { LocalStorage } from '@/services/Utils/password-manager.helper'
 import { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
 import { RequestType, KEYCHAIN_CONST, VaultContent } from '@/services/constants'
-import { LocalStorage } from '@/services/Utils/password-manager.helper'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 const { add, modify } = RequestType
@@ -94,35 +94,18 @@ export function Vault() {
 		if (keychainId) openKeychain(keychainId, modify)
 	}
 
-	const keychainModal = {
-		open: () => setShowModalForm(true),
-		close: () => {
-			setShowModalForm(false)
-			// set the keychain to initial state
-			setKeychain(KEYCHAIN)
-			setView(vault_content)
-		},
-		toggle: (toggle: boolean) => (toggle ? keychainModal.open() : keychainModal.close()),
-	}
-
-	const Content = ({ view }: { view: TVaultContent }) => {
-		const contents = {
-			vault_content: (
-				<VaultContainer.Vault
-					vault={vault}
-					actionCallback={openKeychain}
-				/>
-			),
-			keychain_content: (
-				<Keychain
-					{...keychain}
-					actionCallback={keychainFormCallback}
-				/>
-			),
+	const keychainModal = useMemo(() => {
+		return {
+			open: () => setShowModalForm(true),
+			close: () => {
+				setShowModalForm(false)
+				// set the keychain to initial state
+				setKeychain(KEYCHAIN)
+				setView(vault_content)
+			},
+			toggle: (toggle: boolean) => (toggle ? keychainModal.open() : keychainModal.close()),
 		}
-
-		return contents[view]
-	}
+	}, [])
 
 	return (
 		<div className="vault-container">
@@ -151,7 +134,17 @@ export function Vault() {
 					<Header.Status status={clipboardStatus} />
 				</Header>
 
-				<Content view={currentView} />
+				{currentView === vault_content ? (
+					<VaultContainer.Vault
+						vault={vault}
+						actionCallback={openKeychain}
+					/>
+				) : (
+					<Keychain
+						{...keychain}
+						actionCallback={keychainFormCallback}
+					/>
+				)}
 			</VaultContainer>
 
 			<Modal

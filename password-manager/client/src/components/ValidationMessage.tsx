@@ -12,7 +12,7 @@ export const ValidationMessage: FCProps<IValidationMessage> = ({
 	validations,
 }) => {
 	return (
-		<div>
+		<>
 			{title && isVisible && <span className="small">{title}</span>}
 			<ul className="x-small fa-ul">
 				{validations && isVisible
@@ -29,6 +29,6 @@ export const ValidationMessage: FCProps<IValidationMessage> = ({
 					  ))
 					: null}
 			</ul>
-		</div>
+		</>
 	)
 }

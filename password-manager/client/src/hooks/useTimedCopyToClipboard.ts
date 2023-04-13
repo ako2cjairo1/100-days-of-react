@@ -2,6 +2,13 @@ import { useRef, useState } from 'react'
 import { CopyToClipboard, Log, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
 import { TFunction } from '@/types'
 
+const CLIPBOARD_TIMEOUT = 15
+interface IUseTimedCopyToClipboard {
+	text?: string
+	message: string
+	callbackFn: TFunction
+	expiration: number
+}
 /**
  * This function allows you to copy text to the clipboard for a specified amount of time.
  * After the specified time has passed, the clipboard is cleared and a callback function is executed.
@@ -14,13 +21,6 @@ import { TFunction } from '@/types'
  *
  * returns {Object} An object containing the `copy`, `clear`, `statusMessage`, and `isCopied` properties.
  */
-interface IUseTimedCopyToClipboard {
-	text?: string
-	message: string
-	callbackFn: TFunction
-	expiration: number
-}
-const CLIPBOARD_TIMEOUT = 15
 export function useTimedCopyToClipboard({
 	text = '',
 	message = 'Copied to clipboard!',
