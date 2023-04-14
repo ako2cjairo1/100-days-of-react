@@ -1,5 +1,5 @@
-import { Header } from '@/components'
 import { render } from '@/services/Utils/test.util'
+import { Header } from '@/components/Header'
 
 describe('Header', () => {
 	it('should render a header element with given "title" and "subtitle"', () => {
@@ -14,6 +14,16 @@ describe('Header', () => {
 		)
 		expect(getByText(props.title)).toBeInTheDocument()
 		expect(getByText(props.subTitle)).toBeInTheDocument()
+	})
+
+	it('should render a animated Logo component"', () => {
+		const { container } = render(
+			<Header>
+				<Header.Logo />
+			</Header>
+		)
+		expect(container.querySelector('.logo-key.fade-in.fa.fa-key')).toBeInTheDocument()
+		expect(container.querySelector('.logo-shield.scale-up.fa.fa-shield')).toBeInTheDocument()
 	})
 
 	it('should render children when given', () => {

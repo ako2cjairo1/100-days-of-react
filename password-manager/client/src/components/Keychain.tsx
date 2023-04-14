@@ -1,13 +1,16 @@
 import { useState } from 'react'
-import { IKeychain } from '@/types'
+import { TFunction, TKeychain } from '@/types'
 import { useDebounceToggle, useTimedCopyToClipboard } from '@/hooks'
 import { SubmitButton } from './SubmitButton'
 import { AnimatedIcon } from './AnimatedIcon'
 import { PasswordStrength } from './PasswordStrength'
 import { InlineNotification } from './InlineNotification'
-import { KeychainCard } from './KeychainCard'
+import { KeychainCard } from './KeychainCard/KeychainCard'
 import { TimeAgo } from '@/services/Utils/password-manager.helper'
 
+export interface IKeychain extends Partial<TKeychain> {
+	actionCallback: TFunction<[keychainId?: string]>
+}
 export function Keychain({
 	keychainId,
 	logo = '',
@@ -18,36 +21,21 @@ export function Keychain({
 	actionCallback,
 }: IKeychain) {
 	const [revealPassword, setRevealPassword] = useState(false)
-	const userNameClipboard = useTimedCopyToClipboard({
-		text: username,
-		message: 'User Name copied!',
-	})
+	const userNameClipboard = useTimedCopyToClipboard({})
 	const passwordClipboard = useTimedCopyToClipboard({
-		text: password,
-		message: 'Password copied!',
-		callbackFn: () => setRevealPassword(false),
+		copyCallbackFn: () => setRevealPassword(false),
 	})
 
 	const handleAction = {
 		copyUserName: () => {
-			if (!userNameClipboard.isCopied) {
-				passwordClipboard.clear()
-				userNameClipboard.copy()
-			}
+			passwordClipboard.clear()
+			userNameClipboard.copy(username)
 		},
 		copyPassword: () => {
-			if (!passwordClipboard.isCopied) {
-				userNameClipboard.clear()
-				passwordClipboard.copy()
-			}
-		},
-		showVault: () => {
 			userNameClipboard.clear()
-			passwordClipboard.clear()
-			setRevealPassword(false)
-			// send the changes of keychain info for mutation
-			actionCallback()
+			passwordClipboard.copy(password)
 		},
+		showVault: () => actionCallback(),
 		// send the unique KeychainId to update in Modal
 		modifyKeychain: () => actionCallback(keychainId),
 	}
@@ -63,7 +51,8 @@ export function Keychain({
 	return (
 		<>
 			<KeychainCard
-				{...{ logo, website }}
+				logo={logo}
+				website={website}
 				subText={`Last modified ${TimeAgo(new Date(timeAgo))}`}
 				onClick={handleAction.showVault}
 			/>

@@ -250,7 +250,7 @@ describe('GenerateUUID', () => {
 describe('GetLogoUrlAsync', () => {
 	it('should return the correct favicon URL for a given website', async () => {
 		const siteUrl = 'https://www.youtube.com/'
-		const expectedFaviconUrl = 'https://www.youtube.com/s/desktop/932eb6a8/img/favicon.ico'
+		const expectedFaviconUrl = 'https://www.youtube.com/s/desktop/70627e6a/img/favicon.ico'
 		const faviconUrl = await GetLogoUrlAsync(siteUrl)
 		expect(faviconUrl).toBe(expectedFaviconUrl)
 	})

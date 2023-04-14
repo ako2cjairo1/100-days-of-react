@@ -16,6 +16,20 @@ describe('useTimedCopyToClipboard', () => {
 		expect(result.current.statusMessage).toBe('Copied to clipboard!')
 	})
 
+	it('should show message from object param when clipboard is copied', () => {
+		const { result } = renderHook(() =>
+			useTimedCopyToClipboard({
+				text: 'text',
+				message: 'text is copied!',
+			})
+		)
+
+		result.current.copy()
+
+		expect(result.current.isCopied).toBe(true)
+		expect(result.current.statusMessage).toBe('text is copied!')
+	})
+
 	it('should clear text to clipboard and reset the state', () => {
 		const { result } = renderHook(() =>
 			useTimedCopyToClipboard({

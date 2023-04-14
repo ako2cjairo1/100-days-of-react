@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import '@/assets/modules/Vault.css'
 import {
-	Header,
 	VaultContainer,
 	Modal,
 	KeychainForm,
@@ -9,6 +8,7 @@ import {
 	Keychain,
 	AnimatedIcon,
 	SubmitButton,
+	Header,
 } from '@/components'
 import { useAuthContext } from '@/hooks'
 import { LocalStorage } from '@/services/Utils/password-manager.helper'
@@ -136,7 +136,7 @@ export function Vault() {
 				/>
 			</Menubar>
 
-			<VaultContainer>
+			<section className="form-container">
 				{vault.some(Boolean) ? (
 					<Header>
 						<Header.Logo />
@@ -165,7 +165,7 @@ export function Vault() {
 				)}
 
 				{currentView === vault_content ? (
-					<VaultContainer.Vault
+					<VaultContainer
 						vault={vault}
 						actionCallback={openKeychain}
 					/>
@@ -175,7 +175,7 @@ export function Vault() {
 						actionCallback={keychainFormCallback}
 					/>
 				)}
-			</VaultContainer>
+			</section>
 
 			<Modal
 				isOpen={showModalForm}

@@ -1,4 +1,4 @@
-import { IChildren, TFunction } from '@/types'
+import { TFunction } from '@/types'
 import { Link } from 'react-router-dom'
 
 interface IMenuItem {
@@ -7,7 +7,6 @@ interface IMenuItem {
 	name: string
 	iconName: string
 }
-
 /**
  * Item component
  * param {string} name - The name of the item
@@ -17,7 +16,12 @@ interface IMenuItem {
  *
  * returns {JSX.Element} A Link component with an optional icon
  */
-function Item({ name, navigateTo = '', onClick, iconName = 'fa fa-bars' }: Partial<IMenuItem>) {
+export function Item({
+	name,
+	navigateTo = '',
+	onClick,
+	iconName = 'fa fa-bars',
+}: Partial<IMenuItem>) {
 	return (
 		<Link
 			title={name}
@@ -34,15 +38,3 @@ function Item({ name, navigateTo = '', onClick, iconName = 'fa fa-bars' }: Parti
 		</Link>
 	)
 }
-
-/**
- * Toolbar component
- * param {IChildren} children - The children elements to be rendered inside the Toolbar
- *
- * returns {JSX.Element} A section element with the class "form-container vault-menu" containing the children elements
- */
-export function Menubar({ children }: IChildren) {
-	return <section className="form-container vault-menu">{children}</section>
-}
-
-Menubar.Item = Item

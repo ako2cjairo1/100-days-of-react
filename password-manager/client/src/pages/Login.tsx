@@ -10,7 +10,6 @@ import {
 	RunAfterSomeTime,
 } from '@/services/Utils/password-manager.helper'
 import {
-	Header,
 	LinkLabel,
 	Separator,
 	AuthProviderSection,
@@ -19,6 +18,7 @@ import {
 	FormGroup,
 	ValidationMessage,
 	AnimatedIcon,
+	Header,
 } from '@/components'
 
 export const Login = () => {

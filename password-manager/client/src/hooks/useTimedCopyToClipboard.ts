@@ -1,12 +1,13 @@
-import { useRef, useState } from 'react'
-import { CopyToClipboard, Log, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
+import { useRef } from 'react'
+import { useStateObj } from './useStateObj'
 import { TFunction } from '@/types'
+import { CopyToClipboard, Log, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
 
 const CLIPBOARD_TIMEOUT = 15
 interface IUseTimedCopyToClipboard {
-	text?: string
+	text: string
 	message: string
-	callbackFn: TFunction
+	copyCallbackFn: TFunction
 	expiration: number
 }
 /**
@@ -24,46 +25,53 @@ interface IUseTimedCopyToClipboard {
 export function useTimedCopyToClipboard({
 	text = '',
 	message = 'Copied to clipboard!',
-	callbackFn = () => null,
+	copyCallbackFn = () => null,
 	expiration = CLIPBOARD_TIMEOUT,
 }: Partial<IUseTimedCopyToClipboard>) {
-	const [isCopied, setIsCopied] = useState(false)
-	const [statusMessage, setStatusMessage] = useState(message)
+	const { objState: clipboard, mutate: mutateStatus } = useStateObj({
+		isCopied: false,
+		statusMessage: message,
+	})
+	const { isCopied, statusMessage } = clipboard
 	const timerRef = useRef<NodeJS.Timeout>()
 	const timeoutRef = useRef<NodeJS.Timeout>()
 
 	const clear = () => {
+		// reset and clear all clipboards
 		CopyToClipboard('')
-		setIsCopied(false)
-		setStatusMessage('')
+		mutateStatus({ isCopied: false, statusMessage: '' })
 		clearInterval(timerRef.current)
 		clearTimeout(timeoutRef.current)
 	}
 
 	const copy = (value?: string) => {
+		if (!isCopied) {
+			// copy the actual value to clipboard
+			CopyToClipboard(value ? value : text)
+			// update clipboard status
+			mutateStatus({ isCopied: true, statusMessage: message })
+			// start the countdown to expire clipboard
+			runCountDown()
+		}
+	}
+
+	const runCountDown = () => {
 		let countDown = expiration
-
-		// reset and clear all clipboards
-		clear()
-		// copy the actual value to clipboard
-		CopyToClipboard(value ? value : text)
-		setIsCopied(true)
-		setStatusMessage(message)
-
 		timerRef.current = RunAfterSomeTime(
 			() => {
 				countDown--
-				setStatusMessage(`${message} (will expire in ${countDown} seconds)`)
+				mutateStatus({ statusMessage: `${message} (will expire in ${countDown} seconds)` })
 			},
 			1,
 			'interval'
 		)
 
 		timeoutRef.current = RunAfterSomeTime(() => {
-			// clear contents of clipboard and execute callback function(s)
+			// clear contents of clipboard
 			clear()
 			Log('Clipboard cleared!')
-			callbackFn()
+			// execute callback function(s) from subscriber
+			copyCallbackFn()
 		}, expiration)
 	}
 

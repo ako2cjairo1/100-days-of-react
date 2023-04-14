@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import '@/assets/modules/NewKeychainForm.css'
+import '@/assets/modules/KeychainForm.css'
 import {
-	Header,
 	FormGroup,
 	PasswordStrength,
 	SubmitButton,
@@ -9,6 +8,7 @@ import {
 	InlineNotification,
 	KeychainCard,
 	LinkLabel,
+	Header,
 } from '.'
 import { useDebounceToggle, useInput, useStateObj, useTimedCopyToClipboard } from '@/hooks'
 import {
@@ -17,6 +17,7 @@ import {
 	GenerateUUID,
 	MergeRegExObj,
 	RunAfterSomeTime,
+	TimeAgo,
 } from '@/services/Utils/password-manager.helper'
 import { REGISTER_STATE, KEYCHAIN_CONST, RequestType } from '@/services/constants'
 import { TFunction, TKeychain, TStatus, TRequestType } from '@/types'
@@ -42,14 +43,8 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 	const [revealPassword, setRevealPassword] = useState(false)
 	const { objState: keychainStatus, mutate: updateKeychainStatus } = useStateObj<TStatus>(STATUS)
 
-	const usernameClipboard = useTimedCopyToClipboard({
-		text: username,
-		message: 'User Name copied!',
-	})
-	const passwordClipboard = useTimedCopyToClipboard({
-		text: password,
-		message: 'Password copied!',
-	})
+	const usernameClipboard = useTimedCopyToClipboard({})
+	const passwordClipboard = useTimedCopyToClipboard({})
 
 	// conditional rendering
 	const checkIf = {
@@ -64,8 +59,8 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 			!checkIf.isValidWebsite ||
 			!checkIf.isValidUsernameLength ||
 			!checkIf.isValidPasswordLength,
-		canCopyUsername: !usernameClipboard.isCopied && username.length > 0,
-		canCopyPassword: !passwordClipboard.isCopied && password.length > 0,
+		canCopyUsername: username.length > 0,
+		canCopyPassword: password.length > 0,
 		canUpdatePassword: !isSubmitted && !keychainStatus.success,
 		debounceUsernameClipboard:
 			useDebounceToggle(usernameClipboard.isCopied, 2) &&
@@ -110,13 +105,13 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 		copyPassword: () => {
 			if (checkIf.canCopyPassword) {
 				usernameClipboard.clear()
-				passwordClipboard.copy()
+				passwordClipboard.copy(password)
 			}
 		},
 		copyUserName: () => {
 			if (checkIf.canCopyUsername) {
 				passwordClipboard.clear()
-				usernameClipboard.copy()
+				usernameClipboard.copy(username)
 			}
 		},
 		revealPassword: () => {
@@ -164,7 +159,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 						const successMessage = checkIf.isEditing
 							? 'The changes have been saved'
-							: 'Password Saved!'
+							: 'Password have been added!'
 						// show success status before closing the modal
 						updateKeychainStatus({ success: true, message: successMessage })
 
@@ -199,6 +194,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					<KeychainCard
 						logo={keychainInfo?.logo}
 						website={keychainInfo?.website}
+						subText={`Last modified ${TimeAgo(new Date(keychainInfo?.timeAgo ?? ''))}`}
 					>
 						<LinkLabel
 							preText=""

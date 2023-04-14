@@ -9,7 +9,6 @@ import {
 } from '@/services/Utils/password-manager.helper'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import {
-	Header,
 	LinkLabel,
 	Separator,
 	AuthProviderSection,
@@ -19,6 +18,7 @@ import {
 	ValidationMessage,
 	PasswordStrength,
 	AnimatedIcon,
+	Header,
 } from '@/components'
 
 // constants
