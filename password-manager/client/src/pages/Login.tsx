@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
 import { TInputLogin, TStatus } from '@/types/global.type'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
-import { useInput, useAuthContext } from '@/hooks'
+import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import {
 	CreateError,
 	ExtractValFromRegEx,
@@ -21,23 +21,25 @@ import {
 	Header,
 } from '@/components'
 
-export const Login = () => {
-	const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
-	const { minLength } = PASSWORD_REGEX
-	// constants
+// constants
+const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
+const { minLength } = PASSWORD_REGEX
+
+export function Login() {
 	// custom form input hook
 	const { inputAttribute, inputAction } = useInput<TInputLogin>(LOGIN_STATE.Credential)
-	// destructure
+	// destructure useInput hook
 	const { inputStates, isFocus, onChange, onFocus, onBlur, isSubmitted } = inputAttribute
 	const { email, password, isRemember } = inputStates
-	const [loginStatus, setLoginStatus] = useState<TStatus>(LOGIN_STATE.Status)
-	// destructure states
-	// const { success } = loginStatus
+
+	const [isTypingEmail, setIsTypingEmail] = useState(true)
+	const { objState: loginStatus, mutate: updateLoginStatus } = useStateObj<TStatus>(
+		LOGIN_STATE.Status
+	)
 	const emailInputRef = useRef<HTMLInputElement>(null)
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const savedEmailRef = useRef(true)
-	const [isTypingEmail, setIsTypingEmail] = useState(true)
 	const { mutateAuth: updateAuthInfo } = useAuthContext()
 
 	useEffect(() => {
@@ -52,23 +54,19 @@ export const Login = () => {
 	}, [inputStates, inputAction])
 
 	useEffect(() => {
-		if (isTypingEmail) {
-			emailInputRef.current?.focus()
-		} else if (loginStatus.success) {
-			securedVaultLinkRef.current?.focus()
-		} else {
-			passwordInputRef.current?.focus()
-		}
-	}, [loginStatus.success, isTypingEmail, isSubmitted])
+		if (isTypingEmail) return emailInputRef.current?.focus()
+		if (loginStatus.success) return securedVaultLinkRef.current?.focus()
+		passwordInputRef.current?.focus()
+	}, [isTypingEmail, loginStatus.success, isSubmitted])
 
 	useEffect(() => {
-		setLoginStatus(prev => ({ ...prev, message: '' }))
-	}, [inputStates])
+		updateLoginStatus({ message: '' })
+	}, [inputStates, updateLoginStatus])
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
+	const handleSubmit = (formEvent: React.FormEvent) => {
+		formEvent.preventDefault()
 
-		setLoginStatus(prev => ({ ...prev, message: '' }))
+		updateLoginStatus({ message: '' })
 		if (isTypingEmail) {
 			setIsTypingEmail(false)
 			if (isRemember) LocalStorage.write('password_manager_email', email)
@@ -78,7 +76,7 @@ export const Login = () => {
 		}
 
 		if (!isSubmitted) {
-			inputAction.submit(true)
+			inputAction.isSubmit(true)
 			RunAfterSomeTime(() => {
 				try {
 					// TODO: fetch access token to custom authentication backend api
@@ -88,13 +86,13 @@ export const Login = () => {
 					// )
 
 					updateAuthInfo({ ...inputStates, accessToken: 'fake token' })
-					setLoginStatus({ success: true, message: '' })
+					updateLoginStatus({ success: true, message: '' })
 					inputAction.resetInput()
 				} catch (error) {
-					setLoginStatus({ success: false, message: CreateError(error).message })
+					updateLoginStatus({ success: false, message: CreateError(error).message })
 					return false
 				} finally {
-					inputAction.submit(false)
+					inputAction.isSubmit(false)
 				}
 			}, 3)
 		}
@@ -266,10 +264,7 @@ export const Login = () => {
 						<footer>
 							<AuthProviderSection
 								callbackFn={() =>
-									setLoginStatus(prev => ({
-										...prev,
-										message: 'TODO: Implement external authentication.',
-									}))
+									updateLoginStatus({ message: 'TODO: Implement external authentication.' })
 								}
 							/>
 						</footer>

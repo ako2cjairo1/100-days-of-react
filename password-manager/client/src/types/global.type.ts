@@ -1,4 +1,4 @@
-import { RequestType, PasswordStatus, VaultContent } from '@/services/constants'
+import { RequestType, PasswordStatus, FormContent } from '@/services/constants'
 import { TConvertToStringUnion } from '@/types'
 
 export type TCredentials = {
@@ -68,4 +68,4 @@ export type TFunction<T = [], RT = void> = T extends unknown[]
 
 export type TRequestType = TConvertToStringUnion<typeof RequestType>
 
-export type TVaultContent = TConvertToStringUnion<typeof VaultContent>
+export type TVaultContent = TConvertToStringUnion<typeof FormContent>

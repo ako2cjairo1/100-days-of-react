@@ -10,10 +10,11 @@ export const PasswordStatus = {
 export const RequestType = {
 	add: 'add',
 	modify: 'modify',
+	view: 'view',
 	remove: 'remove',
 } as const
 
-export const VaultContent = {
-	vault_content: 'vault_content',
-	keychain_content: 'keychain_content',
+export const FormContent = {
+	vault_component: 'vault_component',
+	keychain_component: 'keychain_component',
 } as const

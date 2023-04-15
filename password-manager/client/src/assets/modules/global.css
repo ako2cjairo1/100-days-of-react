@@ -369,4 +369,7 @@ input {
 	display: flex;
 	place-items: center;
 	margin: 20px 0;
+	/* position: absolute;
+	top: 30%;
+	left: 30%; */
 }

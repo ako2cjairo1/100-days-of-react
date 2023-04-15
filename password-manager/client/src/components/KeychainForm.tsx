@@ -148,13 +148,13 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 			if (!isSubmitted) {
 				// set to submit and reset status
-				inputAction.submit(true)
+				inputAction.isSubmit(true)
 				updateKeychainStatus(STATUS)
 
 				try {
 					// TODO: implement in server component, simulate api post request to update/add the keychain info
 					RunAfterSomeTime(() => {
-						inputAction.submit(false)
+						inputAction.isSubmit(false)
 						const updateResult = updateCallback(inputStates, checkIf.isEditing ? modify : add)
 
 						if (!updateResult.success) {

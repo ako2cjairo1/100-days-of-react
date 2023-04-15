@@ -10,25 +10,26 @@ import {
 	SubmitButton,
 	Header,
 } from '@/components'
-import { useAuthContext } from '@/hooks'
+import { useAuthContext, useStateObj } from '@/hooks'
 import { LocalStorage } from '@/services/Utils/password-manager.helper'
 import { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
-import { RequestType, KEYCHAIN_CONST, VaultContent } from '@/services/constants'
+import { RequestType, KEYCHAIN_CONST, FormContent } from '@/services/constants'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
-const { add, modify } = RequestType
-const { vault_content, keychain_content } = VaultContent
+const { add, modify, view } = RequestType
+const { vault_component, keychain_component } = FormContent
 /**
  * Renders a Keychain component
  * returns A div element with the class "vault-container" containing a KeychainContainer, a Toolbar, and two Modal components
  */
 export function Vault() {
-	const [showModalForm, setShowModalForm] = useState(false)
-	const [currentView, setView] = useState<TVaultContent>(vault_content)
-	const [keychain, setKeychain] = useState<TKeychain>(KEYCHAIN)
-	const [clipboardStatus, setClipboardStatus] = useState<TStatus>(STATUS)
-	const { mutateAuth } = useAuthContext()
+	const { objState: keychain, mutate: updateKeychain } = useStateObj<TKeychain>(KEYCHAIN)
+	const { objState: clipboardStatus, mutate: updateClipboardStatus } = useStateObj<TStatus>(STATUS)
 	const [vault, setVault] = useState<TKeychain[]>([])
+
+	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
+	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
+	const { mutateAuth } = useAuthContext()
 
 	useEffect(() => {
 		// get password vault data from local storage
@@ -77,27 +78,30 @@ export function Vault() {
 	const openKeychain = (keychainId?: string, action?: TRequestType) => {
 		const info = vault.find(info => info.keychainId === keychainId)
 
+		// throw an error message if keychainId is not found
 		if (!info) {
-			return setClipboardStatus({
+			return updateClipboardStatus({
 				success: false,
 				message: 'Keychain information not found! Try again after a while.',
 			})
 		}
 
-		setKeychain(info)
-		if (action === modify) {
-			// submit keychain info to Modal for update
-			return keychainModal.open()
+		// open the keychain info
+		if (!action || action === view) {
+			updateKeychain(info)
+			return setFormContent(keychain_component)
 		}
 
-		// or else show the keychain info instead
-		setView(keychain_content)
+		// submit keychain info to Modal for update
+		if (action === modify) {
+			return keychainModal.open(info)
+		}
 	}
 
 	const keychainFormCallback = (keychainId?: string) => {
 		// hide keychain info and reset clipboard status
-		setView(vault_content)
-		setClipboardStatus(STATUS)
+		setFormContent(vault_component)
+		updateClipboardStatus(STATUS)
 
 		// subsequently open a modal form if user choose to "Update"
 		if (keychainId) openKeychain(keychainId, modify)
@@ -105,16 +109,21 @@ export function Vault() {
 
 	const keychainModal = useMemo(() => {
 		return {
-			open: () => setShowModalForm(true),
+			open: (info?: TKeychain) => {
+				// open Modal form with keychain info, blank if otherwise
+				if (info) updateKeychain(info)
+				setIsOpenModalForm(true)
+			},
 			close: () => {
-				setShowModalForm(false)
-				// set the keychain to initial state
-				setKeychain(KEYCHAIN)
-				setView(vault_content)
+				setIsOpenModalForm(false)
+				// set the keychain state to initial values
+				updateKeychain(KEYCHAIN)
+				// then show Vault (keychain list)
+				setFormContent(vault_component)
 			},
 			toggle: (toggle: boolean) => (toggle ? keychainModal.open() : keychainModal.close()),
 		}
-	}, [])
+	}, [updateKeychain])
 
 	return (
 		<div className="vault-container">
@@ -130,7 +139,7 @@ export function Vault() {
 					name="add item"
 					iconName="fa fa-plus"
 					onClick={() => {
-						setKeychain(KEYCHAIN)
+						updateKeychain(KEYCHAIN)
 						keychainModal.open()
 					}}
 				/>
@@ -164,7 +173,7 @@ export function Vault() {
 					</Header>
 				)}
 
-				{currentView === vault_content ? (
+				{formContent === vault_component ? (
 					<VaultContainer
 						vault={vault}
 						actionCallback={openKeychain}
@@ -177,8 +186,9 @@ export function Vault() {
 				)}
 			</section>
 
+			{/* TODO: create custom hook for modal */}
 			<Modal
-				isOpen={showModalForm}
+				isOpen={isOpenModalForm}
 				onClose={keychainModal.close}
 				hideCloseIcon={true}
 				clickBackdropToClose={false}

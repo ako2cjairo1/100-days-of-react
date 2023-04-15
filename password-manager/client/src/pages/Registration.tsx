@@ -94,7 +94,7 @@ export const Registration = () => {
 
 		if (!isSubmitted) {
 			mutateRegistrationStatus({ message: '' })
-			inputAction.submit(true)
+			inputAction.isSubmit(true)
 
 			RunAfterSomeTime(() => {
 				if (!checkIf.isValidPassword) {
@@ -109,7 +109,7 @@ export const Registration = () => {
 					})
 				}
 
-				inputAction.submit(false)
+				inputAction.isSubmit(false)
 			}, 3)
 		}
 	}
