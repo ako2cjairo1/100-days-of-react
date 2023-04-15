@@ -2,7 +2,7 @@ import { render } from '@/services/Utils/test.util'
 import { Header } from '@/components/Header'
 
 describe('Header', () => {
-	it('should render a header element with given "title" and "subtitle"', () => {
+	it('should render a Header.Title with given "title" and "subtitle"', () => {
 		const props = { title: 'Example Title', subTitle: 'Example Subtitle' }
 		const { getByText } = render(
 			<Header>
@@ -16,7 +16,7 @@ describe('Header', () => {
 		expect(getByText(props.subTitle)).toBeInTheDocument()
 	})
 
-	it('should render a animated Logo component"', () => {
+	it('should render a Header.Logo component"', () => {
 		const { container } = render(
 			<Header>
 				<Header.Logo />
@@ -36,7 +36,7 @@ describe('Header', () => {
 		expect(getByText(childElement)).toBeInTheDocument()
 	})
 
-	it('should render success icon when status.success is true and have a message', () => {
+	it('should render Header.Status success icon when status.success is true and have a message', () => {
 		const { container } = render(
 			<Header>
 				<Header.Status status={{ success: true, message: 'success message' }} />
@@ -45,7 +45,7 @@ describe('Header', () => {
 		expect(container.querySelector('.fa.fa-check-circle')).toBeInTheDocument()
 	})
 
-	it('should not render success icon when either success and message are not truthy', () => {
+	it('should not render Header.Status when either success and message are not truthy', () => {
 		const { container } = render(
 			<Header>
 				<Header.Status status={{ success: true, message: '' }} />
@@ -54,7 +54,7 @@ describe('Header', () => {
 		expect(container.querySelector('.fa.fa-check-circle')).not.toBeInTheDocument()
 	})
 
-	it('should render error icon and message when "success" is false and "errMsg" is defined', () => {
+	it('should render Header.Status error icon and message when "success" is false and "errMsg" is defined', () => {
 		const props = { success: false, message: 'Error message' }
 		const { container, getByText } = render(
 			<Header>

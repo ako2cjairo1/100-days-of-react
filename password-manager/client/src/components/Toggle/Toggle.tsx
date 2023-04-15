@@ -1,12 +1,6 @@
-import { IChildren, IInputElement } from '@/types'
 import '@/assets/modules/Toggle.css'
-
-interface IDescription extends IChildren {
-	checked?: boolean
-}
-function Description({ children, checked }: IDescription) {
-	return <span className={`description ${checked ? 'description-active' : ''}`}>{children}</span>
-}
+import { Description } from '@/components/Toggle'
+import { IChildren, IInputElement } from '@/types'
 
 interface IToggle extends IChildren, IInputElement {}
 export function Toggle({ children, ...rest }: IToggle) {
@@ -24,7 +18,12 @@ export function Toggle({ children, ...rest }: IToggle) {
 				<span className="button" />
 			</label>
 
-			<div className="description-container small">{children}</div>
+			<div
+				data-testid="description-container"
+				className="description-container small"
+			>
+				{children}
+			</div>
 		</div>
 	)
 }

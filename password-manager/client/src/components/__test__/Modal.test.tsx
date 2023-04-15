@@ -14,22 +14,22 @@ afterAll(() => {
 	}
 })
 describe('Modal component', () => {
-	it('renders the modal content when isOpen is true', () => {
+	it('renders its children when isOpen is true', () => {
 		const { getByText } = render(
 			<Modal isOpen={true}>
-				<div>Modal content</div>
+				<div>Modal Content</div>
 			</Modal>
 		)
-		expect(getByText('Modal content')).toBeInTheDocument()
+		expect(getByText('Modal Content')).toBeInTheDocument()
 	})
 
-	it('does not render the modal content when isOpen is false', () => {
-		const { queryByText } = render(
+	it('does not render anything when isOpen is false', () => {
+		const { container } = render(
 			<Modal isOpen={false}>
-				<div>Modal content</div>
+				<div>Modal Content</div>
 			</Modal>
 		)
-		expect(queryByText('Modal content')).not.toBeInTheDocument()
+		expect(container).toBeEmptyDOMElement()
 	})
 
 	it('calls the onClose callback when the close button is clicked', () => {
@@ -44,5 +44,35 @@ describe('Modal component', () => {
 		)
 		fireEvent.click(getByTestId('modal-close'))
 		expect(onClose).toHaveBeenCalled()
+	})
+
+	it('calls onClose when the backdrop is clicked and clickBackdropToClose is true', () => {
+		const onClose = vi.fn()
+		const { getByTestId } = render(
+			<Modal
+				isOpen={true}
+				onClose={onClose}
+				clickBackdropToClose={true}
+			>
+				<div>Modal Content</div>
+			</Modal>
+		)
+		fireEvent.click(getByTestId('modal-overlay'))
+		expect(onClose).toHaveBeenCalled()
+	})
+
+	it('does not call onClose when the backdrop is clicked and clickBackdropToClose is false', () => {
+		const onClose = vi.fn()
+		const { getByTestId } = render(
+			<Modal
+				isOpen={true}
+				onClose={onClose}
+				clickBackdropToClose={false}
+			>
+				<div>Modal Content</div>
+			</Modal>
+		)
+		fireEvent.click(getByTestId('modal-overlay'))
+		expect(onClose).not.toHaveBeenCalled()
 	})
 })

@@ -1,24 +1,25 @@
 import '@/assets/modules/PasswordStrength.css'
-import { FCProps, TEvaluatedPassword, IPasswordStrength } from '@/types'
+import { TEvaluatedPassword } from '@/types'
 import { PasswordStatus } from '@/services/constants'
 import { useEffect, useState } from 'react'
+
+const { weak, mediocre, secure, strong, unbreakable, none } = PasswordStatus
 /**
  * Evaluates the strength of a password based on its length and whether it meets certain requirements.
  *
- * @param password - The password to evaluate.
- * @param regex - An optional regular expression to test if the password meets certain requirements.
+ * param password - The password to evaluate.
+ * param regex - An optional regular expression to test if the password meets certain requirements.
  * 				If not provided, a default regular expression is used.
- * @returns An object of type RTPasswordEval with two properties:
+ * returns An object of type RTPasswordEval with two properties:
  * 		status (a string representing the strength of the password) and
  * 		score (a number representing the score of the password).
  */
-export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvaluatedPassword => {
-	if (!password) return { status: 'weak', score: 0 }
+export function evaluatePassword({ password, regex }: IPasswordStrength): TEvaluatedPassword {
+	if (!password) return { status: weak, score: 0 }
 	if (!regex) {
 		regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/
 	}
 
-	const { weak, mediocre, secure, strong, unbreakable } = PasswordStatus
 	const length = password.length
 	let score = 0
 
@@ -30,6 +31,7 @@ export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvalu
 	else score = 2
 
 	return {
+		score,
 		status:
 			score === 1
 				? weak
@@ -40,22 +42,25 @@ export const evaluatePassword = ({ password, regex }: IPasswordStrength): TEvalu
 				: score === 4
 				? strong
 				: unbreakable,
-		score,
 	}
 }
 
+export interface IPasswordStrength {
+	password?: string
+	regex?: RegExp
+}
 /**
  * Renders a password strength meter based on the given password and regex.
  *
- * @param {string} password - The password being evaluated.
- * @param {RegExp} regex - The regular expression used to evaluate the password.
+ * param {string} password - The password being evaluated.
+ * param {RegExp} regex - The regular expression used to evaluate the password.
  *
- * @returns {FCProps} A Custom Password Strength indicator component
+ * returns {FCProps} A Custom Password Strength indicator component
  */
-export const PasswordStrength: FCProps<Partial<IPasswordStrength>> = ({ password, regex }) => {
+export function PasswordStrength({ password, regex }: Partial<IPasswordStrength>) {
 	const { status, score } = evaluatePassword({ password, regex })
 	const [toggleAnimation, setToggleAnimation] = useState(false)
-	const passwordStatuses = Object.values(PasswordStatus).filter(status => status !== 'strength')
+	const passwordStatuses = Object.values(PasswordStatus).filter(status => status !== none)
 	const len = passwordStatuses.length
 
 	useEffect(() => {
@@ -78,7 +83,7 @@ export const PasswordStrength: FCProps<Partial<IPasswordStrength>> = ({ password
 				let customAnimation = ''
 
 				if (password && statusIndex <= score) customAnimation = `scale-up ${status}`
-				else customAnimation = `scale-down ${PasswordStatus.none}`
+				else customAnimation = `scale-down ${none}`
 
 				// determine opacity of bullet based on its index
 				const opacity = statusIndex === len - 1 ? 1 : Math.round(statusIndex * (1 / len) * 10) / 10

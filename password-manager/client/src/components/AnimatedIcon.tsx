@@ -12,7 +12,7 @@ type TAnimation =
 	| 'fade-in'
 	| 'spins'
 	| 'descend'
-interface IAnimatedIcon extends IChildren {
+export interface IAnimatedIcon extends IChildren {
 	className?: string
 	iconName?: string
 	title?: string

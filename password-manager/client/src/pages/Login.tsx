@@ -265,7 +265,7 @@ export const Login = () => {
 
 						<footer>
 							<AuthProviderSection
-								cb={() =>
+								callbackFn={() =>
 									setLoginStatus(prev => ({
 										...prev,
 										message: 'TODO: Implement external authentication.',

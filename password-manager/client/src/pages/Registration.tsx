@@ -305,7 +305,7 @@ export const Registration = () => {
 
 						<footer>
 							<AuthProviderSection
-								cb={() =>
+								callbackFn={() =>
 									mutateRegistrationStatus({
 										message: 'TODO: Implement external authentication.',
 									})

@@ -1,6 +1,6 @@
-import { KeychainCard } from '@/components'
 import { fireEvent, render } from '@/services/Utils/test.util'
 import { MemoryRouter } from 'react-router-dom'
+import { KeychainCard, Logo } from '@/components/KeychainCard'
 
 describe('KeychainCard', () => {
 	it('renders the website domain name and subText', () => {
@@ -28,5 +28,22 @@ describe('KeychainCard', () => {
 		)
 		fireEvent.click(getByTestId('keychain-card-link'))
 		expect(onClick).toHaveBeenCalled()
+	})
+})
+
+describe('Logo', () => {
+	it('renders an img element with the provided logo', () => {
+		const { getByAltText } = render(
+			<Logo
+				logo="logo.png"
+				website="example.com"
+			/>
+		)
+		expect(getByAltText('E')).toHaveAttribute('src', 'logo.png')
+	})
+
+	it('renders an AnimatedIcon with the first letter of the website domain if logo is not provided', () => {
+		const { getByText } = render(<Logo website="example.com" />)
+		expect(getByText('E')).toBeInTheDocument()
 	})
 })

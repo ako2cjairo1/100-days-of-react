@@ -1,40 +1,30 @@
-import { FormGroup } from '@/components'
 import { fireEvent, render } from '@/services/Utils/test.util'
+import { FormGroup, Input, Label } from '@/components/FormGroup'
 
-describe('FormGroup components', () => {
-	it('renders a label with the given properties', () => {
-		const props = {
-			labelFor: 'input-id',
-			label: 'Label text',
-			subLabel: 'Sublabel text',
-			isOptional: true,
-			isFulfilled: false,
-		}
-		const { getByText } = render(
+describe('FormGroup', () => {
+	it('renders the form with children', () => {
+		const { getByText, getByTestId } = render(
 			<FormGroup onSubmit={() => {}}>
-				<FormGroup.Label props={props} />
-			</FormGroup>
-		)
-		expect(getByText('Label text Sublabel text')).toBeInTheDocument()
-	})
-
-	it('renders an input with the given properties', () => {
-		const { getByDisplayValue } = render(
-			<FormGroup onSubmit={() => {}}>
-				<FormGroup.Input
-					id="input-id"
-					type="text"
-					value="Input value"
+				<Label
+					data-testid="LabelId"
+					props={{ label: 'Test Label' }}
+				/>
+				<Input
+					data-testid="InputId"
+					id="testid"
 				/>
 			</FormGroup>
 		)
-		expect(getByDisplayValue('Input value')).toBeInTheDocument()
+		expect(getByText('Test Label')).toBeInTheDocument()
+		expect(getByTestId('InputId')).toBeInTheDocument()
 	})
 
-	it('triggers the onSubmit callback when the form is submitted', () => {
-		const onSubmit = vi.fn()
+	it('calls the onSubmit function when the form is submitted', () => {
+		const mockOnSubmit = vi.fn()
 		const { getByTestId } = render(
-			<FormGroup onSubmit={onSubmit}>
+			<FormGroup onSubmit={mockOnSubmit}>
+				<Label props={{ label: 'Test Label' }}>Test Label</Label>
+				<Input id="testid" />
 				<button
 					data-testid="submit-button"
 					type="submit"
@@ -44,6 +34,6 @@ describe('FormGroup components', () => {
 			</FormGroup>
 		)
 		fireEvent.click(getByTestId('submit-button'))
-		expect(onSubmit).toHaveBeenCalled()
+		expect(mockOnSubmit).toHaveBeenCalled()
 	})
 })

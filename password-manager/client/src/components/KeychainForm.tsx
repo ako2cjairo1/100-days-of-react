@@ -6,9 +6,9 @@ import {
 	SubmitButton,
 	AnimatedIcon,
 	InlineNotification,
-	KeychainCard,
 	LinkLabel,
 	Header,
+	Separator,
 } from '.'
 import { useDebounceToggle, useInput, useStateObj, useTimedCopyToClipboard } from '@/hooks'
 import {
@@ -21,6 +21,7 @@ import {
 } from '@/services/Utils/password-manager.helper'
 import { REGISTER_STATE, KEYCHAIN_CONST, RequestType } from '@/services/constants'
 import { TFunction, TKeychain, TStatus, TRequestType } from '@/types'
+import { KeychainCard } from './KeychainCard'
 
 const { PASSWORD_REGEX } = REGISTER_STATE
 const { STATUS, KEYCHAIN, WEBSITE_REGEX } = KEYCHAIN_CONST
@@ -46,30 +47,33 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 	const usernameClipboard = useTimedCopyToClipboard({})
 	const passwordClipboard = useTimedCopyToClipboard({})
 
+	const isEmpty = <T,>(value: T) =>
+		typeof value === 'undefined' ||
+		(typeof value === 'object' && Object.keys(value ?? {}).length === 0) ||
+		(typeof value === 'string' && value.length <= 0)
+
 	// conditional rendering
 	const checkIf = {
-		isValidUsernameLength: username.trim().length > 2 ? true : false,
-		isValidPasswordLength: password.length > 2 ? true : false,
 		isEditing: Object.values(keychainInfo || {}).some(Boolean),
 		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
-		isValidWebsite: () => WEBSITE_REGEX.test(website),
+		isValidWebsite: WEBSITE_REGEX.test(website),
 		canDisableSubmit: () =>
 			isSubmitted ||
 			keychainStatus.success ||
 			!checkIf.isValidWebsite ||
-			!checkIf.isValidUsernameLength ||
-			!checkIf.isValidPasswordLength,
-		canCopyUsername: username.length > 0,
-		canCopyPassword: password.length > 0,
-		canUpdatePassword: !isSubmitted && !keychainStatus.success,
+			isEmpty(username) ||
+			isEmpty(password),
+		canCopyUsername: !usernameClipboard.isCopied && !isEmpty(username),
+		canCopyPassword: !passwordClipboard.isCopied && !isEmpty(password),
+		canGeneratePassword: !isSubmitted && !keychainStatus.success,
 		debounceUsernameClipboard:
 			useDebounceToggle(usernameClipboard.isCopied, 2) &&
 			usernameClipboard.isCopied &&
-			username.length > 0,
+			!isEmpty(username),
 		debouncePasswordClipboard:
 			useDebounceToggle(passwordClipboard.isCopied, 2) &&
 			passwordClipboard.isCopied &&
-			password.length > 0,
+			!isEmpty(password),
 	}
 
 	useEffect(() => {
@@ -120,7 +124,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 			}
 		},
 		deletePassword: () => {
-			if (checkIf.canUpdatePassword) {
+			if (checkIf.canGeneratePassword) {
 				// TODO: implement in server component, simulate api post request to update/add the keychain info
 				const removeResult = updateCallback(inputStates, remove)
 				if (!removeResult.success) {
@@ -166,7 +170,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						// after sometime, reset status and close modal
 						RunAfterSomeTime(() => {
 							updateKeychainStatus(STATUS)
-							showForm(false)
+							showForm(true)
 							// invoke resetInput
 							inputAction.resetInput()
 						}, 3)
@@ -190,7 +194,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					}
 				/>
 				<Header.Status status={keychainStatus} />
-				{checkIf.isEditing && (
+			</Header>
+			{checkIf.isEditing && (
+				<>
 					<KeychainCard
 						logo={keychainInfo?.logo}
 						website={keychainInfo?.website}
@@ -199,7 +205,6 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						<LinkLabel
 							preText=""
 							routeTo="/vault"
-							className="menu fdc"
 							onClick={handleAction.deletePassword}
 						>
 							<AnimatedIcon
@@ -209,8 +214,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							/>
 						</LinkLabel>
 					</KeychainCard>
-				)}
-			</Header>
+					<Separator />
+				</>
+			)}
 
 			<FormGroup onSubmit={handleAction.submitForm}>
 				{!checkIf.isEditing && (
@@ -219,7 +225,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							props={{
 								label: 'Website',
 								labelFor: 'website',
-								isFulfilled: checkIf.isValidWebsite(),
+								isFulfilled: checkIf.isValidWebsite,
 							}}
 						/>
 						<FormGroup.Input
@@ -234,7 +240,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							className={`${
 								isSubmitted
 									? 'disabled'
-									: checkIf.isValidWebsite()
+									: checkIf.isValidWebsite
 									? ''
 									: !isFocus.website && 'invalid'
 							}`}
@@ -248,7 +254,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						props={{
 							label: 'User Name',
 							labelFor: 'username',
-							isFulfilled: checkIf.isValidUsernameLength,
+							isFulfilled: !isEmpty(username),
 						}}
 					/>
 					<FormGroup.Input
@@ -259,23 +265,21 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						disabled={isSubmitted}
 						required
 						className={`${
-							isSubmitted
-								? 'disabled'
-								: checkIf.isValidUsernameLength
-								? ''
-								: !isFocus.username && 'invalid'
+							isSubmitted ? 'disabled' : !isEmpty(username) ? '' : !isFocus.username && 'invalid'
 						}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 					<div className="action-container">
-						<AnimatedIcon
-							title="Copy"
-							className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
-							iconName={`fa ${
-								checkIf.debounceUsernameClipboard ? 'fa-check scale-up' : 'fa-clone'
-							}`}
-							onClick={handleAction.copyUserName}
-						/>
+						{username.length > 0 && (
+							<AnimatedIcon
+								title="Copy"
+								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
+								iconName={`fa ${
+									checkIf.debounceUsernameClipboard ? 'fa-check active scale-up' : 'fa-clone'
+								}`}
+								onClick={handleAction.copyUserName}
+							/>
+						)}
 					</div>
 				</div>
 
@@ -284,7 +288,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						props={{
 							label: 'Password',
 							labelFor: 'password',
-							isFulfilled: checkIf.isValidPasswordLength,
+							isFulfilled: !isEmpty(password),
 						}}
 					>
 						<PasswordStrength
@@ -292,55 +296,53 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							regex={MergeRegExObj(PASSWORD_REGEX)}
 						/>
 					</FormGroup.Label>
-					<div>
-						<FormGroup.Input
-							id="password"
-							style={{ paddingRight: '106px' }}
-							type={revealPassword ? 'text' : 'password'}
-							value={password}
-							disabled={isSubmitted}
-							required
-							className={`${
-								isSubmitted
-									? 'disabled'
-									: checkIf.isValidPasswordLength
-									? ''
-									: !isFocus.password && 'invalid'
-							}`}
-							{...{ onChange, onFocus, onBlur }}
+					<FormGroup.Input
+						id="password"
+						style={{ paddingRight: '106px' }}
+						type={revealPassword ? 'text' : 'password'}
+						value={password}
+						disabled={isSubmitted}
+						required
+						className={`${
+							isSubmitted ? 'disabled' : !isEmpty(password) ? '' : !isFocus.password && 'invalid'
+						}`}
+						{...{ onChange, onFocus, onBlur }}
+					/>
+
+					<div className="action-container">
+						{password.length > 0 && (
+							<>
+								<AnimatedIcon
+									title={revealPassword ? 'hide' : 'reveal'}
+									className={`action-button small ${password.length > 0 && 'active'}`}
+									iconName={`fa fa-eye${revealPassword ? '-slash scale-up' : ' scale-down'}`}
+									onClick={handleAction.revealPassword}
+								/>
+								<AnimatedIcon
+									title="Copy"
+									className={`action-button small ${
+										checkIf.canCopyPassword && 'active scale-down'
+									}`}
+									iconName={`fa ${
+										checkIf.debouncePasswordClipboard ? 'fa-check active scale-up' : 'fa-clone'
+									}`}
+									onClick={handleAction.copyPassword}
+								/>
+							</>
+						)}
+						<AnimatedIcon
+							title="generate password"
+							className={`action-button small ${checkIf.canGeneratePassword && 'active'}`}
+							iconName="fa fa-refresh"
+							animation="fa-spin"
+							onClick={handleAction.generatePassword}
 						/>
-
-						<div className="action-container">
-							<AnimatedIcon
-								title={revealPassword ? 'hide' : 'reveal'}
-								className={`action-button small ${password && 'active'}`}
-								iconName={`fa fa-eye${revealPassword ? '-slash scale-up' : ' scale-down'}`}
-								onClick={handleAction.revealPassword}
-							/>
-							<AnimatedIcon
-								title="generate password"
-								className={`action-button small ${checkIf.canUpdatePassword && 'active'}`}
-								iconName="fa fa-refresh"
-								animation="fa-spin"
-								onClick={handleAction.generatePassword}
-							/>
-							<AnimatedIcon
-								title="Copy"
-								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
-								iconName={`fa ${
-									checkIf.debouncePasswordClipboard ? 'fa-check scale-up' : 'fa-clone'
-								}`}
-								onClick={handleAction.copyPassword}
-							/>
-						</div>
-
-						<p className="center small descend">
-							Adding the password here saves it only to your registered account. Make sure the
-							password you save here matches your password for the website.
-						</p>
+					</div>
+					<div>
 						{checkIf.isClipboardTriggered && (
 							<InlineNotification
 								className="lit-info"
+								offsetYPos="98%"
 								iconName="fa-solid fa-triangle-exclamation"
 							>
 								{usernameClipboard.isCopied
@@ -349,6 +351,13 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							</InlineNotification>
 						)}
 					</div>
+				</div>
+
+				<div>
+					<p className="center small descend">
+						Adding the password here saves it only to your registered account. Make sure the
+						password you save here matches your password for the website.
+					</p>
 				</div>
 
 				<div className="center">

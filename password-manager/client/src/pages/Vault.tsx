@@ -180,7 +180,7 @@ export function Vault() {
 			<Modal
 				isOpen={showModalForm}
 				onClose={keychainModal.close}
-				hideCloseButton={true}
+				hideCloseIcon={true}
 				clickBackdropToClose={false}
 			>
 				<KeychainForm

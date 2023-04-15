@@ -1,16 +1,17 @@
-import { FCProps, IValidationMessage } from '@/types'
+import { TValidation } from '@/types'
+export interface IValidationMessage<T = TValidation> {
+	isVisible: boolean
+	title?: string
+	validations: T[]
+}
 /**
  * This function returns a validation message component that displays a title and a list of validation messages.
- * @param {boolean} isVisible - Determines if the validation message is visible or not.
- * @param {string} title - The title of the validation message.
- * @param {Array<TValidation>} validations - An array of validation objects containing an isValid property and a message property.
- * @returns {JSX.Element} A React component that displays the title and list of validation messages.
+ * param {boolean} isVisible - Determines if the validation message is visible or not.
+ * param {string} title - The title of the validation message.
+ * param {Array<TValidation>} validations - An array of validation objects containing an isValid property and a message property.
+ * returns {JSX.Element} A React component that displays the title and list of validation messages.
  */
-export const ValidationMessage: FCProps<IValidationMessage> = ({
-	isVisible,
-	title,
-	validations,
-}) => {
+export function ValidationMessage({ isVisible, title, validations }: IValidationMessage) {
 	return (
 		<>
 			{title && isVisible && <span className="small">{title}</span>}

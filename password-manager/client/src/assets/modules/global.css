@@ -200,7 +200,11 @@ button,
 .submit:disabled,
 .disabled {
 	opacity: 0.5;
-	columns: darkgray;
+	color: currentColor !important;
+}
+.enabled {
+	opacity: 1;
+	color: currentColor !important;
 }
 
 .regular {

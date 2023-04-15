@@ -40,27 +40,29 @@ export function SubmitButton({
 			onClick={rest.onClick}
 			{...rest}
 		>
-			{submitted ? (
-				<div className="center">
-					<AnimatedIcon
-						data-testid="spinner"
-						animation="fa-spin"
-						animateOnLoad
-						iconName="fa fa-spinner"
-					/>
-					{textStatus}
-				</div>
-			) : (
-				<>
-					{iconName && (
+			<div className="center">
+				{submitted ? (
+					<>
 						<AnimatedIcon
-							data-testid={iconName}
-							iconName={iconName}
+							data-testid="spinner"
+							animation="fa-spin"
+							animateOnLoad
+							iconName="fa fa-spinner"
 						/>
-					)}{' '}
-					{children}
-				</>
-			)}
+						{textStatus}
+					</>
+				) : (
+					<>
+						{iconName && (
+							<AnimatedIcon
+								data-testid={iconName}
+								iconName={iconName}
+							/>
+						)}{' '}
+						{children}
+					</>
+				)}
+			</div>
 		</button>
 	)
 }

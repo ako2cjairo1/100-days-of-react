@@ -1,8 +1,7 @@
-import { PasswordStrength, evaluatePassword } from '@/components'
+import { IPasswordStrength, PasswordStrength, evaluatePassword } from '@/components'
 import { PasswordStatus, REGISTER_STATE } from '@/services/constants'
 import { MergeRegExObj } from '@/services/Utils/password-manager.helper'
 import { render } from '@/services/Utils/test.util'
-import { IPasswordStrength } from '@/types'
 
 const { weak, mediocre, secure, strong, unbreakable } = PasswordStatus
 const evaluateObject: IPasswordStrength = {

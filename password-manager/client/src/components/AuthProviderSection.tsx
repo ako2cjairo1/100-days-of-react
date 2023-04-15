@@ -8,11 +8,11 @@ import { Log } from '@/services/Utils/password-manager.helper'
  * Renders a section with buttons for external authentication providers.
  */
 interface IAuthProviderSection {
-	cb?: TFunction
+	callbackFn?: TFunction
 }
-export function AuthProviderSection({ cb = () => null }: IAuthProviderSection) {
+export function AuthProviderSection({ callbackFn = () => null }: IAuthProviderSection) {
 	const handleExternalAuth = () => {
-		cb()
+		callbackFn()
 		Log('TODO: Implement external authentication.')
 	}
 	return (

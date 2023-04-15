@@ -3,7 +3,7 @@ import '@/assets/modules/RotatingBackdrop.css'
  * RotatingBackdrop component
  * Renders a rotating backdrop with two shapes
  */
-export const RotatingBackdrop = () => {
+export function RotatingBackdrop() {
 	return (
 		<div className="background">
 			<div

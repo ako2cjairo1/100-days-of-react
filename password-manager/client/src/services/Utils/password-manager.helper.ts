@@ -1,4 +1,4 @@
-import { IRegExObj, TConvertToStringUnion, TFunction } from '@/types'
+import { TConvertToStringUnion, TFunction } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
 import { REGISTER_STATE } from '../constants'
 
@@ -7,6 +7,9 @@ export function Log<T>(Obj: T) {
 	console.log(Obj)
 }
 
+interface IRegExObj {
+	[key: string]: RegExp
+}
 /**
  * Combines multiple regular expressions into a single regular expression.
  * Parameters: regExObj (object containing key-value pairs of strings and regular expressions).

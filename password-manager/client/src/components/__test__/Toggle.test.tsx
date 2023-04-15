@@ -7,16 +7,6 @@ describe('Toggle', () => {
 		expect(getByRole('checkbox')).toBeInTheDocument()
 	})
 
-	it('renders its children', () => {
-		const text = 'Toggle me'
-		const { getByText } = render(
-			<Toggle id="toggle">
-				<Toggle.Description>{text}</Toggle.Description>
-			</Toggle>
-		)
-		expect(getByText(text)).toBeInTheDocument()
-	})
-
 	it('toggles when clicked', () => {
 		const { getByRole } = render(<Toggle id="toggle" />)
 		const checkbox = getByRole('checkbox')

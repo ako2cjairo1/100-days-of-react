@@ -10,10 +10,19 @@ import { AnimatedIcon } from './AnimatedIcon'
 interface IInlineNotification extends IChildren {
 	iconName?: string
 	className?: string
+	offsetYPos?: string
 }
-export function InlineNotification({ children, iconName, className }: IInlineNotification) {
+export function InlineNotification({
+	children,
+	iconName,
+	className,
+	offsetYPos = '90%',
+}: IInlineNotification) {
 	return (
-		<div className="clipboard-status">
+		<div
+			className="clipboard-status"
+			style={{ top: offsetYPos }}
+		>
 			<p className="center small descend">
 				<AnimatedIcon
 					className={className}

@@ -72,14 +72,14 @@ export function Keychain({
 						/>
 						<div
 							className="action-container"
-							style={{ top: '42px', right: '0' }}
+							style={{ top: '40px', right: '0' }}
 						>
 							<AnimatedIcon
 								title="Copy"
-								className={`action-button small ${checkIf.canCopyUsername && 'active'}`}
+								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
 								iconName={`fa ${
 									!checkIf.canCopyUsername && checkIf.debounceCopyUserName
-										? 'fa-check scale-up'
+										? 'fa-check active scale-up'
 										: 'fa-clone'
 								}`}
 								onClick={handleAction.copyUserName}
@@ -102,7 +102,7 @@ export function Keychain({
 						/>
 						<div
 							className="action-container"
-							style={{ top: '130px', right: '0' }}
+							style={{ top: '125px', right: '0' }}
 						>
 							<AnimatedIcon
 								title={revealPassword ? 'hide' : 'reveal'}
@@ -112,10 +112,10 @@ export function Keychain({
 							/>
 							<AnimatedIcon
 								title="Copy"
-								className={`action-button small ${checkIf.canCopyPassword && 'active'}`}
+								className={`action-button small ${checkIf.canCopyPassword && 'active scale-down'}`}
 								iconName={`fa ${
 									!checkIf.canCopyPassword && checkIf.debounceCopyPassword
-										? 'fa-check scale-up'
+										? 'fa-check active scale-up'
 										: 'fa-clone'
 								}`}
 								onClick={handleAction.copyPassword}
@@ -123,10 +123,10 @@ export function Keychain({
 						</div>
 					</div>
 				</div>
-
 				{checkIf.isClipboardTriggered && (
 					<InlineNotification
 						className="lit-info"
+						offsetYPos="98%"
 						iconName="fa-solid fa-triangle-exclamation"
 					>
 						{userNameClipboard.isCopied

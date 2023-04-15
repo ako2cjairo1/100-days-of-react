@@ -1,6 +1,3 @@
-import { IChildren } from './base.type'
-import { TFunction, TValidation } from './global.type'
-
 // Component Interfaces
 export type TDetailedHTMLProps<T = HTMLElement> = React.DetailedHTMLProps<
 	React.HTMLAttributes<T>,
@@ -23,27 +20,4 @@ export interface IInputElement
 	id: string // override id as required
 	type?: React.HTMLInputTypeAttribute
 	linkRef?: React.Ref<HTMLInputElement>
-}
-export interface IValidationMessage<T = TValidation> {
-	isVisible: boolean
-	title?: string
-	validations: T[]
-}
-
-// Helper function interfaces
-export interface IPasswordStrength {
-	password?: string
-	regex?: RegExp
-}
-
-export interface IRegExObj {
-	[key: string]: RegExp
-}
-
-export interface IModal extends IChildren {
-	isOpen: boolean
-	noBackdrop?: boolean
-	clickBackdropToClose?: boolean
-	onClose?: TFunction
-	hideCloseButton?: boolean
 }
