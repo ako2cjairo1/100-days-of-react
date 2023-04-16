@@ -7,7 +7,6 @@ import {
 	Menubar,
 	Keychain,
 	AnimatedIcon,
-	SubmitButton,
 	Header,
 } from '@/components'
 import { useAuthContext, useStateObj } from '@/hooks'
@@ -154,22 +153,24 @@ export function Vault() {
 					</Header>
 				) : (
 					<Header>
-						<AnimatedIcon
-							iconName="fa fa-face-rolling-eyes"
-							animation="fa-shake"
-						/>
+						<Header.Logo>
+							<AnimatedIcon
+								iconName="fa fa-face-rolling-eyes"
+								animation="fa-shake"
+							/>
+						</Header.Logo>
 						<Header.Title
-							title="There are no items to list."
-							subTitle='click "Add Keychain" to start'
+							title="There are no Keychains here"
+							subTitle='click "+" to Add one'
+						/>
+
+						{/* <SubmitButton
+							style={{ width: '50%' }}
+							props={{ iconName: 'fa fa-plus regular', variant: 'primary' }}
+							onClick={() => keychainModal.open()}
 						>
-							<SubmitButton
-								style={{ width: '50%' }}
-								props={{ iconName: 'fa fa-plus regular', variant: 'primary' }}
-								onClick={() => keychainModal.open()}
-							>
-								Add Keychain
-							</SubmitButton>
-						</Header.Title>
+							Add Keychain
+						</SubmitButton> */}
 					</Header>
 				)}
 

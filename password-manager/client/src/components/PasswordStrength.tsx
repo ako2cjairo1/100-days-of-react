@@ -55,7 +55,7 @@ export interface IPasswordStrength {
  * param {string} password - The password being evaluated.
  * param {RegExp} regex - The regular expression used to evaluate the password.
  *
- * returns {FCProps} A Custom Password Strength indicator component
+ * returns {JSX Element} A Custom Password Strength indicator component
  */
 export function PasswordStrength({ password, regex }: Partial<IPasswordStrength>) {
 	const { status, score } = evaluatePassword({ password, regex })

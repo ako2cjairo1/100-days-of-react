@@ -10,15 +10,20 @@ import { AnimatedIcon } from '../AnimatedIcon'
 export function Logo({ children }: IChildren) {
 	return (
 		<h1 className="scale-up">
-			<AnimatedIcon
-				className="logo-key fade-in"
-				iconName="fa fa-key"
-			/>
-			<AnimatedIcon
-				className="logo-shield scale-up"
-				iconName="fa fa-shield"
-			/>
-			{children}
+			{children ? (
+				children
+			) : (
+				<>
+					<AnimatedIcon
+						className="logo-key fade-in"
+						iconName="fa fa-key"
+					/>
+					<AnimatedIcon
+						className="logo-shield scale-up"
+						iconName="fa fa-shield"
+					/>
+				</>
+			)}
 		</h1>
 	)
 }

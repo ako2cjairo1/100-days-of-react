@@ -54,7 +54,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 	// conditional rendering
 	const checkIf = {
-		isEditing: Object.values(keychainInfo || {}).some(Boolean),
+		isEditing: !isEmpty(keychainInfo?.keychainId),
 		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
 		isValidWebsite: WEBSITE_REGEX.test(website),
 		canDisableSubmit: () =>
@@ -185,16 +185,15 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 	return (
 		<>
 			<Header>
-				<Header.Title
-					title={checkIf.isEditing ? 'Edit Password' : 'Add Password'}
-					subTitle={
-						checkIf.isEditing
-							? ''
-							: 'We will save this password in your session storage and cloud account'
-					}
-				/>
+				<Header.Logo>{checkIf.isEditing ? 'Edit Password' : 'Add Password'}</Header.Logo>
+
+				{!checkIf.isEditing && (
+					<Header.Title subTitle="We will save this password in your session storage and cloud account" />
+				)}
+
 				<Header.Status status={keychainStatus} />
 			</Header>
+
 			{checkIf.isEditing && (
 				<>
 					<KeychainCard
@@ -208,7 +207,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							onClick={handleAction.deletePassword}
 						>
 							<AnimatedIcon
-								className={`regular ${isSubmitted || keychainStatus.success ? 'disabled' : ''}`}
+								className={`regular ${
+									isSubmitted || keychainStatus.success ? 'disabled' : 'active'
+								}`}
 								iconName="fa fa-trash"
 								animation="fa-shake danger"
 							/>
@@ -364,7 +365,6 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					<SubmitButton
 						props={{
 							variant: 'cancel',
-							submitted: false,
 							disabled: isSubmitted,
 						}}
 						onClick={() => {
