@@ -5,6 +5,14 @@
 	gap: 15px;
 }
 
+.vault-list {
+	flex-direction: column;
+	max-height: 430px;
+	overflow: scroll;
+	padding-right: 8px;
+	scroll-behavior: smooth;
+}
+
 .keychain-info {
 	display: block;
 	height: 45px;
@@ -144,45 +152,86 @@
 	padding: 5px;
 }
 
-.vault-container > section > * {
+.vault-container > div > * {
 	opacity: 0;
 	animation: descend-opacity 0.5s forwards;
 }
 
-.vault-container > section > *:nth-child(1) {
+.vault-container > div > *:nth-child(1) {
 	animation-delay: 0.1s;
 }
 
-.vault-container > section > *:nth-child(2) {
+.vault-container > div > *:nth-child(2) {
 	animation-delay: 0.2s;
 }
 
-.vault-container > section > *:nth-child(3) {
+.vault-container > div > *:nth-child(3) {
 	animation-delay: 0.3s;
 }
 
-.vault-container > section > *:nth-child(4) {
+.vault-container > div > *:nth-child(4) {
 	animation-delay: 0.4s;
 }
 
-.vault-container > section > *:nth-child(5) {
+.vault-container > div > *:nth-child(5) {
 	animation-delay: 0.5s;
 }
-.vault-container > section > *:nth-child(6) {
+.vault-container > div > *:nth-child(6) {
 	animation-delay: 0.6s;
 }
-.vault-container > section > *:nth-child(7) {
+.vault-container > div > *:nth-child(7) {
 	animation-delay: 0.7s;
 }
-.vault-container > section > *:nth-child(8) {
+.vault-container > div > *:nth-child(8) {
 	animation-delay: 0.8s;
 }
-.vault-container > section > *:nth-child(9) {
+.vault-container > div > *:nth-child(9) {
 	animation-delay: 0.9s;
 }
-.vault-container > section > *:nth-child(10) {
+.vault-container > div > *:nth-child(10) {
 	animation-delay: 1s;
 }
+
+.vault-list > * {
+	opacity: 0;
+	animation: descend-opacity 0.5s forwards;
+}
+
+.vault-list > *:nth-child(1) {
+	animation-delay: 0.1s;
+}
+
+.vault-list > *:nth-child(2) {
+	animation-delay: 0.2s;
+}
+
+.vault-list > *:nth-child(3) {
+	animation-delay: 0.3s;
+}
+
+.vault-list > *:nth-child(4) {
+	animation-delay: 0.4s;
+}
+
+.vault-list > *:nth-child(5) {
+	animation-delay: 0.5s;
+}
+.vault-list > *:nth-child(6) {
+	animation-delay: 0.6s;
+}
+.vault-list > *:nth-child(7) {
+	animation-delay: 0.7s;
+}
+.vault-list > *:nth-child(8) {
+	animation-delay: 0.8s;
+}
+.vault-list > *:nth-child(9) {
+	animation-delay: 0.9s;
+}
+.vault-list > *:nth-child(10) {
+	animation-delay: 1s;
+}
+
 .action-button {
 	padding: 10px;
 	text-align: center;

@@ -14,7 +14,7 @@ interface IVaultContainer extends Pick<IKeychain, 'actionCallback'> {
  */
 export function VaultContainer({ vault, actionCallback }: IVaultContainer) {
 	return (
-		<>
+		<div className="vault-list">
 			{vault.map(({ keychainId, logo, website, username }) => (
 				<KeychainCard
 					key={keychainId}
@@ -25,6 +25,6 @@ export function VaultContainer({ vault, actionCallback }: IVaultContainer) {
 					onClick={() => actionCallback(keychainId)}
 				/>
 			))}
-		</>
+		</div>
 	)
 }

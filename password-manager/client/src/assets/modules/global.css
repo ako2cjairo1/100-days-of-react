@@ -225,6 +225,7 @@ button,
 	gap: 8px;
 }
 .fdc {
+	place-content: center;
 	flex-direction: column;
 }
 .tal {

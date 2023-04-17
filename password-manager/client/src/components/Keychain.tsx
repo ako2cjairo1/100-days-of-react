@@ -136,15 +136,17 @@ export function Keychain({
 				)}
 			</div>
 
-			<SubmitButton
-				props={{
-					variant: 'default',
-					iconName: 'fa fa-pen-to-square',
-				}}
-				onClick={handleAction.modifyKeychain}
-			>
-				Edit Password
-			</SubmitButton>
+			<div>
+				<SubmitButton
+					props={{
+						variant: 'default',
+						iconName: 'fa fa-pen-to-square',
+					}}
+					onClick={handleAction.modifyKeychain}
+				>
+					Edit Password
+				</SubmitButton>
+			</div>
 		</>
 	)
 }

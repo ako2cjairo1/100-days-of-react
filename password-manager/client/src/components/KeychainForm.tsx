@@ -126,7 +126,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 		deletePassword: () => {
 			if (checkIf.canGeneratePassword) {
 				// TODO: implement in server component, simulate api post request to update/add the keychain info
-				const removeResult = updateCallback(inputStates, remove)
+				const removeResult = updateCallback({ ...inputStates }, remove)
 				if (!removeResult.success) {
 					return updateKeychainStatus(removeResult)
 				}
@@ -155,7 +155,10 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					// TODO: implement in server component, simulate api post request to update/add the keychain info
 					RunAfterSomeTime(() => {
 						inputAction.isSubmit(false)
-						const updateResult = updateCallback(inputStates, checkIf.isEditing ? modify : add)
+						const updateResult = updateCallback(
+							{ ...inputStates },
+							checkIf.isEditing ? modify : add
+						)
 
 						if (!updateResult.success) {
 							return updateKeychainStatus(updateResult)
@@ -170,7 +173,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						// after sometime, reset status and close modal
 						RunAfterSomeTime(() => {
 							updateKeychainStatus(STATUS)
-							showForm(true)
+							showForm(false)
 							// invoke resetInput
 							inputAction.resetInput()
 						}, 3)

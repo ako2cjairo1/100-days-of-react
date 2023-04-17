@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import '@/assets/modules/Vault.css'
 import {
 	VaultContainer,
@@ -10,9 +10,10 @@ import {
 	Header,
 } from '@/components'
 import { useAuthContext, useStateObj } from '@/hooks'
-import { LocalStorage } from '@/services/Utils/password-manager.helper'
+import { CreateError, LocalStorage, Log } from '@/services/Utils/password-manager.helper'
 import { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
 import { RequestType, KEYCHAIN_CONST, FormContent } from '@/services/constants'
+import { SearchBar } from '@/components/SearchBar'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 const { add, modify, view } = RequestType
@@ -23,16 +24,28 @@ const { vault_component, keychain_component } = FormContent
  */
 export function Vault() {
 	const { objState: keychain, mutate: updateKeychain } = useStateObj<TKeychain>(KEYCHAIN)
-	const { objState: clipboardStatus, mutate: updateClipboardStatus } = useStateObj<TStatus>(STATUS)
+	const { objState: vaultStatus, mutate: updateVaultStatus } = useStateObj<TStatus>(STATUS)
 	const [vault, setVault] = useState<TKeychain[]>([])
 
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
 	const { mutateAuth } = useAuthContext()
+	const vaultCountRef = useRef(0)
+
+	const getVaultData = () => {
+		// TODO: implement cache mechanism
+		// get password vault data from local storage
+		const vaultData = JSON.parse(LocalStorage.read('password_manager_data') || '[]')
+		setVault(vaultData)
+		vaultCountRef.current = vaultData.length
+
+		return vaultData
+	}
 
 	useEffect(() => {
 		// get password vault data from local storage
-		setVault(JSON.parse(LocalStorage.read('password_manager_data') || '[]'))
+		getVaultData()
+		Log('Loading Data...')
 	}, [])
 
 	// TODO: implement these as controller methods for API
@@ -40,9 +53,11 @@ export function Vault() {
 		LocalStorage.write('password_manager_data', JSON.stringify(info))
 
 	const mutateVault = (keychainUpdate: TKeychain, requestType: TRequestType): TStatus => {
+		const vaultData: TKeychain[] = getVaultData()
+
 		const cantAddDuplicate =
 			requestType === add &&
-			vault.some(
+			vaultData.some(
 				({ username, website }) =>
 					username === keychainUpdate.username && website === keychainUpdate.website
 			)
@@ -54,8 +69,9 @@ export function Vault() {
 		}
 
 		// for delete action, remove the submitted keychain info from vault
-		let tempVault = vault.filter(({ keychainId }) => keychainId !== keychainUpdate.keychainId)
+		let tempVault = vaultData.filter(({ keychainId }) => keychainId !== keychainUpdate.keychainId)
 
+		// for "add" and "modify" requests: append a timeAgo prop
 		if (requestType === add || requestType === modify) {
 			const keychainUpdateWithTimeAgo: TKeychain = {
 				...keychainUpdate,
@@ -65,12 +81,19 @@ export function Vault() {
 			tempVault = [keychainUpdateWithTimeAgo, ...tempVault]
 		}
 
-		setVault(tempVault)
-		updateLocalStorage(tempVault)
-
-		return {
-			success: true,
-			message: 'Success',
+		try {
+			updateLocalStorage(tempVault)
+			setVault(tempVault)
+			getVaultData()
+			return {
+				success: true,
+				message: 'Success',
+			}
+		} catch (error) {
+			return {
+				success: false,
+				message: CreateError(error).message,
+			}
 		}
 	}
 
@@ -79,7 +102,7 @@ export function Vault() {
 
 		// throw an error message if keychainId is not found
 		if (!info) {
-			return updateClipboardStatus({
+			return updateVaultStatus({
 				success: false,
 				message: 'Keychain information not found! Try again after a while.',
 			})
@@ -100,17 +123,33 @@ export function Vault() {
 	const keychainFormCallback = (keychainId?: string) => {
 		// hide keychain info and reset clipboard status
 		setFormContent(vault_component)
-		updateClipboardStatus(STATUS)
+		updateVaultStatus(STATUS)
+		updateKeychain(KEYCHAIN)
 
 		// subsequently open a modal form if user choose to "Update"
 		if (keychainId) openKeychain(keychainId, modify)
+	}
+
+	const handleSearch = (searchKey: string): number => {
+		let searchResult: TKeychain[] = getVaultData()
+
+		if (searchKey.length > 0) {
+			searchResult = vault.filter(
+				item =>
+					item.username.toLowerCase().includes(searchKey) ||
+					item.website.toLowerCase().includes(searchKey)
+			)
+		}
+		setVault(searchResult)
+
+		return searchResult.length
 	}
 
 	const keychainModal = useMemo(() => {
 		return {
 			open: (info?: TKeychain) => {
 				// open Modal form with keychain info, blank if otherwise
-				if (info) updateKeychain(info)
+				updateKeychain(info ? info : KEYCHAIN)
 				setIsOpenModalForm(true)
 			},
 			close: () => {
@@ -137,10 +176,7 @@ export function Vault() {
 				<Menubar.Item
 					name="add item"
 					iconName="fa fa-plus"
-					onClick={() => {
-						updateKeychain(KEYCHAIN)
-						keychainModal.open()
-					}}
+					onClick={() => keychainModal.open()}
 				/>
 			</Menubar>
 
@@ -149,7 +185,11 @@ export function Vault() {
 					<Header>
 						<Header.Logo />
 						<Header.Title title="Secured Vault" />
-						<Header.Status status={clipboardStatus} />
+						<div className="center">
+							<p className="small">{`${vaultCountRef.current} keychains save.`}</p>
+							<p className="x-small disabled">(0 leaked, 0 reused, 5 weak)</p>
+						</div>
+						<Header.Status status={vaultStatus} />
 					</Header>
 				) : (
 					<Header>
@@ -175,10 +215,14 @@ export function Vault() {
 				)}
 
 				{formContent === vault_component ? (
-					<VaultContainer
-						vault={vault}
-						actionCallback={openKeychain}
-					/>
+					<>
+						{vaultCountRef.current > 0 && <SearchBar searchCallback={handleSearch} />}
+
+						<VaultContainer
+							vault={vault}
+							actionCallback={openKeychain}
+						/>
+					</>
 				) : (
 					<Keychain
 						{...keychain}
