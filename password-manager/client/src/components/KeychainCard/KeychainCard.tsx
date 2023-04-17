@@ -6,6 +6,7 @@ import { Logo } from './Logo'
 import { AnchorWrapper } from '@/components/AnchorWrapper'
 
 export interface IKeychainCard extends IChildren, Partial<Pick<TKeychain, 'logo' | 'website'>> {
+	className?: string
 	iconName?: string
 	subText?: string
 	onClick?: () => void | TFunction<string>
@@ -26,6 +27,7 @@ export function KeychainCard({
 	children,
 	logo = '',
 	website = '',
+	className = 'keychain-item',
 	iconName = 'fa fa-chevron-left',
 	subText = '',
 	onClick,
@@ -33,10 +35,7 @@ export function KeychainCard({
 	const websiteDomain = GetDomainUrl(website)
 
 	return (
-		<div
-			style={{ cursor: 'default' }}
-			className="keychain-item"
-		>
+		<div className={className}>
 			<AnchorWrapper href={website}>
 				<Logo
 					logo={logo}
@@ -56,7 +55,10 @@ export function KeychainCard({
 					className="menu descend"
 					onClick={onClick}
 				>
-					<AnimatedIcon iconName={iconName} />
+					<AnimatedIcon
+						className="x-small"
+						iconName={iconName}
+					/>
 				</Link>
 			)}
 			{children}

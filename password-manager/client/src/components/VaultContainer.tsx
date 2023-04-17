@@ -18,10 +18,10 @@ export function VaultContainer({ vault, actionCallback }: IVaultContainer) {
 			{vault.map(({ keychainId, logo, website, username }) => (
 				<KeychainCard
 					key={keychainId}
-					iconName="fa fa-chevron-right"
-					subText={username}
 					logo={logo}
 					website={website}
+					subText={username}
+					iconName="fa fa-chevron-right"
 					onClick={() => actionCallback(keychainId)}
 				/>
 			))}

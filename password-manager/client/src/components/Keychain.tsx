@@ -53,6 +53,7 @@ export function Keychain({
 			<KeychainCard
 				logo={logo}
 				website={website}
+				className="keychain-item card-header"
 				subText={`Last modified ${TimeAgo(new Date(timeAgo))}`}
 				onClick={handleAction.showVault}
 			/>

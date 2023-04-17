@@ -12,9 +12,9 @@ interface ITitle extends IChildren {
  */
 export function Title({ children, title, subTitle }: ITitle) {
 	return (
-		<div style={{ marginTop: '15px' }}>
+		<div>
 			{title && <h1 className="fade-in">{title}</h1>}
-			{subTitle && <p className="center descend">{subTitle}</p>}
+			{subTitle && <p className="center small descend">{subTitle}</p>}
 			{children}
 		</div>
 	)

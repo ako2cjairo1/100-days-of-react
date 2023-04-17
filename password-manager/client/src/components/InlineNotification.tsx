@@ -23,7 +23,7 @@ export function InlineNotification({
 			className="clipboard-status"
 			style={{ top: offsetYPos }}
 		>
-			<p className="center small descend">
+			<p className="center x-small descend">
 				<AnimatedIcon
 					className={className}
 					iconName={`${iconName ? iconName : 'fa fa-info-circle'}`}

@@ -31,6 +31,7 @@ body {
 	place-items: center;
 	padding: 0 24px;
 	color: currentColor;
+	font-size: 12px;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
 		'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
@@ -52,10 +53,6 @@ header {
 	margin-bottom: 34px;
 }
 
-header h1 {
-	display: grid;
-	gap: 20px;
-}
 header i {
 	font-size: 50px;
 }
@@ -75,6 +72,7 @@ video {
 h1 {
 	font-weight: 500;
 	line-height: 42px;
+	font-size: 1.8rem;
 }
 a {
 	text-decoration: none;
@@ -208,7 +206,7 @@ button,
 }
 
 .regular {
-	font-size: 20px;
+	font-size: 14px;
 }
 
 .small {

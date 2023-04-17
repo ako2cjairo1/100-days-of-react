@@ -41,7 +41,6 @@ describe('Keychain components', () => {
 			  >
 			    <div
 			      class="keychain-item"
-			      style="cursor: default;"
 			    >
 			      <a
 			        href="link1"
@@ -78,7 +77,7 @@ describe('Keychain components', () => {
 			        href="/vault"
 			      >
 			        <i
-			          class=" fa fa-chevron-right "
+			          class="x-small fa fa-chevron-right "
 			          data-testid="animated-icon"
 			          title=""
 			        />
@@ -86,7 +85,6 @@ describe('Keychain components', () => {
 			    </div>
 			    <div
 			      class="keychain-item"
-			      style="cursor: default;"
 			    >
 			      <a
 			        href="link2"
@@ -123,7 +121,7 @@ describe('Keychain components', () => {
 			        href="/vault"
 			      >
 			        <i
-			          class=" fa fa-chevron-right "
+			          class="x-small fa fa-chevron-right "
 			          data-testid="animated-icon"
 			          title=""
 			        />

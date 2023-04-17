@@ -202,6 +202,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					<KeychainCard
 						logo={keychainInfo?.logo}
 						website={keychainInfo?.website}
+						className="keychain-item card-header"
 						subText={`Last modified ${TimeAgo(new Date(keychainInfo?.timeAgo ?? ''))}`}
 					>
 						<LinkLabel
