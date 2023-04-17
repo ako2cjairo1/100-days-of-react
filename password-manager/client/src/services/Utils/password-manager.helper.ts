@@ -2,9 +2,9 @@ import { TConvertToStringUnion, TFunction } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
 import { REGISTER_STATE } from '../constants'
 
-export function Log<T>(Obj: T) {
+export function Log<T>(Obj: T, ...optional: unknown[]) {
 	if (Obj instanceof Error) console.error(Obj)
-	console.log(Obj)
+	console.log(Obj, ...optional)
 }
 
 interface IRegExObj {
@@ -204,6 +204,11 @@ export function CreateError(error: unknown) {
 	return result
 }
 
+type TLSKey =
+	| 'password_manager_data'
+	| 'password_manager_email'
+	| 'password_manager_searchkey'
+	| (string & { keys?: string })
 /**
  * LocalStorage object provides an interface for interacting with the browser's local storage.
  * param write - Function that takes a key and value and stores it in local storage.
@@ -211,9 +216,9 @@ export function CreateError(error: unknown) {
  * param remove - Function that takes a key and removes it from local storage.
  */
 interface ILocalStorage {
-	write: TFunction<[key: string, value: string]>
-	read: TFunction<[key: string], string>
-	remove: TFunction<[key: string]>
+	write: TFunction<[key: TLSKey, value: string]>
+	read: TFunction<[key: TLSKey], string>
+	remove: TFunction<[key: TLSKey]>
 }
 export const LocalStorage: ILocalStorage = {
 	write: (key, value) => localStorage.setItem(key, value),

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Input } from '@/components/FormGroup/Input'
 import { CloseIcon } from '@/components/Modal/CloseIcon'
 import { IChildren, TFunction } from '@/types'
+import { LocalStorage } from '@/services/Utils/password-manager.helper'
 
 const STATUS = {
 	message: '',
@@ -20,24 +21,45 @@ interface ISearchBar extends IChildren {
 export function SearchBar({ children, searchCallback }: ISearchBar) {
 	const [search, setSearch] = useState('')
 	const [{ message, resultCount }, setSearchStatus] = useState(STATUS)
+	const cachedSearchKeyRef = useRef(true)
+
+	const executeSearch = useCallback(
+		(searchKey: string) => {
+			// trigger search callbackfn from subscriber
+			const resultCount = searchCallback(searchKey)
+
+			// create message base on the resultCount
+			const message = resultCount
+				? `${resultCount} keychain found`
+				: `No results for "${searchKey}"`
+
+			// update status of search action
+			setSearchStatus({ message, resultCount })
+		},
+		[searchCallback]
+	)
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = event.target.value
 		setSearch(searchValue)
-
-		// trigger search callbackfn from subscriber
-		const resultCount = searchCallback(searchValue)
-		const message = resultCount
-			? `${resultCount} keychain found`
-			: `No results for "${event.target.value}"`
-		setSearchStatus({ message, resultCount })
+		executeSearch(searchValue)
 	}
 
 	const handleClear = () => {
 		setSearch('')
 		setSearchStatus(STATUS)
 		searchCallback('')
+		LocalStorage.write('password_manager_searchkey', '')
 	}
+
+	useEffect(() => {
+		if (cachedSearchKeyRef.current) {
+			const cachedSearchKey = LocalStorage.read('password_manager_searchkey')
+			setSearch(cachedSearchKey)
+			executeSearch(cachedSearchKey)
+			cachedSearchKeyRef.current = false
+		}
+	}, [executeSearch])
 
 	return (
 		<div className="fdc">
@@ -48,6 +70,7 @@ export function SearchBar({ children, searchCallback }: ISearchBar) {
 				placeholder="Search keychains"
 				value={search}
 				onChange={handleChange}
+				onBlur={() => LocalStorage.write('password_manager_searchkey', search)}
 			/>
 			<div
 				className="fdc"

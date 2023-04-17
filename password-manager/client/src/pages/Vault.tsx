@@ -20,7 +20,7 @@ const { add, modify, view } = RequestType
 const { vault_component, keychain_component } = FormContent
 /**
  * Renders a Keychain component
- * returns A div element with the class "vault-container" containing a KeychainContainer, a Toolbar, and two Modal components
+ * returns A div element with the class "vault-container" containing a KeychainContainer, a Toolbar, and Modal component
  */
 export function Vault() {
 	const { objState: keychain, mutate: updateKeychain } = useStateObj<TKeychain>(KEYCHAIN)
@@ -71,13 +71,13 @@ export function Vault() {
 		// for delete action, remove the submitted keychain info from vault
 		let tempVault = vaultData.filter(({ keychainId }) => keychainId !== keychainUpdate.keychainId)
 
-		// for "add" and "modify" requests: append a timeAgo prop
+		// for "add" and "modify" requests: append timeAgo prop
 		if (requestType === add || requestType === modify) {
 			const keychainUpdateWithTimeAgo: TKeychain = {
 				...keychainUpdate,
 				timeAgo: new Date().toString(),
 			}
-			// clone vault and modify using submitted Keychain info
+			// clone vault and append submitted Keychain info
 			tempVault = [keychainUpdateWithTimeAgo, ...tempVault]
 		}
 
@@ -131,10 +131,11 @@ export function Vault() {
 	}
 
 	const handleSearch = (searchKey: string): number => {
-		let searchResult: TKeychain[] = getVaultData()
+		const vaultData: TKeychain[] = getVaultData()
+		let searchResult = vaultData
 
 		if (searchKey.length > 0) {
-			searchResult = vault.filter(
+			searchResult = vaultData.filter(
 				item =>
 					item.username.toLowerCase().includes(searchKey) ||
 					item.website.toLowerCase().includes(searchKey)
@@ -203,14 +204,6 @@ export function Vault() {
 							title="There are no Keychains here"
 							subTitle='click "+" to Add one'
 						/>
-
-						{/* <SubmitButton
-							style={{ width: '50%' }}
-							props={{ iconName: 'fa fa-plus regular', variant: 'primary' }}
-							onClick={() => keychainModal.open()}
-						>
-							Add Keychain
-						</SubmitButton> */}
 					</Header>
 				)}
 

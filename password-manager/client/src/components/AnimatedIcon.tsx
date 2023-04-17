@@ -12,11 +12,12 @@ type TAnimation =
 	| 'fade-in'
 	| 'spins'
 	| 'descend'
+	| (string & { animation?: string })
 export interface IAnimatedIcon extends IChildren {
 	className?: string
 	iconName?: string
 	title?: string
-	animation?: TAnimation | (string & { animation?: string })
+	animation?: TAnimation
 	animateOnLoad?: boolean
 	onClick?: TFunction
 }
