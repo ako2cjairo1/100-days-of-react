@@ -42,7 +42,7 @@ describe('Modal component', () => {
 				<div>Modal content</div>
 			</Modal>
 		)
-		fireEvent.click(getByTestId('modal-close'))
+		fireEvent.click(getByTestId('close-button'))
 		expect(onClose).toHaveBeenCalled()
 	})
 

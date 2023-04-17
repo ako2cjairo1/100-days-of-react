@@ -10,6 +10,13 @@ const STATUS = {
 interface ISearchBar extends IChildren {
 	searchCallback: TFunction<[searchKey: string], number>
 }
+/**
+ * SearchBar component that allows users to search for keychains.
+ * param {React.ReactNode} props.children - The children of the SearchBar component.
+ * param {TFunction<[searchKey: string], number>} props.searchCallback - The callback function that is triggered when the search input changes. It takes in a searchKey string and returns the number of results found.
+ *
+ * returns {JSX.Element} - The SearchBar component.
+ */
 export function SearchBar({ children, searchCallback }: ISearchBar) {
 	const [search, setSearch] = useState('')
 	const [{ message, resultCount }, setSearchStatus] = useState(STATUS)
