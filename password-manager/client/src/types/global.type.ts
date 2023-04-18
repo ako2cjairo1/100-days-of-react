@@ -1,5 +1,5 @@
 import { RequestType, PasswordStatus, FormContent } from '@/services/constants'
-import { TConvertToStringUnion } from '@/types'
+import type { TConvertToStringUnion } from '@/types'
 
 export type TCredentials = {
 	email: string

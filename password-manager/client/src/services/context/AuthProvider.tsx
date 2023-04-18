@@ -1,5 +1,5 @@
-import { TAuthContext, TAuthProvider, IChildren } from '@/types'
 import { createContext, useState } from 'react'
+import type { TAuthContext, TAuthProvider, IChildren } from '@/types'
 import { AUTH_CONTEXT } from '@/services/constants'
 
 export const AuthContext = createContext<TAuthContext<TAuthProvider> | null>(null)

@@ -1,4 +1,4 @@
-import { TInputLogin, TStatus } from '@/types'
+import type { TInputLogin, TStatus } from '@/types'
 
 export const LOGIN_STATE = {
 	Credential: {

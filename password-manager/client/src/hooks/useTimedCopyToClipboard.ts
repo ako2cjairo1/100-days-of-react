@@ -1,6 +1,6 @@
 import { useRef } from 'react'
-import { useStateObj } from './useStateObj'
-import { TFunction } from '@/types'
+import type { TFunction } from '@/types'
+import { useStateObj } from '@/hooks'
 import { CopyToClipboard, Log, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
 
 const CLIPBOARD_TIMEOUT = 15

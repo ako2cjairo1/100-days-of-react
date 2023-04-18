@@ -1,4 +1,10 @@
-import { TConvertKeysOf, TPassword, TStatus, TInputValidation, TInputRegistration } from '@/types'
+import type {
+	TConvertKeysOf,
+	TPassword,
+	TStatus,
+	TInputValidation,
+	TInputRegistration,
+} from '@/types'
 
 export const REGISTER_STATE = {
 	CREDENTIALS: { email: '', password: '', confirm: '', isTermsAgreed: false },

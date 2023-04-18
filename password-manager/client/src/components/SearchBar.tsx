@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Input } from '@/components/FormGroup/Input'
-import { CloseIcon } from '@/components/Modal/CloseIcon'
-import { IChildren, TFunction } from '@/types'
+import type { IChildren, TFunction } from '@/types'
+import { CloseIcon, Input } from '@/components'
 import { LocalStorage } from '@/services/Utils/password-manager.helper'
 
 const STATUS = {

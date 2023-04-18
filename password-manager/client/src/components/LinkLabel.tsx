@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { IChildren, TDetailedHTMLProps } from '@/types'
+import type { IChildren, TDetailedHTMLProps } from '@/types'
 
 interface ILinkLabel extends IChildren, Pick<TDetailedHTMLProps, 'className' | 'onClick'> {
 	linkRef?: React.Ref<HTMLAnchorElement>

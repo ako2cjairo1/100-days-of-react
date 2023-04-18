@@ -1,5 +1,5 @@
-import { AnimatedIcon } from '../AnimatedIcon'
-import { IChildren, TStatus } from '@/types'
+import { AnimatedIcon } from '@/components'
+import type { IChildren, TStatus } from '@/types'
 
 interface IStatus extends IChildren {
 	status?: TStatus

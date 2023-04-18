@@ -2,7 +2,7 @@ import '@/assets/modules/AuthProviderSection.css'
 import google from '@/assets/google.png'
 import apple from '@/assets/apple.png'
 import github from '@/assets/github.png'
-import { TFunction } from '@/types'
+import type { TFunction } from '@/types'
 import { Log } from '@/services/Utils/password-manager.helper'
 /**
  * Renders a section with buttons for external authentication providers.

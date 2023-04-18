@@ -1,4 +1,4 @@
-import { IChildren } from '@/types'
+import type { IChildren } from '@/types'
 
 interface IDescription extends IChildren {
 	checked?: boolean

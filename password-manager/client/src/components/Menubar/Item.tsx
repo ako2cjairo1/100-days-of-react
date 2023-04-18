@@ -1,5 +1,5 @@
-import { TFunction } from '@/types'
 import { Link } from 'react-router-dom'
+import type { TFunction } from '@/types'
 
 interface IMenuItem {
 	onClick: TFunction

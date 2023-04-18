@@ -1,4 +1,4 @@
-import { TKeychain, TStatus } from '@/types'
+import type { TKeychain, TStatus } from '@/types'
 
 export const KEYCHAIN_CONST = {
 	STATUS: { success: false, message: '' },

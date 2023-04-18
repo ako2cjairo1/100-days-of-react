@@ -1,5 +1,5 @@
-import { IChildren } from '@/types'
-import { AnimatedIcon } from '../AnimatedIcon'
+import type { IChildren } from '@/types'
+import { AnimatedIcon } from '@/components'
 
 /**
  * Renders a Logo component

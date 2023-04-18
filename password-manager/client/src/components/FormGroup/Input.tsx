@@ -1,4 +1,4 @@
-import { IInputElement } from '@/types'
+import type { IInputElement } from '@/types'
 /**
  * Renders an input element
  * param linkRef - A ref to be attached to the input element

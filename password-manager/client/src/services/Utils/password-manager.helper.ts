@@ -1,6 +1,6 @@
-import { TConvertToStringUnion, TFunction } from '@/types'
+import type { TConvertToStringUnion, TFunction } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
-import { REGISTER_STATE } from '../constants'
+import { REGISTER_STATE } from '@/services/constants'
 
 export function Log<T>(Obj: T, ...optional: unknown[]) {
 	if (Obj instanceof Error) console.error(Obj)

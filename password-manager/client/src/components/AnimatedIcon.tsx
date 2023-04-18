@@ -1,4 +1,4 @@
-import { IChildren, TFunction } from '@/types'
+import type { IChildren, TFunction } from '@/types'
 import { useState } from 'react'
 
 type TAnimation =

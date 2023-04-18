@@ -1,5 +1,5 @@
-import { IChildren } from '@/types'
-import { Item } from './Item'
+import type { IChildren } from '@/types'
+import { Item } from '@/components/Menubar/Item'
 
 /**
  * Toolbar component

@@ -1,7 +1,7 @@
 import { createPortal } from 'react-dom'
 import '@/assets/modules/Modal.css'
 import { CloseIcon, BackdropOverlay } from '@/components/Modal'
-import { IChildren, TFunction } from '@/types'
+import type { IChildren, TFunction } from '@/types'
 
 export interface IModal extends IChildren {
 	isOpen?: boolean

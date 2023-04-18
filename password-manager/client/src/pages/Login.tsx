@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
-import { TInputLogin, TStatus } from '@/types/global.type'
+import type { TInputLogin, TStatus } from '@/types'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import {

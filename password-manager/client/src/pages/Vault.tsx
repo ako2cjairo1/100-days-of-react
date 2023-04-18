@@ -8,12 +8,12 @@ import {
 	Keychain,
 	AnimatedIcon,
 	Header,
+	SearchBar,
 } from '@/components'
 import { useAuthContext, useStateObj } from '@/hooks'
 import { CreateError, LocalStorage, Log } from '@/services/Utils/password-manager.helper'
-import { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
+import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
 import { RequestType, KEYCHAIN_CONST, FormContent } from '@/services/constants'
-import { SearchBar } from '@/components/SearchBar'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 const { add, modify, view } = RequestType

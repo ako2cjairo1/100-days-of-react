@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useRef } from 'react'
 import '@/assets/modules/Login.css'
-import { TStatus, TInputRegistration } from '@/types/global.type'
+import type { TStatus, TInputRegistration } from '@/types'
 import { REGISTER_STATE } from '@/services/constants/Registration.constant'
 import {
 	RunAfterSomeTime,

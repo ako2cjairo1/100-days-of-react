@@ -1,4 +1,4 @@
-import { IChildren } from '@/types'
+import type { IChildren } from '@/types'
 import React from 'react'
 
 interface IAnchorWrapper extends IChildren {

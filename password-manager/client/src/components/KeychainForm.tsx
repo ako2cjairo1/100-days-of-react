@@ -9,7 +9,8 @@ import {
 	LinkLabel,
 	Header,
 	Separator,
-} from '.'
+} from '@/components'
+import { KeychainCard } from '@/components/KeychainCard'
 import { useDebounceToggle, useInput, useStateObj, useTimedCopyToClipboard } from '@/hooks'
 import {
 	CreateError,
@@ -20,8 +21,7 @@ import {
 	TimeAgo,
 } from '@/services/Utils/password-manager.helper'
 import { REGISTER_STATE, KEYCHAIN_CONST, RequestType } from '@/services/constants'
-import { TFunction, TKeychain, TStatus, TRequestType } from '@/types'
-import { KeychainCard } from './KeychainCard'
+import type { TFunction, TKeychain, TStatus, TRequestType } from '@/types'
 
 const { PASSWORD_REGEX } = REGISTER_STATE
 const { STATUS, KEYCHAIN, WEBSITE_REGEX } = KEYCHAIN_CONST

@@ -1,5 +1,5 @@
-import { IChildren, IRequiredLabelProps } from '@/types'
-import { RequiredLabel } from '@/components/RequiredLabel'
+import type { IChildren, IRequiredLabelProps } from '@/types'
+import { RequiredLabel } from '@/components'
 
 interface ILabel extends IChildren {
 	props: Pick<IRequiredLabelProps, 'label' | 'labelFor' | 'subLabel' | 'isOptional' | 'isFulfilled'>

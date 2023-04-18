@@ -1,4 +1,4 @@
-import { TAuthContext, TAuthProvider } from '@/types'
+import type { TAuthContext, TAuthProvider } from '@/types'
 
 export const AUTH_CONTEXT = {
 	authInfo: {

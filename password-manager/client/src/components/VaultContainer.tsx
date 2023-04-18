@@ -1,6 +1,6 @@
-import { TKeychain } from '@/types'
-import { KeychainCard } from './KeychainCard/KeychainCard'
-import { IKeychain } from './Keychain'
+import type { TKeychain } from '@/types'
+import type { IKeychain } from '@/components'
+import { KeychainCard } from '@/components/KeychainCard'
 
 interface IVaultContainer extends Pick<IKeychain, 'actionCallback'> {
 	vault: Omit<TKeychain, 'password' | 'timeAgo'>[]

@@ -1,4 +1,4 @@
-import { IChildren, TFunction } from '@/types'
+import type { IChildren, TFunction } from '@/types'
 
 interface IBackdropOverlay extends IChildren {
 	className?: string

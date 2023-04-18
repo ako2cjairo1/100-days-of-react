@@ -1,4 +1,4 @@
-import { TValidation } from '@/types'
+import type { TValidation } from '@/types'
 export interface IValidationMessage<T = TValidation> {
 	isVisible: boolean
 	title?: string

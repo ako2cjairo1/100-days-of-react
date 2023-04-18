@@ -1,4 +1,4 @@
-import { IChildren } from '@/types'
+import type { IChildren } from '@/types'
 /**
  * Renders a separator with an optional `children` prop.
  *

@@ -1,5 +1,5 @@
 import { useDebounceToggle } from '@/hooks'
-import { IRequiredLabelProps } from '@/types'
+import type { IRequiredLabelProps } from '@/types'
 
 /**
  * This function returns a label element with the given properties.

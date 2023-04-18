@@ -1,5 +1,5 @@
-import { IChildren } from '@/types'
-import { AnimatedIcon } from './AnimatedIcon'
+import type { IChildren } from '@/types'
+import { AnimatedIcon } from '@/components'
 
 /**
  * This function returns a div element containing an animated icon and a paragraph element displaying the children prop.

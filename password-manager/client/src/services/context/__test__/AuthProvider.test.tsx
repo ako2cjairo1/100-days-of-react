@@ -1,7 +1,7 @@
-import { render, fireEvent } from '@/services/Utils/test.util'
-import { TAuthProvider } from '@/types'
 import { useContext } from 'react'
-import { AuthContext, AuthProvider } from '../AuthProvider'
+import { render, fireEvent } from '@/services/Utils/test.util'
+import { AuthContext, AuthProvider } from '@/services/context'
+import type { TAuthProvider } from '@/types'
 
 describe('AuthContext', () => {
 	const initAuthState: TAuthProvider = { email: '', password: '', accessToken: '' }

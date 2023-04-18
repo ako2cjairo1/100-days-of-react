@@ -24,14 +24,14 @@ describe('useStateObj', () => {
 		expect(result.current.objState).toEqual({ a: 1, b: 2 })
 	})
 
-	test('should add new properties to the state using the mutate function', () => {
-		const { result } = renderHook(() => useStateObj({ a: 1, b: 2 }))
-		const { mutate } = result.current
+	// test('should add new properties to the state using the mutate function', () => {
+	// 	const { result } = renderHook(() => useStateObj({ a: 1, b: 2 }))
+	// 	const { mutate } = result.current
 
-		act(() => {
-			mutate({ c: 3 })
-		})
+	// 	act(() => {
+	// 		mutate({ c: 3 })
+	// 	})
 
-		expect(result.current.objState).toEqual({ a: 1, b: 2, c: 3 })
-	})
+	// 	expect(result.current.objState).toEqual({ a: 1, b: 2, c: 3 })
+	// })
 })

@@ -1,7 +1,7 @@
-import { IChildren, TDetailedHTMLProps } from '@/types'
-import { Logo } from './Logo'
-import { Title } from './Title'
-import { Status } from './Status'
+import type { IChildren, TDetailedHTMLProps } from '@/types'
+import { Logo } from '@/components/Header/Logo'
+import { Title } from '@/components/Header/Title'
+import { Status } from '@/components/Header/Status'
 
 interface IHeaderProps extends IChildren, TDetailedHTMLProps {}
 

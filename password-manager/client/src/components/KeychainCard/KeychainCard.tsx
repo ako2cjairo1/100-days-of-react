@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom'
-import { AnimatedIcon } from '../AnimatedIcon'
-import { IChildren, TFunction, TKeychain } from '@/types'
+import type { IChildren, TFunction, TKeychain } from '@/types'
 import { GetDomainUrl } from '@/services/Utils/password-manager.helper'
-import { Logo } from './Logo'
-import { AnchorWrapper } from '@/components/AnchorWrapper'
+import { AnchorWrapper, AnimatedIcon } from '@/components'
+import { Logo } from '@/components/KeychainCard'
 
 export interface IKeychainCard extends IChildren, Partial<Pick<TKeychain, 'logo' | 'website'>> {
 	className?: string

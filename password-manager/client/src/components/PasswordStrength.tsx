@@ -1,5 +1,5 @@
 import '@/assets/modules/PasswordStrength.css'
-import { TEvaluatedPassword } from '@/types'
+import type { TEvaluatedPassword } from '@/types'
 import { PasswordStatus } from '@/services/constants'
 import { useEffect, useState } from 'react'
 

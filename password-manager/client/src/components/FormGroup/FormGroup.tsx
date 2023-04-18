@@ -1,5 +1,5 @@
-import { Label, Input } from '@/components/FormGroup'
-import { IChildren, TFunction } from '@/types'
+import { Label, Input } from '@/components'
+import type { IChildren, TFunction } from '@/types'
 
 interface IFormGroup extends IChildren {
 	onSubmit: TFunction<[e: React.FormEvent]>
@@ -11,7 +11,7 @@ interface IFormGroup extends IChildren {
  *
  * returns A form element with an onSubmit event handler containing the child components
  */
-export const FormGroup = ({ children, onSubmit }: IFormGroup) => {
+export function FormGroup({ children, onSubmit }: IFormGroup) {
 	return <form onSubmit={onSubmit}>{children}</form>
 }
 
