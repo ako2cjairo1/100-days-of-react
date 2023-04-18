@@ -1,4 +1,3 @@
-import { useDebounceToggle } from '@/hooks'
 import { AnimatedIcon } from '../AnimatedIcon'
 import { IChildren, TStatus } from '@/types'
 
@@ -15,7 +14,6 @@ interface IStatus extends IChildren {
 
 export function Status({ children, status }: IStatus) {
 	const isSuccessfulWithMessage = Object.values(status ? status : {}).every(Boolean)
-	const delaySuccess = useDebounceToggle(isSuccessfulWithMessage)
 
 	return (
 		<>
@@ -24,30 +22,29 @@ export function Status({ children, status }: IStatus) {
 					className={`center fdc ${status.message ? 'fade-in' : ''}`}
 					style={{ opacity: `${status.message ? 1 : 0}` }}
 				>
-					{isSuccessfulWithMessage
-						? delaySuccess && (
-								<>
+					{isSuccessfulWithMessage ? (
+						<>
+							<AnimatedIcon
+								className="scale-up"
+								iconName="fa fa-check-circle"
+							/>
+							<p className="center x-small descend">{status.message}</p>
+						</>
+					) : (
+						status.message && (
+							<>
+								{!status.success && (
 									<AnimatedIcon
-										className="scale-up"
-										iconName="fa fa-check-circle"
+										className="regular lit-error"
+										iconName="fa-solid fa-triangle-exclamation"
+										animation="fa-beat-fade"
+										animateOnLoad
 									/>
-									<p className="center x-small descend">{status.message}</p>
-								</>
-						  )
-						: delaySuccess &&
-						  status.message && (
-								<>
-									{!status.success && (
-										<AnimatedIcon
-											className="regular lit-error"
-											iconName="fa-solid fa-triangle-exclamation"
-											animation="fa-beat-fade"
-											animateOnLoad
-										/>
-									)}
-									<p className="center x-small descend error">{status.message}</p>
-								</>
-						  )}
+								)}
+								<p className="center x-small descend error">{status.message}</p>
+							</>
+						)
+					)}
 				</div>
 			)}
 			{children}

@@ -56,12 +56,15 @@ describe('Header', () => {
 
 	it('should render Header.Status error icon and message when "success" is false and "errMsg" is defined', () => {
 		const props = { success: false, message: 'Error message' }
+		vi.useFakeTimers()
 		const { container, getByText } = render(
 			<Header>
 				<Header.Status status={props} />
 			</Header>
 		)
+		vi.advanceTimersByTime(3000)
 		expect(container.querySelector('.fa-solid.fa-triangle-exclamation')).toBeInTheDocument()
 		expect(getByText(props.message)).toBeInTheDocument()
+		vi.useRealTimers()
 	})
 })
