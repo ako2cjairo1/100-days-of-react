@@ -1,11 +1,10 @@
 import mongoose from "mongoose"
-import { string } from "zod"
 
 // create User schema
 const UserSchema = new mongoose.Schema(
 	{
-		email: { type: string, required: true, unique: true },
-		masterPassword: { type: string, required: true },
+		email: { type: String, required: true, unique: true },
+		masterPassword: { type: String, required: true },
 	},
 	{
 		timestamps: true,

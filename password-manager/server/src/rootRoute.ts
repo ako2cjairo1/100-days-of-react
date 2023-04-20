@@ -1,5 +1,5 @@
-import { Logger } from "../utils/logger"
 import express from "express"
+import { Logger } from "./utils"
 
 const rootRouter = express.Router()
 

@@ -1,16 +1,34 @@
 import { Request, Response } from "express"
 import { TUser } from "../../types/User.type"
-import { Logger } from "../../utils/logger"
-import { createUser, extractJWT } from "./user.service"
+import { createUser } from "../user"
+import { createVault } from "../vault"
+import { CreateError, generateSalt, jwtSign } from "../../utils"
 
 export async function registerUser(req: Request, res: Response) {
-	const user = req.body as TUser // TODO: create object validation for props
-	const token = extractJWT(req)
+	const body = req.body as TUser // TODO: create object validation for props
 
-	Logger.info(user)
-	Logger.info(token)
+	try {
+		// create user and generate user._id
+		const user = await createUser(body)
+		const salt = generateSalt()
+		// subsequently create vault and assign user._id
+		const { vault } = await createVault({ user: user._id.toString(), salt })
 
-	createUser(user)
+		// create access token and send to response
+		const accessToken = jwtSign({ _id: user._id, email: user.email })
+		res.status(201).send({ accessToken, vault, salt })
+	} catch (error) {
+		const { code, status, errorObj } = CreateError(error)
+		let responseObj = { message: "Error creating user", error }
 
-	res.status(200).send(token)
+		if (code === 11000) {
+			// create "Duplicate key Error"
+			responseObj = {
+				message: "Duplicate Error",
+				error: errorObj.keyValue,
+			}
+		}
+
+		res.status(status).send(responseObj)
+	}
 }

@@ -1,9 +1,7 @@
 import { TUser } from "./User.type"
 
 export type TVault = {
-	user: TUser & {
-		required: true
-	}
+	user: string
 	vault: string
 	salt: string
 }

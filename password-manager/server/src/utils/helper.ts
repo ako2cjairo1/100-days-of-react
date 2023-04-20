@@ -1,17 +1,10 @@
+import { HTTPRequestError } from "@/types"
 /**
- * This function takes in an unknown error and returns an IPasswordMangerError object.
+ * This function takes in an unknown error and returns an HTTPRequestError object.
  *
  * param {unknown} error - The error to be processed.
- * returns {IPasswordMangerError} - The processed error object.
+ * returns {HTTPRequestError} - The processed error object.
  */
-type TResponseError = Error & {
-	code: string | number
-	status: number
-	name: string
-}
-type HTTPRequestError = TResponseError & {
-	errorObj: Partial<TResponseError> | any
-}
 export function CreateError(error: unknown) {
 	let result: HTTPRequestError = {
 		code: -1,

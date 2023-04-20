@@ -1,12 +1,11 @@
 import mongoose from "mongoose"
-import { string } from "zod"
 
 // create vault schema
 const VaultSchema = new mongoose.Schema(
 	{
-		user: { type: string, required: true, unique: true },
-		vault: { type: string, required: true },
-		salt: { type: string, required: true },
+		user: { type: String, required: true, unique: true },
+		vault: { type: String, default: "" },
+		salt: { type: String, required: true },
 	},
 	{
 		timestamps: true,

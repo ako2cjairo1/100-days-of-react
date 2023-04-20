@@ -1,6 +1,5 @@
-import { PasswordManagerServer } from "./utils/createServer"
-import { disconnectFromMongoDB } from "./utils/monggoDB"
-import { Logger } from "./utils/logger"
+import { Logger, PMServer, app } from "./utils"
+import { connectToMongoDB, disconnectFromMongoDB } from "./database"
 
 async function gracefulShutdown(signal: string, closeCallbackFn: () => void) {
 	process.on(signal, async () => {
@@ -14,15 +13,15 @@ async function gracefulShutdown(signal: string, closeCallbackFn: () => void) {
 	})
 }
 
-;(() => {
+;(async () => {
 	// create instance of server
-	const { connect, close } = PasswordManagerServer()
-	// listen to port
-	connect()
+	const server = PMServer(app)
+	// start http server
+	server.start()
+	// initiate and connect to MongoDB
+	connectToMongoDB()
 
-	// execute signals
 	const signals = ["SIGTERM", "SIGINT"]
-	for (const signal of signals) {
-		gracefulShutdown(signal, close)
-	}
+	// execute signals
+	signals.map((signal) => gracefulShutdown(signal, server.close))
 })()
