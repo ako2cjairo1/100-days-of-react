@@ -1,20 +1,18 @@
 import env from "dotenv"
-import fs from "fs"
-import path from "path"
 import express from "express"
 import cors from "cors"
-import bodyparser from "body-parser"
-import { expressjwt as jwt } from "express-jwt"
+import { ApiLogger } from "./logger"
+import { rootRouter } from "../routes/rootRoute"
+import { userRouter } from "../modules/user/user.route"
+import { customErrorPlugin, jwtPlugin } from "../plugins"
 
 env.config()
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:5173"
-const publicKey = fs.readFileSync(
-	`${(path.join(process.cwd()), "certs")}/public.key`
-)
 
 export const app = express()
-/* Register plugins here */
 
+/* Register plugins here */
+app.use(ApiLogger)
 // cors
 app.use(
 	cors({
@@ -23,12 +21,14 @@ app.use(
 	})
 )
 // jason web token
-app.use(
-	jwt({
-		secret: publicKey,
-		algorithms: ["RS256"],
-		credentialsRequired: true,
-	})
-)
+app.use(jwtPlugin)
 // json parser
-app.use(bodyparser.json())
+app.use(express.json())
+
+/* Routes */
+app.use(rootRouter)
+app.use(userRouter)
+// TODO:  app.use(vaultRouter)
+
+/* Error Handler */
+app.use(customErrorPlugin)
