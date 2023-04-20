@@ -1,5 +1,5 @@
 import { ValidationMessage } from '@/components'
-import { render } from '@/services/Utils/test.util'
+import { act, render } from '@/services/Utils/test.util'
 
 describe('ValidationMessage', () => {
 	it('should render title when isVisible is true', () => {
@@ -13,7 +13,8 @@ describe('ValidationMessage', () => {
 		expect(getByText('Test Title')).toBeInTheDocument()
 	})
 
-	it('should not render title when isVisible is false', () => {
+	it('should not render title when isVisible is false', async () => {
+		vi.useFakeTimers()
 		const { queryByText } = render(
 			<ValidationMessage
 				isVisible={false}
@@ -21,6 +22,9 @@ describe('ValidationMessage', () => {
 				validations={[]}
 			/>
 		)
+		await act(async () => {
+			vi.advanceTimersByTime(3000)
+		})
 		expect(queryByText('Test Title')).not.toBeInTheDocument()
 	})
 
@@ -40,7 +44,8 @@ describe('ValidationMessage', () => {
 		expect(getByText('Invalid Message')).toBeInTheDocument()
 	})
 
-	it('should not render validation messages when isVisible is false', () => {
+	it('should not render validation messages when isVisible is false', async () => {
+		vi.useFakeTimers()
 		const validations = [
 			{ isValid: true, message: 'Valid Message' },
 			{ isValid: false, message: 'Invalid Message' },
@@ -52,6 +57,9 @@ describe('ValidationMessage', () => {
 				validations={validations}
 			/>
 		)
+		await act(async () => {
+			vi.advanceTimersByTime(3000)
+		})
 		expect(queryByText('Valid Message')).not.toBeInTheDocument()
 		expect(queryByText('Invalid Message')).not.toBeInTheDocument()
 	})

@@ -201,7 +201,7 @@ export function Vault() {
 							/>
 						</Header.Logo>
 						<Header.Title
-							title="There are no Keychains here"
+							title="There are no Keychains"
 							subTitle='click "+" to Add one'
 						/>
 					</Header>
@@ -228,7 +228,7 @@ export function Vault() {
 			<Modal
 				isOpen={isOpenModalForm}
 				onClose={keychainModal.close}
-				// hideCloseIcon={true}
+				hideCloseIcon={true}
 				clickBackdropToClose={false}
 			>
 				<KeychainForm

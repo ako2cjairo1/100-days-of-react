@@ -6,6 +6,8 @@ import {
 	RunAfterSomeTime,
 	ExtractValFromRegEx,
 	MergeRegExObj,
+	CreateError,
+	IsEmpty,
 } from '@/services/Utils/password-manager.helper'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import {
@@ -20,12 +22,13 @@ import {
 	AnimatedIcon,
 	Header,
 } from '@/components'
+import axios from 'axios'
 
 // constants
 const { CREDENTIALS, STATUS, EMAIL_REGEX, PASSWORD_REGEX } = REGISTER_STATE
 const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
 
-export const Registration = () => {
+export function Registration() {
 	// form controlled inputs
 	const { inputAttribute, inputAction } = useInput<TInputRegistration>(CREDENTIALS)
 	// destructure
@@ -58,7 +61,16 @@ export const Registration = () => {
 	const checkIf = {
 		isValidEmail: EMAIL_REGEX.test(email),
 		isValidPassword: Object.values(passwordRequirement).every(Boolean),
-		validConfirmation: password === confirm && Object.values(passwordRequirement).every(Boolean),
+		validConfirmation: !IsEmpty(password) && password === confirm,
+		canSubmitForm() {
+			return (
+				!isTermsAgreed ||
+				isSubmitted ||
+				!checkIf.isValidEmail ||
+				!checkIf.isValidPassword ||
+				password !== confirm
+			)
+		},
 	}
 
 	const { emailReq, passwordReq, confirmReq } = {
@@ -96,20 +108,44 @@ export const Registration = () => {
 			mutateRegistrationStatus({ message: '' })
 			inputAction.isSubmit(true)
 
-			RunAfterSomeTime(() => {
-				if (!checkIf.isValidPassword) {
-					// TODO: use custom API to handle registration
-					mutateAuth({ ...inputStates, accessToken: 'fakeToken' })
-					inputAction.resetInput()
-					mutateRegistrationStatus({ success: true, message: '' })
-				} else {
-					mutateRegistrationStatus({
-						success: false,
-						message: 'Registration Failed!',
-					})
-				}
+			RunAfterSomeTime(async () => {
+				try {
+					if (checkIf.isValidPassword) {
+						let accessToken = ''
+						// TODO: use custom API to handle registration
+						const response = await axios.post(
+							'http://localhost:8080/api/registration',
+							{ ...inputStates },
+							{
+								headers: {
+									'Content-Type': 'application/json',
+									Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrbzJjamFpcm9AZ21haWwuY29tIiwibWFzdGVyUGFzc3dvcmQiOiJQYXNzd29yZEAxMjM0IiwiaWF0IjoxNTE2MjM5MDIyfQ.fDuadGFSggqHWSGfDiuen8pqz6ff_Zfv8y-KNXKxWSc`,
+								},
+							}
+						)
 
-				inputAction.isSubmit(false)
+						if (response.status !== 200) {
+							throw new Error(response.statusText)
+						}
+						// extract access token from API
+						accessToken = response.data
+						mutateAuth({ email, password, accessToken })
+
+						// clear form input states and status
+						inputAction.resetInput()
+						mutateRegistrationStatus({ success: true, message: '' })
+					} else {
+						mutateRegistrationStatus({
+							success: false,
+							message: 'Registration Failed!',
+						})
+					}
+
+					inputAction.isSubmit(false)
+				} catch (error) {
+					inputAction.isSubmit(false)
+					return mutateRegistrationStatus({ success: false, message: CreateError(error).message })
+				}
 			}, 3)
 		}
 	}
@@ -276,12 +312,7 @@ export const Registration = () => {
 										iconName: 'fa fa-user-plus',
 										textStatus: 'Processing...',
 										submitted: isSubmitted,
-										disabled:
-											!isTermsAgreed ||
-											isSubmitted ||
-											!checkIf.isValidEmail ||
-											!checkIf.isValidPassword ||
-											password !== confirm,
+										disabled: checkIf.canSubmitForm(),
 									}}
 									className="accent-bg"
 									onClick={() => console.log('Submit button triggered!')}

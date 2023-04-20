@@ -7,7 +7,7 @@
 
 .vault-list {
 	flex-direction: column;
-	max-height: 425px;
+	max-height: 433px;
 	overflow: scroll;
 	padding-right: 8px;
 	scroll-behavior: smooth;

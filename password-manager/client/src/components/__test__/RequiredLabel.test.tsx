@@ -1,5 +1,6 @@
 import { RequiredLabel } from '@/components'
 import { render } from '@/services/Utils/test.util'
+import { act } from 'react-dom/test-utils'
 
 describe('RequiredLabel', () => {
 	it('should render a label element with given htmlFor and text', () => {
@@ -95,5 +96,21 @@ describe('RequiredLabel', () => {
 			/>
 		)
 		expect(container.querySelector('.fa.fa-check')).toBeInTheDocument()
+	})
+
+	it('should hide check icon after 3s when isFulfilled prop is true', async () => {
+		vi.useFakeTimers()
+		const { container } = render(
+			<RequiredLabel
+				labelFor="example"
+				label="Example Label"
+				subLabel="Example Sub-label"
+				isFulfilled={true}
+			/>
+		)
+		await act(async () => {
+			vi.advanceTimersByTime(3000)
+		})
+		expect(container.querySelector('.fa.fa-check')).not.toBeInTheDocument()
 	})
 })

@@ -16,6 +16,7 @@ import {
 	CreateError,
 	GeneratePassword,
 	GenerateUUID,
+	IsEmpty,
 	MergeRegExObj,
 	RunAfterSomeTime,
 	TimeAgo,
@@ -47,33 +48,31 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 	const usernameClipboard = useTimedCopyToClipboard({})
 	const passwordClipboard = useTimedCopyToClipboard({})
 
-	const isEmpty = <T,>(value: T) =>
-		typeof value === 'undefined' ||
-		(typeof value === 'object' && Object.keys(value ?? {}).length === 0) ||
-		(typeof value === 'string' && value.length <= 0)
-
 	// conditional rendering
 	const checkIf = {
-		isEditing: !isEmpty(keychainInfo?.keychainId),
+		isEditing: !IsEmpty(keychainInfo?.keychainId),
 		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
 		isValidWebsite: WEBSITE_REGEX.test(website),
-		canDisableSubmit: () =>
-			isSubmitted ||
-			keychainStatus.success ||
-			!checkIf.isValidWebsite ||
-			isEmpty(username) ||
-			isEmpty(password),
-		canCopyUsername: !usernameClipboard.isCopied && !isEmpty(username),
-		canCopyPassword: !passwordClipboard.isCopied && !isEmpty(password),
+		canCopyUsername: !usernameClipboard.isCopied && !IsEmpty(username),
+		canCopyPassword: !passwordClipboard.isCopied && !IsEmpty(password),
 		canGeneratePassword: !isSubmitted && !keychainStatus.success,
 		debounceUsernameClipboard:
 			useDebounceToggle(usernameClipboard.isCopied, 2) &&
 			usernameClipboard.isCopied &&
-			!isEmpty(username),
+			!IsEmpty(username),
 		debouncePasswordClipboard:
 			useDebounceToggle(passwordClipboard.isCopied, 2) &&
 			passwordClipboard.isCopied &&
-			!isEmpty(password),
+			!IsEmpty(password),
+		canDisableSubmit() {
+			return (
+				isSubmitted ||
+				keychainStatus.success ||
+				!checkIf.isValidWebsite ||
+				IsEmpty(username) ||
+				IsEmpty(password)
+			)
+		},
 	}
 
 	useEffect(() => {
@@ -259,7 +258,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						props={{
 							label: 'User Name',
 							labelFor: 'username',
-							isFulfilled: !isEmpty(username),
+							isFulfilled: !IsEmpty(username),
 						}}
 					/>
 					<FormGroup.Input
@@ -270,7 +269,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						disabled={isSubmitted}
 						required
 						className={`${
-							isSubmitted ? 'disabled' : !isEmpty(username) ? '' : !isFocus.username && 'invalid'
+							isSubmitted ? 'disabled' : !IsEmpty(username) ? '' : !isFocus.username && 'invalid'
 						}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
@@ -293,7 +292,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						props={{
 							label: 'Password',
 							labelFor: 'password',
-							isFulfilled: !isEmpty(password),
+							isFulfilled: !IsEmpty(password),
 						}}
 					>
 						<PasswordStrength
@@ -309,7 +308,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						disabled={isSubmitted}
 						required
 						className={`${
-							isSubmitted ? 'disabled' : !isEmpty(password) ? '' : !isFocus.password && 'invalid'
+							isSubmitted ? 'disabled' : !IsEmpty(password) ? '' : !isFocus.password && 'invalid'
 						}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>

@@ -1,3 +1,4 @@
+import { useDebounceToggle } from '@/hooks'
 import type { TValidation } from '@/types'
 export interface IValidationMessage<T = TValidation> {
 	isVisible: boolean
@@ -12,11 +13,14 @@ export interface IValidationMessage<T = TValidation> {
  * returns {JSX.Element} A React component that displays the title and list of validation messages.
  */
 export function ValidationMessage({ isVisible, title, validations }: IValidationMessage) {
+	// use to delay animation of validations (isVisible)
+	const delayedToggle = useDebounceToggle(!isVisible)
+
 	return (
 		<>
-			{title && isVisible && <span className="small">{title}</span>}
+			{title && (isVisible || delayedToggle) && <span className="small">{title}</span>}
 			<ul className="x-small fa-ul">
-				{validations && isVisible
+				{validations && (isVisible || delayedToggle)
 					? validations.map(({ message, isValid }, idx) => (
 							<li key={idx}>
 								<i
