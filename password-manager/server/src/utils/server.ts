@@ -1,13 +1,14 @@
 import dotenv from "dotenv"
 import http from "http"
+import { Express } from "express"
 import { Logger } from "./logger"
 
 // config process env
 dotenv.config()
 
-export function PMServer(listener: any) {
+export function PMServer(app: Express) {
 	const PORT = process.env.PORT || 8080
-	const server = http.createServer(listener)
+	const server = http.createServer(app)
 
 	return {
 		start() {

@@ -34,7 +34,7 @@ export function extractJWT(req: Request) {
 
 export function jwtSign<T extends {} | string | Buffer>(payload: T) {
 	const publicKey = fs.readFileSync(
-		`${(path.join(process.cwd()), "certs")}/public.key`
+		`${(path.join(process.cwd()), "certs")}/private.key`
 	)
 	return jwt.sign(payload, publicKey, { algorithm: "HS256" })
 }

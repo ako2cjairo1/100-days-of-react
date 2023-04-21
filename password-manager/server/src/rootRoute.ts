@@ -3,9 +3,9 @@ import { Logger } from "./utils"
 
 const rootRouter = express.Router()
 
-rootRouter.get("/api", (req, res) => {
-	Logger.info("Henlo from root!")
-	res.send("I'm alive")
+rootRouter.get("/heartbeat", (req, res) => {
+	Logger.info("Just checking if server is up!")
+	res.status(200).send("I'm alive")
 })
 
 export { rootRouter }

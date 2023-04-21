@@ -23,6 +23,7 @@ app.use(
 app.use(jwtPlugin)
 // json parser
 app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
 //* Routes */
 app.use(rootRouter)

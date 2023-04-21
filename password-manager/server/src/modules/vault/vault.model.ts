@@ -13,4 +13,4 @@ const VaultSchema = new mongoose.Schema(
 )
 
 // create the vault model using the schema then export
-export const VaultModel = mongoose.model("vault", VaultSchema)
+export const VaultModel = mongoose.model("Vault", VaultSchema)
