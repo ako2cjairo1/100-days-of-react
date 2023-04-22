@@ -11,8 +11,10 @@ export function ActivityLogger(
 
 	response.on("finish", () => {
 		const elapsedTime = new Date().getTime() - startTime
+		const { method, originalUrl, hostname, ip } = request
+
 		Logger.info(
-			`[${request.method}] -> ${request.originalUrl} -  ${response.statusCode} (${elapsedTime}ms)`
+			`[${hostname}:${ip}] [${method}] -> ${originalUrl} - ${response.statusCode} (${elapsedTime}ms)`
 		)
 	})
 	next()
