@@ -14,6 +14,7 @@ import { useAuthContext, useStateObj } from '@/hooks'
 import { CreateError, LocalStorage, Log } from '@/services/Utils/password-manager.helper'
 import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
 import { RequestType, KEYCHAIN_CONST, FormContent } from '@/services/constants'
+import { encryptVault } from '@/services/Utils/crypto'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 const { add, modify, view } = RequestType
@@ -49,8 +50,15 @@ export function Vault() {
 	}, [])
 
 	// TODO: implement these as controller methods for API
-	const updateLocalStorage = (info: TKeychain[]) =>
-		LocalStorage.write('password_manager_data', JSON.stringify(info))
+	const updateLocalStorage = (vault: TKeychain[]) => {
+		LocalStorage.write('password_manager_data', JSON.stringify(vault))
+
+		const encryptedVault = encryptVault({
+			vault: JSON.stringify({ vault }),
+			vaultKey: '', //TODO: provide the vault key
+		})
+		Log(encryptedVault)
+	}
 
 	const mutateVault = (keychainUpdate: TKeychain, requestType: TRequestType): TStatus => {
 		const vaultData: TKeychain[] = getVaultData()

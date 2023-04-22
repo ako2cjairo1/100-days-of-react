@@ -8,6 +8,7 @@ import {
 	MergeRegExObj,
 	CreateError,
 	IsEmpty,
+	LocalStorage,
 } from '@/services/Utils/password-manager.helper'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import {
@@ -22,7 +23,8 @@ import {
 	AnimatedIcon,
 	Header,
 } from '@/components'
-import axios from 'axios'
+import { generateVaultKey, hashPassword } from '@/services/Utils/crypto'
+import { registerUser } from '@/api'
 
 // constants
 const { CREDENTIALS, STATUS, EMAIL_REGEX, PASSWORD_REGEX } = REGISTER_STATE
@@ -111,26 +113,32 @@ export function Registration() {
 			RunAfterSomeTime(async () => {
 				try {
 					if (checkIf.isValidPassword) {
-						let accessToken = ''
-						// TODO: use custom API to handle registration
-						const response = await axios.post(
-							'http://localhost:8080/api/registration',
-							{ ...inputStates },
-							{
-								headers: {
-									'Content-Type': 'application/json',
-									Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrbzJjamFpcm9AZ21haWwuY29tIiwibWFzdGVyUGFzc3dvcmQiOiJQYXNzd29yZEAxMjM0IiwiaWF0IjoxNTE2MjM5MDIyfQ.fDuadGFSggqHWSGfDiuen8pqz6ff_Zfv8y-KNXKxWSc`,
-								},
-							}
-						)
+						const hashedPassword = hashPassword(password)
+						// register and get accessToken from /api/registration endpoint
+						const { accessToken, vault, salt } = await registerUser({
+							email,
+							password: hashedPassword,
+						})
 
-						if (response.status !== 200) {
-							throw new Error(response.statusText)
-						}
-						// extract access token from API
-						accessToken = response.data
-						mutateAuth({ email, password, accessToken })
+						const vaultKey = generateVaultKey({
+							email,
+							hashedPassword,
+							salt,
+						})
+						console.table({ accessToken, vault, salt, hashedPassword })
+						mutateAuth({
+							email,
+							password: hashedPassword,
+							accessToken,
+						})
 
+						// save the vault key in session storage
+						window.sessionStorage.setItem('vk', vaultKey)
+
+						// TODO: save this to session storage instead
+						// LocalStorage.write("password_manager_data", vault)
+						window.sessionStorage.setItem('vault', vault)
+						// throw new Error("[Mock Error]")
 						// clear form input states and status
 						inputAction.resetInput()
 						mutateRegistrationStatus({ success: true, message: '' })
