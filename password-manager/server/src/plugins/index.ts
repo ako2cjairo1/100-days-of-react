@@ -1,3 +1,4 @@
-export { ActivityLogger } from "./ActivityLogger.plugin"
-export { jwtPlugin } from "./jwt.plugin"
-export { customErrorPlugin } from "./customErrorHandler.plugin"
+export * from "./ActivityLogger.plugin"
+export * from "./jwt.plugin"
+export * from "./customErrorHandler.plugin"
+export * from "./cookieParser.plugin"

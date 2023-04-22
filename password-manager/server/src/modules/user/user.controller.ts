@@ -1,10 +1,14 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 import { TUser } from "../../types/User.type"
 import { createUser } from "../user"
 import { createVault } from "../vault"
 import { CreateError, Logger, generateSalt, jwtSign } from "../../utils"
 
-export async function registerUser(req: Request, res: Response) {
+export async function registerUserHandler(
+	req: Request,
+	res: Response,
+	next: NextFunction
+) {
 	const user = req.body as TUser // TODO: create object validation for props
 
 	try {
@@ -23,33 +27,36 @@ export async function registerUser(req: Request, res: Response) {
 			email: registerUser.email,
 			// iat: will be included here
 		})
-		// send a 201:"Created" status with accessToken
-		res.status(201).send({ accessToken, vault, salt })
+		res.cookie("PM_accessToken", accessToken, {
+			secure: true,
+			httpOnly: false,
+			sameSite: true,
+			signed: true,
+		})
+		// respond a 201:"Created" status with payload
+		return res.status(201).send({ accessToken, vault, salt })
 	} catch (err) {
 		// parse unknown err
-		const error = CreateError(err)
-		const { code, errorObj } = error
-		// default error props
-		let responseObj = {
-			status: error.status,
-			message: "Error creating user",
-			errorObj: err,
-		}
+		let error = CreateError(err)
+
+		// default error message
+		error.message = "Error creating user"
 
 		// override code:11000 as "Duplicate email" error
-		if (code === 11000) {
-			responseObj = {
-				status: 400,
-				message: "Duplicate Email",
-				errorObj: errorObj.keyValue,
-			}
+		if (error.code === 11000) {
+			error.status = 409
+			error.message = "email already exist"
+			error.errorObj = error.errorObj.keyValue
 		}
 
-		// extract error props for client
-		const { status, message } = responseObj
-		// server log custom error obj with readable message
-		Logger.error(error, message)
-		// respond with assigned response code (status) and formatted error
-		res.status(status).send({ status, message })
+		// pass formatted error to error handler plugin
+		next(error)
 	}
+}
+
+export async function createUserSessionHandler(req: Request, res: Response) {
+	// validate email and master password
+	// create session
+	// create access token
+	// create refresh token
 }

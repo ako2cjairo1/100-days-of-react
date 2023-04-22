@@ -9,15 +9,20 @@ const MONGODB_URI =
 export async function connectToMongoDB() {
 	try {
 		Logger.info("Connecting to MongoDB...")
-		await mongoose.connect(MONGODB_URI)
-		return Logger.info("MongoDB connection successful!")
+
+		await mongoose.connect(MONGODB_URI, {
+			retryWrites: true,
+			w: "majority",
+		})
+
+		return Logger.info("MongoDB connected!")
 	} catch (error) {
-		Logger.error(error, "Error connecting to Mongodb Database.")
+		Logger.error(error, "Error connecting to MongoDB.")
 		process.exit(1)
 	}
 }
 
 export async function disconnectFromMongoDB() {
 	await mongoose.connection.close()
-	return Logger.info("Disconnected from Mongodb Database.")
+	return Logger.info("MongoDB disconnected!")
 }
