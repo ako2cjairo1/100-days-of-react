@@ -1,6 +1,6 @@
 import express from "express"
 import { registerUserHandler } from "./user.controller"
-import { LoginLimiter } from "@/plugins/Security.plugin"
+import { LoginLimiter } from "../../plugins"
 
 export const userRouter = express.Router()
 userRouter.post("/api/users", registerUserHandler)

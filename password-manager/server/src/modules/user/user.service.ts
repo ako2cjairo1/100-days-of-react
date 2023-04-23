@@ -1,4 +1,4 @@
-import { TUser } from "@/types"
+import { TUser } from "../../types"
 import { UserModel } from "./user.model"
 import { isHashVerified } from "../../utils"
 
