@@ -4,7 +4,7 @@ import { AuthContext, AuthProvider } from '@/services/context'
 import type { TAuthProvider } from '@/types'
 
 describe('AuthContext', () => {
-	const initAuthState: TAuthProvider = { email: '', password: '', accessToken: '' }
+	const initAuthState: TAuthProvider = { email: '', vaultId: '', accessToken: '' }
 
 	it('provides initial auth state to its children', () => {
 		let result = {}
@@ -26,7 +26,7 @@ describe('AuthContext', () => {
 	it('allows updating the auth state using setAuth', async () => {
 		let resultState = {}
 		const mockSetAuth = vi.fn() // mock the setAuth action from context provider
-		const authState = { email: 'test@example.com', password: 'password', accessToken: 'token' }
+		const authState = { email: 'test@example.com', vaultId: '1', accessToken: 'token' }
 
 		const TestUpdateComponent = () => {
 			const { authInfo: auth } = useContext(AuthContext)!
