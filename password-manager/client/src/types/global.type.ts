@@ -51,7 +51,9 @@ export type TEvaluatedPassword = {
 	score: number
 }
 
-export type TAuthProvider = TCredentials & {
+export type TAuthProvider = {
+	email: string
+	vaultId: string
 	accessToken: string
 }
 

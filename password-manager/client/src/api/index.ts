@@ -6,7 +6,7 @@ const baseURL = `${import.meta.env.VITE_PUBLIC_API_ENDPOINT}/api/users`
 
 interface IRTRegisterUser {
 	accessToken: string
-	vault: string
+	vaultId: string
 	salt: string
 }
 export function registerUser(payload: TCredentials): Promise<IRTRegisterUser> {

@@ -3,7 +3,7 @@ import type { TAuthContext, TAuthProvider } from '@/types'
 export const AUTH_CONTEXT = {
 	authInfo: {
 		email: '',
-		password: '',
+		vaultId: '',
 		accessToken: '',
 	},
 	mutateAuth: () => null,

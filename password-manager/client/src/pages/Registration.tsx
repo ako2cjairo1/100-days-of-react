@@ -8,7 +8,6 @@ import {
 	MergeRegExObj,
 	CreateError,
 	IsEmpty,
-	LocalStorage,
 } from '@/services/Utils/password-manager.helper'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import {
@@ -115,7 +114,7 @@ export function Registration() {
 					if (checkIf.isValidPassword) {
 						const hashedPassword = hashPassword(password)
 						// register and get accessToken from /api/registration endpoint
-						const { accessToken, vault, salt } = await registerUser({
+						const { accessToken, vaultId, salt } = await registerUser({
 							email,
 							password: hashedPassword,
 						})
@@ -125,10 +124,10 @@ export function Registration() {
 							hashedPassword,
 							salt,
 						})
-						console.table({ accessToken, vault, salt, hashedPassword })
+						// console.table({ accessToken, vaultId, salt, hashedPassword })
 						mutateAuth({
 							email,
-							password: hashedPassword,
+							vaultId,
 							accessToken,
 						})
 
@@ -137,7 +136,7 @@ export function Registration() {
 
 						// TODO: save this to session storage instead
 						// LocalStorage.write("password_manager_data", vault)
-						window.sessionStorage.setItem('vault', vault)
+						window.sessionStorage.setItem('vault', vaultId)
 						// throw new Error("[Mock Error]")
 						// clear form input states and status
 						inputAction.resetInput()
@@ -212,10 +211,10 @@ export function Registration() {
 										isFocus.email
 											? ''
 											: checkIf.isValidEmail
-											? 'valid'
-											: email.length > 0
-											? 'invalid'
-											: ''
+												? 'valid'
+												: email.length > 0
+													? 'invalid'
+													: ''
 									}
 								/>
 								<ValidationMessage
@@ -249,10 +248,10 @@ export function Registration() {
 										isFocus.password
 											? ''
 											: checkIf.isValidPassword
-											? 'valid'
-											: password.length > 0
-											? 'invalid'
-											: ''
+												? 'valid'
+												: password.length > 0
+													? 'invalid'
+													: ''
 									}
 								/>
 								<ValidationMessage
@@ -283,10 +282,10 @@ export function Registration() {
 										isFocus.confirm
 											? ''
 											: checkIf.validConfirmation
-											? 'valid'
-											: password.length > 0
-											? 'invalid'
-											: ''
+												? 'valid'
+												: password.length > 0
+													? 'invalid'
+													: ''
 									}
 								/>
 
