@@ -1,29 +1,28 @@
-import fs from "fs"
-import path from "path"
 import crypto from "crypto"
 import argon2 from "argon2"
 import * as jwt from "jsonwebtoken"
 import { Request } from "express"
+import { ParameterStore, TokenExpiration } from "../constant"
 
-// generate salt
 export function generateSalt() {
 	return crypto.randomBytes(64).toString("hex")
 }
 
-export async function generateHash(password: string) {
-	return argon2.hash(password)
+export async function generateHash(plain: string) {
+	return argon2.hash(plain)
 }
 
 export async function isHashVerified(verifier: string, plain: string) {
-	const hash = await generateHash(plain)
-	return argon2.verify(verifier, hash)
+	return argon2.verify(verifier, plain)
 }
 
 // extract jwt from request
 export function extractJWT(req: Request) {
 	const { authorization } = req.headers
 
+	// make sure that the JWT is in correct Header format
 	if (authorization && authorization.toLowerCase().includes("bearer ")) {
+		// extract the JWT from "Authorization" header
 		return authorization.split(" ")[1]?.toString()
 	}
 
@@ -32,9 +31,11 @@ export function extractJWT(req: Request) {
 	}
 }
 
-export function jwtSign<T extends {} | string | Buffer>(payload: T) {
-	const publicKey = fs.readFileSync(
-		`${(path.join(process.cwd()), "certs")}/private.key`
-	)
-	return jwt.sign(payload, publicKey, { algorithm: "HS256" })
+export function signAccessToken<T extends { userId: string; email: string }>(
+	payload: T
+) {
+	return jwt.sign(payload, ParameterStore.SECRET, {
+		algorithm: "HS256",
+		expiresIn: TokenExpiration.Access,
+	})
 }

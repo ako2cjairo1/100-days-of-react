@@ -1,9 +1,8 @@
 import express from "express"
-import { registerUserHandler } from "./user.controller"
+import { loginHandler, registerHandler } from "./user.controller"
 import { LoginLimiter } from "../../plugins"
 
 export const userRouter = express.Router()
-userRouter.post("/api/users", registerUserHandler)
+userRouter.post("/api/users", registerHandler)
 
-// TODO: implement loginUserHandler
-// userRouter.post("/api/sessions", LoginLimiter, loginUserHandler)
+userRouter.post("/api/users/login", LoginLimiter, loginHandler)

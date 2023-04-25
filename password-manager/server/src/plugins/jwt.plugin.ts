@@ -1,12 +1,8 @@
-import fs from "fs"
-import path from "path"
 import { expressjwt as jwt } from "express-jwt"
+import { ParameterStore } from "../constant"
 
-const privateKey = fs.readFileSync(
-	`${(path.join(process.cwd()), "certs")}/private.key`
-)
-export const jwtPlugin = jwt({
+export const JWTPlugin = jwt({
 	algorithms: ["HS256"],
 	credentialsRequired: false,
-	secret: privateKey,
+	secret: ParameterStore.SECRET,
 })

@@ -7,10 +7,19 @@ export async function createUser(user: TUser) {
 	return UserModel.create(user)
 }
 
-export async function findUserByEmailAndPassword({ email, password }: TUser) {
+export async function authenticateByEmailAndPassword({
+	email,
+	password,
+}: TUser) {
 	const user = await UserModel.findOne({ email })
-	// return nothing if user not found or master password is not verified
-	if (!user || !isHashVerified(user.password, password)) return null
-	// otherwise, return found User from database
-	return user
+
+	// return user info if found and password hash is verified
+	if (user && (await isHashVerified(user.password, password))) return user
+
+	// otherwise, return nothing
+	return null
+}
+
+export async function deleteUserById(userId: string) {
+	return await UserModel.findOneAndDelete({ _id: userId })
 }

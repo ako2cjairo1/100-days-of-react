@@ -1,7 +1,5 @@
-import { TUser } from "./User.type"
-
 export type TVault = {
-	user: string
-	vault: string
-	salt: string
+	userId: string
+	data: string
+	salt?: string
 }

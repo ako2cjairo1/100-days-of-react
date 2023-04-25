@@ -1,36 +1,36 @@
-import env from "dotenv"
 import express from "express"
 import cors from "cors"
 import { rootRouter } from "./rootRoute"
 import { userRouter } from "./modules/user"
-import { Security } from "./plugins/Security.plugin"
 import {
 	ActivityLogger,
+	ApiHeaderRules,
 	CookieParser,
 	customErrorPlugin,
-	jwtPlugin,
+	JWTPlugin,
+	NotFound,
+	Security,
 } from "./plugins"
-
-env.config()
-const CORS_ORIGIN = process.env.CORS_ORIGIN
+import { ParameterStore } from "./constant"
 const app = express()
 
 //* Register plugins here */
-// helmet, verify session cookies, rate limiter,
-app.use(Security)
 app.use(
 	cors({
-		origin: CORS_ORIGIN,
 		credentials: true,
+		origin: ParameterStore.CLIENT_URL,
 	})
 )
-// custom request logger
-app.use(ActivityLogger)
+// helmet, verify session cookies, rate limiter,
+app.use(Security)
 // using public key to sign
 app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
+app.use(ApiHeaderRules)
 app.use(CookieParser)
-app.use(jwtPlugin)
+app.use(JWTPlugin)
+// custom request logger
+app.use(ActivityLogger)
 
 //* Routes */
 app.use(rootRouter)
@@ -40,5 +40,7 @@ app.use(userRouter)
 
 //* custom Error Handler */
 app.use(customErrorPlugin)
+
+app.use(NotFound)
 
 export { app }

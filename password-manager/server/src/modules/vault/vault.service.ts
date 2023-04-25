@@ -1,14 +1,14 @@
 import { TVault } from "../../types"
 import { VaultModel } from "./vault.model"
 
-export function createVault(vault: Pick<TVault, "user" | "salt">) {
+export async function createVault(vault: TVault) {
 	return VaultModel.create(vault)
 }
 
-interface IUpdateVault {
-	userId: string
-	data: string
+export async function updateVaultByUserId({ userId, data }: TVault) {
+	VaultModel.updateOne({ userId }, { data })
 }
-export function updateVault({ userId, data }: IUpdateVault) {
-	VaultModel.updateOne({ user: userId }, { data })
+
+export async function getVaultByUserId(userId: string) {
+	return VaultModel.findOne({ userId: userId })
 }

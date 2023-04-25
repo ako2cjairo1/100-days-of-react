@@ -1,10 +1,11 @@
 import mongoose from "mongoose"
+import { TVault } from "../../types"
 
 // create vault schema
 const VaultSchema = new mongoose.Schema(
 	{
-		user: { type: String, required: true, unique: true },
-		vault: { type: String, default: "" },
+		userId: { type: String, required: true, unique: true },
+		data: { type: String, default: "" },
 		salt: { type: String, required: true },
 	},
 	{
@@ -13,4 +14,4 @@ const VaultSchema = new mongoose.Schema(
 )
 
 // create the vault model using the schema then export
-export const VaultModel = mongoose.model("Vault", VaultSchema)
+export const VaultModel = mongoose.model<TVault>("Vault", VaultSchema)

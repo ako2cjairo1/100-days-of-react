@@ -1,23 +1,19 @@
-import env from "dotenv"
 import mongoose from "mongoose"
 import { Logger } from "../utils/logger"
-
-env.config()
-const MONGODB_URI =
-	process.env.MONGODB_URI || "mongodb://localhost:27017/password-manager"
+import { ParameterStore } from "../constant"
 
 export async function connectToMongoDB() {
 	try {
 		Logger.info("Connecting to MongoDB...")
 
-		await mongoose.connect(MONGODB_URI, {
+		await mongoose.connect(ParameterStore.MongoDBUrl, {
 			retryWrites: true,
 			w: "majority",
 		})
 
-		return Logger.info("MongoDB connected!")
+		return Logger.info("Connection to MongoDB -> Success")
 	} catch (error) {
-		Logger.error(error, "Error connecting to MongoDB.")
+		Logger.error(error, "Unable to connect to MongoDB.")
 		process.exit(1)
 	}
 }

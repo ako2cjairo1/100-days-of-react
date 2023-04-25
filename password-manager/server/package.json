@@ -1,10 +1,11 @@
 {
 	"name": "password-manager-server",
 	"version": "1.0.0",
-	"main": "index.js",
+	"main": "src/main.ts",
 	"license": "MIT",
 	"scripts": {
-		"start": "nodemon -x ts-node src/main.ts"
+		"start": "nodemon -x ts-node src/main.ts",
+		"build": "rm -rf build/ && tsc"
 	},
 	"dependencies": {
 		"@typegoose/typegoose": "^11.0.1",
