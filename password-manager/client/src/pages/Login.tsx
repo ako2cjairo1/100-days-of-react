@@ -88,7 +88,7 @@ export function Login() {
 					// hash password before sending to API
 					const hashedPassword = hashPassword(password)
 					// authenticate user using email and hashed password from API
-					const { vault, salt } = await loginUser({
+					const { accessToken, vault, salt } = await loginUser({
 						email,
 						password: hashedPassword,
 					})
@@ -109,7 +109,7 @@ export function Login() {
 					mutateAuth({
 						email,
 						vault,
-						// accessToken,
+						accessToken,
 					})
 					// clear form input states and status
 					inputAction.resetInput()

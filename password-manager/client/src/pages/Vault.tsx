@@ -15,6 +15,7 @@ import { CreateError, LocalStorage, Log } from '@/services/Utils/password-manage
 import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
 import { RequestType, KEYCHAIN_CONST, FormContent } from '@/services/constants'
 import { encryptVault } from '@/services/Utils/crypto'
+import { logoutUser } from '@/api'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 const { add, modify, view } = RequestType
@@ -30,7 +31,7 @@ export function Vault() {
 
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
-	const { mutateAuth } = useAuthContext()
+	const { authInfo, mutateAuth } = useAuthContext()
 	const vaultCountRef = useRef(0)
 
 	const getVaultData = () => {
@@ -181,7 +182,18 @@ export function Vault() {
 					name="Logout"
 					iconName="fa fa-sign-out"
 					navigateTo="/login"
-					onClick={() => mutateAuth({ accessToken: '' })}
+					onClick={async () => {
+						try {
+							await logoutUser(authInfo.accessToken)
+							window.sessionStorage.clear()
+							mutateAuth({ accessToken: '' })
+						} catch (error) {
+							updateVaultStatus({
+								success: false,
+								message: 'Operation Failed!',
+							})
+						}
+					}}
 				/>
 
 				<Menubar.Item

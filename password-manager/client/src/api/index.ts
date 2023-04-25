@@ -21,3 +21,17 @@ export async function loginUser(userInfo: TCredentials): Promise<IAuthInfo> {
 	})
 	return res.data
 }
+
+export async function logoutUser(accessToken: string) {
+	const res = await axios.post(
+		`${baseURL}/users/logout`,
+		{},
+		{
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+			withCredentials: true,
+		}
+	)
+	return res.data
+}
