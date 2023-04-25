@@ -1,6 +1,5 @@
 import mongoose from "mongoose"
-import argon2 from "argon2"
-import { TUser } from "../../types"
+import { IUserModel } from "../../types"
 import { generateHash } from "../../utils"
 
 // create User schema
@@ -25,4 +24,4 @@ UserSchema.pre("save", async function (next) {
 })
 
 // create the User model and export
-export const UserModel = mongoose.model<TUser>("User", UserSchema)
+export const UserModel = mongoose.model<IUserModel>("User", UserSchema)

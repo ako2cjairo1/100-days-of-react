@@ -1,6 +1,8 @@
 import env from "dotenv"
+import { CookieOptions } from "express"
 env.config()
 
+const isProd = process.env.NODE_ENV === "production"
 const SERVER_PORT = process.env.SERVER_PORT || 8080
 const MONGODB_USERNAME = process.env.MONGODB_USERNAME || ""
 const MONGODB_PASSWORD = process.env.MONGODB_PASSWORD || ""
@@ -31,3 +33,12 @@ export const TokenExpiration = {
 	Access: 5 * 60, // 5 mins
 	Refresh: 7 * 24 * 60 * 60, // a week
 } as const
+
+export const DefaultCookieOptions: CookieOptions = {
+	httpOnly: isProd, // set to "true" if we don't want want JS to read cookies
+	secure: isProd,
+	sameSite: isProd ? "strict" : "lax",
+	domain: COOKIE_DOMAIN,
+	path: "/", // to let cookies be available to all pages of our app
+	signed: true,
+}

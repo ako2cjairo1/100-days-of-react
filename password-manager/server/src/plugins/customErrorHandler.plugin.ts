@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express"
-import { CreateError } from "../utils/helper"
-import { Logger } from "../utils/logger"
+import { CreateError, Logger } from "../utils"
 
 export function customErrorPlugin(
 	err: unknown,

@@ -2,21 +2,13 @@ import Helmet from "helmet"
 import session from "express-session"
 import limiter from "express-rate-limit"
 import { ParameterStore } from "../constant"
+import { DefaultCookieOptions } from "../constant"
 
 const SessionCookies = session({
 	secret: ParameterStore.SECRET,
 	resave: false,
 	saveUninitialized: false,
-	cookie: {
-		domain: ParameterStore.COOKIE_DOMAIN,
-		path: "/",
-		secure: true,
-		httpOnly: true,
-		sameSite: true,
-		signed: true,
-		// Cookie will expire in 1 hour from when it's generated
-		// expires: new Date(Date.now() + 60 * 60 * 1000),
-	},
+	cookie: DefaultCookieOptions,
 })
 
 const limiterConfig = {

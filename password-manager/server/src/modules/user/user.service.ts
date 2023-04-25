@@ -1,4 +1,4 @@
-import { TUser } from "../../types"
+import { IUserModel, TUser } from "../../types"
 import { UserModel } from "./user.model"
 import { isHashVerified } from "../../utils"
 
@@ -20,6 +20,6 @@ export async function authenticateByEmailAndPassword({
 	return null
 }
 
-export async function deleteUserById(userId: string) {
+export async function deleteUserById(userId: IUserModel["userId"]) {
 	return await UserModel.findOneAndDelete({ _id: userId })
 }

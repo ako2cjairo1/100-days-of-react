@@ -1,6 +1,6 @@
 import http from "http"
 import { Express } from "express"
-import { Logger } from "../utils"
+import { Logger } from "."
 import { disconnectFromMongoDB } from "../database"
 import { ParameterStore } from "../constant"
 

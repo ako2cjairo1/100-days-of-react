@@ -1,0 +1,24 @@
+version: "1"
+services:
+    api-service:
+        image: node:14
+        container_name: auth_api
+        volumes:
+            - ./node_modules:/node_modules
+            - ./src:/src
+            - ./tsconfig.json:/tsconfig.json
+            - ./package.json:/package.json
+        ports:
+            - "1337:1337"
+        working_dir: /server
+        command: yarn run ts-node-dev --project server/tsconfig.json -r tsconfig-paths/register src/main.ts
+        env_file: .env
+
+    mongodb:
+        image: mongo:5
+        container_name: auth_mongodb
+        ports:
+            - "1335:1337"
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: admin
+            MONGO_INITDB_ROOT_PASSWORD: change_me

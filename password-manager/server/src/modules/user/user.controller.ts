@@ -1,10 +1,15 @@
-import env from "dotenv"
 import { NextFunction, Request, Response } from "express"
 import { createUser, authenticateByEmailAndPassword } from "../user"
 import { createVault, getVaultByUserId } from "../vault"
-import { CreateError, generateSalt, signAccessToken } from "../../utils"
+import {
+	CreateError,
+	buildTokens,
+	generateSalt,
+	setCookie,
+	signAccessToken,
+} from "../../utils"
 import { TUser } from "../../types"
-import { Cookies, ParameterStore } from "../../constant"
+import { Cookies } from "../../constant"
 
 export async function registerHandler(
 	req: Request,
@@ -79,16 +84,12 @@ export async function loginHandler(
 				.send({ message: "We can't find your Vault" })
 		}
 		// create access token using authenticated user(_id, email, etc.)
-		const accessToken = signAccessToken({
+		const { accessToken, refreshToken } = buildTokens({
 			userId,
 			email: authenticatedUser.email,
 		})
 		// attach signed accessToken to cookie
-		setCookie({
-			name: Cookies.AccessToken,
-			token: accessToken,
-			res,
-		})
+		setCookie({ res, accessToken, refreshToken })
 		// login success: send accessToken, vault and salt (to generate vault key)
 		return res.status(200).send({
 			accessToken,
@@ -106,18 +107,8 @@ export async function loginHandler(
 	}
 }
 
-interface ICookie {
-	name: string
-	token: string
-	res: Response
-}
-function setCookie({ name, token, res }: ICookie) {
-	res.cookie(name, token, {
-		domain: ParameterStore.COOKIE_DOMAIN,
-		path: "/",
-		secure: true,
-		httpOnly: true,
-		sameSite: true,
-		signed: true,
-	})
+export async function logoutHandler(_req: Request, res: Response) {
+	res.clearCookie(Cookies.AccessToken)
+	res.clearCookie(Cookies.RefreshToken)
+	res.end()
 }

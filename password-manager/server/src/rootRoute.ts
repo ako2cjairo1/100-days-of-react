@@ -1,5 +1,7 @@
 import express from "express"
-import { Logger } from "./utils"
+import { Logger, buildTokens, setCookie } from "./utils"
+import { createUser } from "./modules"
+import { ParameterStore } from "./constant"
 
 const rootRouter = express.Router()
 
@@ -7,5 +9,23 @@ rootRouter.get("/heartbeat", (req, res) => {
 	Logger.info("Just checking if server is up!")
 	res.status(200).send("I'm alive")
 })
+
+// rootRouter.get("/github", (req, res) => {
+// 	const { code } = req.query
+
+// const githubUser = await getGitHubUser(code as string)
+// let user = await getUserByGitHubId(githubUser.id)
+
+// // register github user if not found database
+// if(!user) user = await createUser({ email: githubUser.email, password: githubUser.id })
+
+// const {accessToken, refreshToken} = buildTokens(user)
+// setCookie({
+// 	res,
+// 	accessToken,
+// 	refreshToken
+// })
+// 	res.redirect(`${ParameterStore.CLIENT_URL}/me`)
+// })
 
 export { rootRouter }

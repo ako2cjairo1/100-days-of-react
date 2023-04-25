@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import { Logger } from "../utils/logger"
+import { Logger } from "../utils"
 import { ParameterStore } from "../constant"
 
 export async function connectToMongoDB() {
