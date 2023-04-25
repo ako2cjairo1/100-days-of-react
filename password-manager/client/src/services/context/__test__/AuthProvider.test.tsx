@@ -4,7 +4,7 @@ import { AuthContext, AuthProvider } from '@/services/context'
 import type { TAuthProvider } from '@/types'
 
 describe('AuthContext', () => {
-	const initAuthState: TAuthProvider = { email: '', vaultId: '', accessToken: '' }
+	const initAuthState: TAuthProvider = { email: '', vault: '', accessToken: '' }
 
 	it('provides initial auth state to its children', () => {
 		let result = {}

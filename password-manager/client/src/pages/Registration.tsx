@@ -8,6 +8,7 @@ import {
 	MergeRegExObj,
 	CreateError,
 	IsEmpty,
+	Log,
 } from '@/services/Utils/password-manager.helper'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import {
@@ -112,32 +113,30 @@ export function Registration() {
 			RunAfterSomeTime(async () => {
 				try {
 					if (checkIf.isValidPassword) {
+						// hash password before sending to API
 						const hashedPassword = hashPassword(password)
-						// register and get accessToken from /api/registration endpoint
-						const { accessToken, vaultId, salt } = await registerUser({
+						// register and get encrypted vault and salt from API
+						const { vault, salt } = await registerUser({
 							email,
 							password: hashedPassword,
 						})
-
+						// generate vaultKey using "salt" from API
 						const vaultKey = generateVaultKey({
 							email,
 							hashedPassword,
 							salt,
 						})
-						// console.table({ accessToken, vaultId, salt, hashedPassword })
-						mutateAuth({
-							email,
-							vaultId,
-							accessToken,
-						})
-
-						// save the vault key in session storage
-						window.sessionStorage.setItem('vk', vaultKey)
-
+						// store vaultKey in session storage
+						window.sessionStorage.setItem('PM_VK', vaultKey)
 						// TODO: save this to session storage instead
 						// LocalStorage.write("password_manager_data", vault)
-						window.sessionStorage.setItem('vault', vaultId)
-						// throw new Error("[Mock Error]")
+						window.sessionStorage.setItem('PM_V', vault)
+						// !This maybe replaced with cookies
+						mutateAuth({
+							email,
+							vault,
+							// accessToken,
+						})
 						// clear form input states and status
 						inputAction.resetInput()
 						mutateRegistrationStatus({ success: true, message: '' })
@@ -151,7 +150,8 @@ export function Registration() {
 					inputAction.isSubmit(false)
 				} catch (error) {
 					inputAction.isSubmit(false)
-					return mutateRegistrationStatus({ success: false, message: CreateError(error).message })
+					Log(CreateError(error).message)
+					return mutateRegistrationStatus({ success: false, message: 'Registration Failed!' })
 				}
 			}, 3)
 		}
@@ -211,10 +211,10 @@ export function Registration() {
 										isFocus.email
 											? ''
 											: checkIf.isValidEmail
-												? 'valid'
-												: email.length > 0
-													? 'invalid'
-													: ''
+											? 'valid'
+											: email.length > 0
+											? 'invalid'
+											: ''
 									}
 								/>
 								<ValidationMessage
@@ -248,10 +248,10 @@ export function Registration() {
 										isFocus.password
 											? ''
 											: checkIf.isValidPassword
-												? 'valid'
-												: password.length > 0
-													? 'invalid'
-													: ''
+											? 'valid'
+											: password.length > 0
+											? 'invalid'
+											: ''
 									}
 								/>
 								<ValidationMessage
@@ -282,10 +282,10 @@ export function Registration() {
 										isFocus.confirm
 											? ''
 											: checkIf.validConfirmation
-												? 'valid'
-												: password.length > 0
-													? 'invalid'
-													: ''
+											? 'valid'
+											: password.length > 0
+											? 'invalid'
+											: ''
 									}
 								/>
 

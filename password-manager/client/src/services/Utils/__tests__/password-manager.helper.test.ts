@@ -170,8 +170,8 @@ describe('CreateError', () => {
 		const input = { code: 123, name: 'test name' }
 		const output = CreateError(input)
 		expect(output).toEqual({
-			code: 123,
-			name: 'test name',
+			code: -1,
+			name: 'An error has occurred.',
 			message: 'An unknown error occurred.',
 			unknownError: input,
 		})
@@ -181,9 +181,9 @@ describe('CreateError', () => {
 		const input = { code: 123, name: 'test name', message: 'test message' }
 		const output = CreateError(input)
 		expect(output).toEqual({
-			code: 123,
-			name: 'test name',
-			message: 'test message',
+			code: -1,
+			name: 'An error has occurred.',
+			message: 'An unknown error occurred.',
 			unknownError: input,
 		})
 	})

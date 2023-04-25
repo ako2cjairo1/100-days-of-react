@@ -1,22 +1,23 @@
 import axios from 'axios'
-import { CreateError } from '@/services/Utils/password-manager.helper'
 import { TCredentials } from '@/types'
 
-const baseURL = `${import.meta.env.VITE_PUBLIC_API_ENDPOINT}/api/users`
-
-interface IRTRegisterUser {
+const baseURL = `${import.meta.env.VITE_PUBLIC_API_ENDPOINT}/api`
+interface IAuthInfo {
 	accessToken: string
-	vaultId: string
+	vault: string
 	salt: string
 }
-export function registerUser(payload: TCredentials): Promise<IRTRegisterUser> {
-	return axios
-		.post(baseURL, payload, {
-			// to make sure the cookie is set
-			withCredentials: true,
-		})
-		.then(res => res.data)
-		.catch(err => {
-			throw new Error(CreateError(err).message)
-		})
+export async function registerUser(userInfo: TCredentials): Promise<IAuthInfo> {
+	const res = await axios.post(`${baseURL}/users`, userInfo, {
+		// to make sure the cookie is set
+		withCredentials: true,
+	})
+	return res.data
+}
+
+export async function loginUser(userInfo: TCredentials): Promise<IAuthInfo> {
+	const res = await axios.post(`${baseURL}/users/login`, userInfo, {
+		withCredentials: true,
+	})
+	return res.data
 }

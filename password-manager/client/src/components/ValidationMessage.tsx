@@ -18,15 +18,16 @@ export function ValidationMessage({ isVisible, title, validations }: IValidation
 			<ul className="x-small fa-ul">
 				{validations && isVisible
 					? validations.map(({ message, isValid }, idx) => (
-						<li key={idx}>
-							<i
-								style={{ animationDelay: `${idx * 0.1}s` }}
-								className={`smooth small fa-li fa ${isValid ? 'fa-check scale-up' : 'fa-close scale-down spins'
+							<li key={idx}>
+								<i
+									style={{ animationDelay: `${idx * 0.1}s` }}
+									className={`smooth small fa-li fa ${
+										isValid ? 'fa-check scale-up' : 'fa-close scale-down spins'
 									}`}
-							/>
-							{message}
-						</li>
-					))
+								/>
+								{message}
+							</li>
+					  ))
 					: null}
 			</ul>
 		</>

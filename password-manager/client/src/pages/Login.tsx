@@ -20,6 +20,8 @@ import {
 	AnimatedIcon,
 	Header,
 } from '@/components'
+import { decryptVault, generateVaultKey, hashPassword } from '@/services/Utils/crypto'
+import { loginUser } from '@/api'
 
 // constants
 const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
@@ -40,7 +42,7 @@ export function Login() {
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const savedEmailRef = useRef(true)
-	const { mutateAuth: updateAuthInfo } = useAuthContext()
+	const { mutateAuth } = useAuthContext()
 
 	useEffect(() => {
 		if (savedEmailRef.current) {
@@ -71,33 +73,54 @@ export function Login() {
 			setIsTypingEmail(false)
 			if (isRemember) LocalStorage.write('password_manager_email', email)
 			else LocalStorage.remove('password_manager_email')
-
-			return true
+			return
 		}
 
 		if (!isSubmitted) {
 			inputAction.isSubmit(true)
-			RunAfterSomeTime(() => {
+			RunAfterSomeTime(async () => {
+				// TODO: fetch access token to custom authentication backend api
+				// throw new Error(
+				// 	// '[TEST]: There is no Vercel account associated with this email address. Sign up?'
+				// 	'[TEST]: An error has occurred. E-mail or Password is incorrect. Try again'
+				// )
 				try {
-					// TODO: fetch access token to custom authentication backend api
-					// throw new Error(
-					// 	// '[TEST]: There is no Vercel account associated with this email address. Sign up?'
-					// 	'[TEST]: An error has occurred. E-mail or Password is incorrect. Try again'
-					// )
-
-					updateAuthInfo({ ...inputStates, accessToken: 'fake token' })
-					updateLoginStatus({ success: true, message: '' })
+					// hash password before sending to API
+					const hashedPassword = hashPassword(password)
+					// authenticate user using email and hashed password from API
+					const { vault, salt } = await loginUser({
+						email,
+						password: hashedPassword,
+					})
+					// generate vaultKey using "salt" from API
+					const vaultKey = generateVaultKey({
+						email,
+						hashedPassword,
+						salt,
+					})
+					// decrypt vault using vaultKey with salt from API
+					const decryptedVault = decryptVault({ vault, vaultKey })
+					// save the vault key in session storage
+					window.sessionStorage.setItem('PM_VK', vaultKey)
+					// LocalStorage.write("password_manager_data", vault)
+					// TODO: save this to session storage instead
+					window.sessionStorage.setItem('vault', JSON.stringify(decryptedVault))
+					// !This maybe replaced with cookies
+					mutateAuth({
+						email,
+						vault,
+						// accessToken,
+					})
+					// clear form input states and status
 					inputAction.resetInput()
+					updateLoginStatus({ success: true, message: '' })
 				} catch (error) {
 					updateLoginStatus({ success: false, message: CreateError(error).message })
-					return false
 				} finally {
 					inputAction.isSubmit(false)
 				}
 			}, 3)
 		}
-
-		return true
 	}
 
 	const handleChangeLoginEmail = () => {

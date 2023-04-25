@@ -37,6 +37,8 @@ export function Vault() {
 		// TODO: implement cache mechanism
 		// get password vault data from local storage
 		const vaultData = JSON.parse(LocalStorage.read('password_manager_data') || '[]')
+		const sessionVault = window.sessionStorage.getItem('PM_V')
+		Log(sessionVault)
 		setVault(vaultData)
 		vaultCountRef.current = vaultData.length
 
@@ -55,7 +57,7 @@ export function Vault() {
 
 		const encryptedVault = encryptVault({
 			vault: JSON.stringify({ vault }),
-			vaultKey: '', //TODO: provide the vault key
+			vaultKey: window.sessionStorage.getItem('PM_VK') ?? '',
 		})
 		Log(encryptedVault)
 	}

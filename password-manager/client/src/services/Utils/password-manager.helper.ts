@@ -1,6 +1,7 @@
 import type { TConvertToStringUnion, TFunction } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
 import { REGISTER_STATE } from '@/services/constants'
+import { AxiosError } from 'axios'
 
 export function Log<T>(Obj: T, ...optional: unknown[]) {
 	if (Obj instanceof Error) console.error(Obj)
@@ -176,30 +177,32 @@ export function CreateError(error: unknown) {
 		message: 'An unknown error occurred.',
 	}
 
-	if (error instanceof Error) {
+	if (error instanceof AxiosError) {
+		result.code = error.response?.status || ''
+		result.message = error.response?.data.message || error.response?.statusText
+	} else if (error instanceof Error) {
 		// error is an instance of Error
 		result.message = error.message
-	}
 
-	if (typeof error === 'object' && error !== null) {
-		// error is an object cast to interface with a name, message or code properties
-		const unknownError = error as PasswordManagerError
+		if (typeof error === 'object' && error !== null) {
+			// error is an object cast to interface with a name, message or code properties
+			const unknownError = error as PasswordManagerError
 
-		if (unknownError) {
-			const { code, name, message } = unknownError
+			if (unknownError) {
+				const { code, name, message } = unknownError
 
-			result = {
-				code: code ? code : result.code,
-				name: name ? name : result.name,
-				message: message ? message : result.message,
-				unknownError: error,
+				result = {
+					code: code ? code : result.code,
+					name: name ? name : result.name,
+					message: message ? message : result.message,
+					unknownError: error,
+				}
 			}
 		}
-	} else {
-		// error is not an instance of Error and does not have a message property
-		result.unknownError = error
-		console.warn(`${result} ${error}`)
 	}
+
+	// attach original error as unknownError prop
+	result.unknownError = error
 
 	return result
 }

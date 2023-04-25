@@ -53,7 +53,7 @@ export type TEvaluatedPassword = {
 
 export type TAuthProvider = {
 	email: string
-	vaultId: string
+	vault: string
 	accessToken: string
 }
 
