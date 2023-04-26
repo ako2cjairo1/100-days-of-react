@@ -17,7 +17,7 @@ export async function updateVaultHandler(
 		//TODO: authenticate user before updating the vault
 		await updateVaultByUserId(vault)
 
-		return res.status(200).send("Vault Updated!")
+		return res.status(200).json({ message: "Vault Updated!" })
 	} catch (err) {
 		// parse unknown err
 		let error = CreateError(err)

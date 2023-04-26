@@ -1,9 +1,11 @@
 import express from "express"
 import { loginHandler, registerHandler, logoutHandler } from "./user.controller"
-import { AuthMiddleware, LoginLimiter } from "../../plugins"
+import { deserializeSession, LoginLimiter } from "../../middlewares"
 
-export const userRouter = express.Router()
-userRouter.post("/api/users", registerHandler)
+const userRouter = express.Router()
 
-userRouter.post("/api/users/login", LoginLimiter, loginHandler)
-userRouter.post("/api/users/logout", AuthMiddleware, logoutHandler)
+userRouter.post("/", registerHandler)
+userRouter.post("/login", LoginLimiter, loginHandler)
+userRouter.post("/logout", logoutHandler)
+
+export { userRouter }

@@ -23,3 +23,17 @@ export async function authenticateByEmailAndPassword({
 export async function deleteUserById(userId: IUserModel["userId"]) {
 	return await UserModel.findOneAndDelete({ _id: userId })
 }
+
+export async function loginUserById(userId: IUserModel["userId"]) {
+	return await UserModel.findOneAndUpdate(
+		{ _id: userId },
+		{ isLoggedIn: true }
+	)
+}
+
+export async function logoutUserByEmail(userId: IUserModel["userId"]) {
+	return await UserModel.findOneAndUpdate(
+		{ _id: userId },
+		{ isLoggedIn: false }
+	)
+}

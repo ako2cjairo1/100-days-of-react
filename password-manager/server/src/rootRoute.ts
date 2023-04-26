@@ -1,13 +1,13 @@
 import express from "express"
-import { Logger, buildTokens, setCookie } from "./utils"
+import { Logger, buildTokens, setCookies } from "./utils"
 import { createUser } from "./modules"
 import { ParameterStore } from "./constant"
 
-const rootRouter = express.Router()
+const apiRoute = express.Router()
 
-rootRouter.get("/heartbeat", (req, res) => {
+apiRoute.get("/heartbeat", (req, res) => {
 	Logger.info("Just checking if server is up!")
-	res.status(200).send("I'm alive")
+	res.status(200).json({ message: "I'm alive" })
 })
 
 // rootRouter.get("/github", (req, res) => {
@@ -28,4 +28,4 @@ rootRouter.get("/heartbeat", (req, res) => {
 // 	res.redirect(`${ParameterStore.CLIENT_URL}/me`)
 // })
 
-export { rootRouter }
+export { apiRoute }

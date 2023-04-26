@@ -5,7 +5,7 @@
 	"license": "MIT",
 	"scripts": {
 		"start": "nodemon -x ts-node src/main.ts",
-		"build": "rm -rf build/ && tsc"
+		"build": "tsc && yarn tsc"
 	},
 	"dependencies": {
 		"@typegoose/typegoose": "^11.0.1",

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { CreateError, Logger } from "../utils"
 
-export function customErrorPlugin(
+export function errorHandler(
 	err: unknown,
 	_req: Request,
 	res: Response,
@@ -26,8 +26,16 @@ export function customErrorPlugin(
 	if (status >= 500) Logger.error(error, message)
 
 	// set the status and send the error object as response
-	res.status(status).send({
+	res.status(status).json({
 		status,
 		message,
 	})
+}
+
+export function invalidRouteHandler(
+	_request: Request,
+	response: Response,
+	_next: NextFunction
+) {
+	response.status(404).json({ message: "Requested resource not found." })
 }

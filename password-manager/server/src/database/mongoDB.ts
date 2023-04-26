@@ -6,7 +6,7 @@ export async function connectToMongoDB() {
 	try {
 		Logger.info("Connecting to MongoDB...")
 
-		await mongoose.connect(ParameterStore.MongoDBUrl, {
+		await mongoose.connect(ParameterStore.MONGODB_URL, {
 			retryWrites: true,
 			w: "majority",
 		})

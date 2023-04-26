@@ -3,10 +3,11 @@ import { IUserModel } from "../../types"
 import { generateHash } from "../../utils"
 
 // create User schema
-const UserSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema<IUserModel>(
 	{
 		email: { type: String, required: true, unique: true },
 		password: { type: String, required: true },
+		isLoggedIn: { type: Boolean, default: false },
 	},
 	{
 		timestamps: true,

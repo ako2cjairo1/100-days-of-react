@@ -1,15 +1,22 @@
 import { NextFunction, Request, Response } from "express"
-import { createUser, authenticateByEmailAndPassword } from "../user"
+import {
+	createUser,
+	authenticateByEmailAndPassword,
+	loginUserById,
+	logoutUserByEmail,
+} from "../user"
 import { createVault, getVaultByUserId } from "../vault"
 import {
 	CreateError,
 	buildTokens,
 	generateSalt,
-	setCookie,
-	signAccessToken,
+	removeCookies,
+	setCookies,
+	signToken,
+	verifyAccessToken,
 } from "../../utils"
 import { TUser } from "../../types"
-import { Cookies } from "../../constant"
+import { Cookies, TokenExpiration } from "../../constant"
 
 export async function registerHandler(
 	req: Request,
@@ -17,31 +24,33 @@ export async function registerHandler(
 	next: NextFunction
 ) {
 	try {
-		// map User info from request body
-		const user: TUser = {
+		// create user and generate user._id
+		const newUser = await createUser({
 			email: req.body.email,
 			password: req.body.password,
-		}
-		// create user and generate user._id
-		const newUser = await createUser(user)
+		})
 
 		// create Vault by referencing to user._id
-		// salt: to generate vaultKey
-		const salt = generateSalt()
 		// and with initial vault data as blank value
-		const vault = await createVault({
+		const { data, salt } = await createVault({
 			userId: newUser._id.toString(),
 			data: "",
-			salt,
+			salt: generateSalt(), // use to generate vaultKey
 		})
+
 		// create access token using the created user
-		const accessToken = signAccessToken({
-			userId: newUser._id.toString(),
-			email: newUser.email,
-		})
+		const accessToken = signToken(
+			{
+				userId: newUser._id.toString(),
+				email: newUser.email,
+			},
+			TokenExpiration.Access
+		)
+
 		// registration successful: send accessToken, vault and salt (to generate vault key)
-		return res.status(201).send({ accessToken, vault, salt })
+		return res.status(201).json({ accessToken, vault: data, salt })
 	} catch (err) {
+		console.warn(err)
 		// parse unknown err
 		let error = CreateError(err)
 		// default error message
@@ -72,7 +81,7 @@ export async function loginHandler(
 		if (!authenticatedUser) {
 			return res
 				.status(401)
-				.send({ message: "Invalid email or password." })
+				.json({ message: "Invalid email or password." })
 		}
 		// convert user _id to string
 		const userId = authenticatedUser._id.toString()
@@ -81,17 +90,20 @@ export async function loginHandler(
 		if (!vault) {
 			return res
 				.status(405) // method not allowed
-				.send({ message: "We can't find your Vault" })
+				.json({ message: "We can't find your Vault" })
 		}
 		// create access token using authenticated user(_id, email, etc.)
 		const { accessToken, refreshToken } = buildTokens({
 			userId,
 			email: authenticatedUser.email,
+			version: 1,
 		})
 		// attach signed accessToken to cookie
-		setCookie({ res, accessToken, refreshToken })
+		setCookies({ res, accessToken, refreshToken })
+		// update user as loggedIn
+		await loginUserById(userId)
 		// login success: send accessToken, vault and salt (to generate vault key)
-		return res.status(200).send({
+		return res.status(200).json({
 			accessToken,
 			vault: vault.data,
 			salt: vault.salt,
@@ -107,8 +119,26 @@ export async function loginHandler(
 	}
 }
 
-export async function logoutHandler(_req: Request, res: Response) {
-	res.clearCookie(Cookies.AccessToken)
-	res.clearCookie(Cookies.RefreshToken)
-	res.end()
+export async function logoutHandler(
+	req: Request,
+	res: Response,
+	next: NextFunction
+) {
+	try {
+		// remove tokens from session cookies
+		removeCookies(res)
+		// from "deserializeSession" middleware
+		const { userId } = res.locals.accessToken
+		// update session to database
+		if (userId) await logoutUserByEmail(userId)
+	} catch (err) {
+		// parse unknown err
+		let error = CreateError(err)
+		// default error message
+		error.message = "Error logging out"
+		// send formatted error to error handler plugin
+		next(error)
+	}
+
+	res.json({ success: true }).end()
 }

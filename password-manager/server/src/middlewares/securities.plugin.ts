@@ -5,7 +5,7 @@ import { ParameterStore } from "../constant"
 import { DefaultCookieOptions } from "../constant"
 
 const SessionCookies = session({
-	secret: ParameterStore.SECRET,
+	secret: ParameterStore.SECRET_KEY,
 	resave: false,
 	saveUninitialized: false,
 	cookie: DefaultCookieOptions,
@@ -26,7 +26,7 @@ export const LoginLimiter = limiter({
 	message: "Too many login attempts, please try again after sometime.",
 })
 
-const ApiLimiter = limiter(limiterConfig)
+const requestLimiter = limiter(limiterConfig)
 
 // add more security plugins here
-export const Security = [Helmet(), SessionCookies, ApiLimiter]
+export const securities = [Helmet(), SessionCookies, requestLimiter]

@@ -4,24 +4,21 @@ env.config()
 
 const isProd = process.env.NODE_ENV === "production"
 const SERVER_PORT = process.env.SERVER_PORT || 8080
-const MONGODB_USERNAME = process.env.MONGODB_USERNAME || ""
-const MONGODB_PASSWORD = process.env.MONGODB_PASSWORD || ""
-const MONGODB_DATABASE = process.env.MONGODB_DATABASE || ""
-const MongoDBUrl = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mern-ecommerce-cluster.jjpzu.mongodb.net/${MONGODB_DATABASE}`
+const mongoDB_userName = process.env.MONGODB_USERNAME || ""
+const mongoDB_password = process.env.MONGODB_PASSWORD || ""
+const mongodb_database = process.env.MONGODB_DATABASE || ""
+const MONGODB_URL = `mongodb+srv://${mongoDB_userName}:${mongoDB_password}@mern-ecommerce-cluster.jjpzu.mongodb.net/${mongodb_database}`
 
 const CLIENT_URL = process.env.CLIENT_URL
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || "localhost"
-const SECRET = process.env.SECRET || ""
+const SECRET_KEY = process.env.SECRET || ""
 
 export const ParameterStore = {
 	SERVER_PORT,
-	MONGODB_USERNAME,
-	MONGODB_PASSWORD,
-	MONGODB_DATABASE,
-	MongoDBUrl,
+	MONGODB_URL,
 	CLIENT_URL,
 	COOKIE_DOMAIN,
-	SECRET,
+	SECRET_KEY,
 }
 
 export const Cookies = {
@@ -40,5 +37,5 @@ export const DefaultCookieOptions: CookieOptions = {
 	sameSite: isProd ? "strict" : "lax",
 	domain: COOKIE_DOMAIN,
 	path: "/", // to let cookies be available to all pages of our app
-	signed: true,
+	// signed: true,
 }
