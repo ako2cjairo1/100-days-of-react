@@ -225,8 +225,21 @@ interface ILocalStorage {
 }
 export const LocalStorage: ILocalStorage = {
 	write: (key, value) => localStorage.setItem(key, value),
-	read: key => localStorage.getItem(key) ?? '',
+	read: key => localStorage.getItem(key) || '',
 	remove: key => localStorage.removeItem(key),
+}
+
+interface ISessionStorage {
+	write: TFunction<Array<Array<[key: string, value: string]>>>
+	read: TFunction<[key: TLSKey], string>
+}
+export const SessionStorage: ISessionStorage = {
+	write: data => {
+		for (const [key, value] of data) {
+			window.sessionStorage.setItem(key, value)
+		}
+	},
+	read: key => window.sessionStorage.getItem(key) || '',
 }
 
 /**

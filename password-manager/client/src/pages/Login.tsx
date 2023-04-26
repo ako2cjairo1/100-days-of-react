@@ -8,6 +8,7 @@ import {
 	ExtractValFromRegEx,
 	LocalStorage,
 	RunAfterSomeTime,
+	SessionStorage,
 } from '@/services/Utils/password-manager.helper'
 import {
 	LinkLabel,
@@ -88,7 +89,7 @@ export function Login() {
 					// hash password before sending to API
 					const hashedPassword = hashPassword(password)
 					// authenticate user using email and hashed password from API
-					const { accessToken, vault, salt } = await loginUser({
+					const { vault, salt } = await loginUser({
 						email,
 						password: hashedPassword,
 					})
@@ -98,19 +99,15 @@ export function Login() {
 						hashedPassword,
 						salt,
 					})
-					// decrypt vault using vaultKey with salt from API
+					// decrypt Vault using vaultKey with salt from API
 					const decryptedVault = decryptVault({ vault, vaultKey })
-					// save the vault key in session storage
-					window.sessionStorage.setItem('PM_VK', vaultKey)
-					// LocalStorage.write("password_manager_data", vault)
-					// TODO: save this to session storage instead
-					window.sessionStorage.setItem('vault', JSON.stringify(decryptedVault))
+					// store decrypted Vault and vaultKey in session storage
+					SessionStorage.write([
+						['PM_VK', vaultKey],
+						['vault', JSON.stringify(decryptedVault)],
+					])
 					// !This maybe replaced with cookies
-					mutateAuth({
-						email,
-						vault,
-						accessToken,
-					})
+					mutateAuth({ email, vault })
 					// clear form input states and status
 					inputAction.resetInput()
 					updateLoginStatus({ success: true, message: '' })

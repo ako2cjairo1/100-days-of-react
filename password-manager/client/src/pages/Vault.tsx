@@ -31,7 +31,7 @@ export function Vault() {
 
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
-	const { authInfo, mutateAuth } = useAuthContext()
+	const { mutateAuth } = useAuthContext()
 	const vaultCountRef = useRef(0)
 
 	const getVaultData = () => {
@@ -175,6 +175,19 @@ export function Vault() {
 		}
 	}, [updateKeychain])
 
+	const handleLogout = async () => {
+		try {
+			// clear session storage (Vault and saltKey)
+			window.sessionStorage.clear()
+			// call API to clear session cookies
+			await logoutUser()
+			// update application states
+			mutateAuth({ accessToken: '' })
+		} catch (error) {
+			Log(error)
+		}
+	}
+
 	return (
 		<div className="vault-container">
 			<Menubar>
@@ -182,18 +195,7 @@ export function Vault() {
 					name="Logout"
 					iconName="fa fa-sign-out"
 					navigateTo="/login"
-					onClick={async () => {
-						try {
-							await logoutUser(authInfo.accessToken)
-							window.sessionStorage.clear()
-							mutateAuth({ accessToken: '' })
-						} catch (error) {
-							updateVaultStatus({
-								success: false,
-								message: 'Operation Failed!',
-							})
-						}
-					}}
+					onClick={handleLogout}
 				/>
 
 				<Menubar.Item

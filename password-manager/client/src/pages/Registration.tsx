@@ -9,8 +9,8 @@ import {
 	CreateError,
 	IsEmpty,
 	Log,
-} from '@/services/Utils/password-manager.helper'
-import { useInput, useAuthContext, useStateObj } from '@/hooks'
+	hashPassword,
+} from '@/services/Utils'
 import {
 	LinkLabel,
 	Separator,
@@ -23,7 +23,7 @@ import {
 	AnimatedIcon,
 	Header,
 } from '@/components'
-import { generateVaultKey, hashPassword } from '@/services/Utils/crypto'
+import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import { registerUser } from '@/api'
 
 // constants
@@ -103,8 +103,8 @@ export function Registration() {
 		],
 	}
 
-	const handleSubmit = async (e: FormEvent) => {
-		e.preventDefault()
+	const handleSubmit = async (event: FormEvent) => {
+		event.preventDefault()
 
 		if (!isSubmitted) {
 			mutateRegistrationStatus({ message: '' })
@@ -113,30 +113,14 @@ export function Registration() {
 			RunAfterSomeTime(async () => {
 				try {
 					if (checkIf.isValidPassword) {
-						// hash password before sending to API
-						const hashedPassword = hashPassword(password)
-						// register and get encrypted vault and salt from API
-						const { vault, salt } = await registerUser({
+						// register and get accessToken, encrypted vault and salt from API
+						await registerUser({
 							email,
-							password: hashedPassword,
+							// hash password before sending to API
+							password: hashPassword(password),
 						})
-						// generate vaultKey using "salt" from API
-						const vaultKey = generateVaultKey({
-							email,
-							hashedPassword,
-							salt,
-						})
-						// store vaultKey in session storage
-						window.sessionStorage.setItem('PM_VK', vaultKey)
-						// TODO: save this to session storage instead
-						// LocalStorage.write("password_manager_data", vault)
-						window.sessionStorage.setItem('PM_V', vault)
 						// !This maybe replaced with cookies
-						mutateAuth({
-							email,
-							vault,
-							// accessToken,
-						})
+						mutateAuth({ email })
 						// clear form input states and status
 						inputAction.resetInput()
 						mutateRegistrationStatus({ success: true, message: '' })
