@@ -4,6 +4,7 @@ import { connectToMongoDB } from "./database"
 
 // immediately invoke connection to database and server
 ;(async function () {
+	console.clear()
 	// initiate and connect to MongoDB
 	await connectToMongoDB()
 

@@ -4,16 +4,18 @@ import {
 	authenticateByEmailAndPassword,
 	loginUserById,
 	logoutUserByEmail,
+	getUserById,
 } from "../user"
 import { createVault, getVaultByUserId } from "../vault"
 import {
 	CreateError,
+	Logger,
 	buildTokens,
 	generateSalt,
 	removeCookies,
 	setCookies,
 	signToken,
-	verifyAccessToken,
+	verifyToken,
 } from "../../utils"
 import { TUser } from "../../types"
 import { Cookies, TokenExpiration } from "../../constant"
@@ -76,6 +78,7 @@ export async function loginHandler(
 			email: req.body.email,
 			password: req.body.password,
 		}
+
 		// find user and verify the hashed password
 		const authenticatedUser = await authenticateByEmailAndPassword(userInfo)
 		if (!authenticatedUser) {
@@ -83,31 +86,43 @@ export async function loginHandler(
 				.status(401)
 				.json({ message: "Invalid email or password." })
 		}
-		// convert user _id to string
-		const userId = authenticatedUser._id.toString()
-		// get user vault from db using userId
-		const vault = await getVaultByUserId(userId)
-		if (!vault) {
-			return res
-				.status(405) // method not allowed
-				.json({ message: "We can't find your Vault" })
+
+		if (authenticatedUser) {
+			const { _id, email, version } = authenticatedUser
+			const userId = _id.toString()
+
+			// get user vault from db using userId
+			const vault = await getVaultByUserId(userId)
+
+			if (!vault) {
+				return res
+					.status(405) // method not allowed
+					.json({ message: "We can't find your Vault" })
+			}
+
+			// generate pair of tokens using authenticated user(_Id, email, version, etc.)
+			const { accessToken, refreshToken } = buildTokens({
+				userId,
+				email,
+				// increment for refresh token validation
+				version: (version || 0) + 1,
+			})
+
+			// store signed tokens into cookies
+			setCookies(res, { accessToken, refreshToken })
+			// update user as loggedIn (optional)
+			await loginUserById(userId)
+
+			const { data, salt } = vault
+			// login success: send accessToken, vault data and salt (to generate vault key)
+			return res.status(200).json({
+				accessToken,
+				vault: data,
+				salt,
+			})
 		}
-		// create access token using authenticated user(_id, email, etc.)
-		const { accessToken, refreshToken } = buildTokens({
-			userId,
-			email: authenticatedUser.email,
-			version: 1,
-		})
-		// attach signed accessToken to cookie
-		setCookies({ res, accessToken, refreshToken })
-		// update user as loggedIn
-		await loginUserById(userId)
-		// login success: send accessToken, vault and salt (to generate vault key)
-		return res.status(200).json({
-			accessToken,
-			vault: vault.data,
-			salt: vault.salt,
-		})
+
+		throw Error("Login failed!")
 	} catch (err) {
 		// parse unknown err
 		let error = CreateError(err)
@@ -125,12 +140,17 @@ export async function logoutHandler(
 	next: NextFunction
 ) {
 	try {
-		// remove tokens from session cookies
-		removeCookies(res)
 		// from "deserializeSession" middleware
-		const { userId } = res.locals.accessToken
-		// update session to database
-		if (userId) await logoutUserByEmail(userId)
+		const { userId } = res.locals[Cookies.AccessToken]
+		Logger.error(userId)
+
+		if (userId) {
+			// remove tokens from session cookies
+			// !IMP: client should also delete the cookies
+			removeCookies(res)
+			// update login status to database
+			await logoutUserByEmail(userId)
+		}
 	} catch (err) {
 		// parse unknown err
 		let error = CreateError(err)
@@ -141,4 +161,8 @@ export async function logoutHandler(
 	}
 
 	res.json({ success: true }).end()
+}
+
+export async function fetchUserById(userId: string) {
+	return await getUserById(userId)
 }

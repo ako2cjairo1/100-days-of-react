@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema<IUserModel>(
 	{
 		email: { type: String, required: true, unique: true },
 		password: { type: String, required: true },
+		version: { type: Number, default: 0 },
 		isLoggedIn: { type: Boolean, default: false },
 	},
 	{
@@ -17,9 +18,10 @@ const UserSchema = new mongoose.Schema<IUserModel>(
 // automatically hash the "password" when adding or updating a User
 // !Note: password from client maybe hashed as well, but we'll hash it again anyway.
 UserSchema.pre("save", async function (next) {
-	const user = this
-	if (user.isModified("password") || user.isNew) {
-		user.password = await generateHash(user.password)
+	const { isNew, isModified, password } = this
+
+	if (isNew || isModified("password")) {
+		this.password = await generateHash(password)
 		return next()
 	}
 })

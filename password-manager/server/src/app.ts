@@ -13,6 +13,7 @@ import {
 	securities,
 	deserializeSession,
 } from "./middlewares"
+import { vaultRoute } from "./modules"
 
 const app = express()
 app.use(
@@ -22,23 +23,25 @@ app.use(
 		origin: ParameterStore.CLIENT_URL,
 	})
 )
-// middlewares: helmet, verify session cookies, rate limiter
+/* middlewares: helmet, verify session cookies, rate limiter */
 app.use(securities)
 app.use(express.json())
+// handle urlencoded form data
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 
-//* Register plugins here */
+/* Register plugins here */
 app.use(headerRules)
 app.use(jwtPlugin)
 app.use(activityLogger)
 
-//* Routes */
+/* Routes */
 app.use("/api/v1", apiRoute)
-app.use("/api/v1/user", deserializeSession, userRouter)
-// TODO: implement vault router
-// app.use(vaultRouter)
-//* custom Error Handler */
+app.use(deserializeSession)
+app.use("/api/v1/user", userRouter)
+app.use("/api/v1/vault", vaultRoute)
+
+/* custom Error Handler */
 app.use(errorHandler, invalidRouteHandler)
 
 export { app }

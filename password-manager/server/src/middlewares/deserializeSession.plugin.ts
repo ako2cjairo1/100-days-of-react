@@ -1,5 +1,15 @@
 import { Request, Response, NextFunction } from "express"
-import { CreateError, parseToken, verifyAccessToken } from "../utils"
+import {
+	CreateError,
+	Logger,
+	buildTokens,
+	parseToken,
+	removeCookies,
+	setCookies,
+	verifyToken,
+} from "../utils"
+import { fetchUserById } from "../modules"
+import { Cookies } from "../constant"
 
 export async function deserializeSession(
 	req: Request,
@@ -7,18 +17,54 @@ export async function deserializeSession(
 	next: NextFunction
 ) {
 	try {
-		const token = parseToken(req)
-		// no token to verify, move to next action
-		if (!token) return next()
-		// verify the token signature
-		const { accessToken } = verifyAccessToken(token)
+		const { accessToken, refreshToken } = parseToken(req)
+		// if there are no tokens to deserialize, proceed to next
+		if (!accessToken && !refreshToken) return next()
+		console.table({ accessToken, refreshToken })
+
 		if (accessToken) {
-			// set the verified access token to response locals
-			res.locals.accessToken = accessToken
-			next()
+			// verify accessToken signature
+			const { isVerified, token } = verifyToken(accessToken)
+			if (isVerified) {
+				// set the verified access token to response locals
+				res.locals[Cookies.AccessToken] = token
+				return next()
+			}
 		}
+
+		Logger.error("Token is expired")
+
+		if (refreshToken) {
+			// expired accessToken, check the refresh token
+			const { isVerified, token } = verifyToken(refreshToken)
+			if (isVerified && token) {
+				const user = await fetchUserById(token.userId)
+
+				if (user) {
+					const { _id, email, version } = user
+					// generate new set of tokens using verified User info
+					const { accessToken, refreshToken } = buildTokens({
+						email,
+						userId: _id.toString(),
+						// increment for refresh token validation
+						version: (version || 0) + 1,
+					})
+					// attach signed accessToken to cookie
+					setCookies(res, { accessToken, refreshToken })
+					// set the verified access token to response locals
+					res.locals[Cookies.AccessToken] = accessToken
+					return next()
+				}
+			}
+
+			// refreshToken not verified, remove tokens from cookies
+			removeCookies(res)
+			return next()
+		}
+
+		return next()
 	} catch (err) {
 		// send formatted error to error handler plugin
-		next(CreateError(err))
+		return next(CreateError(err))
 	}
 }

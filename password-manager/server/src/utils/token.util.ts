@@ -22,20 +22,44 @@ export async function isHashVerified(verifier: string, plain: string) {
 	return argon2.verify(verifier, plain)
 }
 
+export interface IParseToken {
+	accessToken?: string
+	refreshToken?: string
+}
 // extract jwt from request
-export function parseToken(
-	req: Request,
-	tokenName: string = Cookies.AccessToken
-) {
-	if (req.cookies) return req.cookies[tokenName]
-	if (req.query && req.query.token) return req.query.toString()
+export function parseToken(req: Request): IParseToken {
+	let parsedTokens: IParseToken = {}
+
+	// check for cookies
+	if (req.cookies) {
+		parsedTokens = {
+			accessToken: req.cookies[Cookies.AccessToken],
+			refreshToken: req.cookies[Cookies.RefreshToken],
+		}
+		Logger.warn("Parsing Cookies for Tokens")
+	}
+
+	// check query string
+	if (req.query && req.query.token) {
+		parsedTokens = {
+			...parsedTokens,
+			accessToken: req.query[Cookies.AccessToken]?.toString(),
+		}
+		Logger.warn("Parsing Query String Tokens")
+	}
 
 	const { authorization } = req.headers
 	// make sure that the JWT is in correct Header format
 	if (authorization && authorization.toLowerCase().includes("bearer ")) {
 		// extract the JWT from "Authorization" header
-		return authorization.split(" ")[1]?.toString()
+		parsedTokens = {
+			...parsedTokens,
+			accessToken: authorization.split(" ")[1]?.toString(),
+		}
+		Logger.warn("Parsing Bearer Tokens")
 	}
+
+	return parsedTokens
 }
 
 export interface ITokenPayload {
@@ -50,27 +74,32 @@ export function signToken(payload: ITokenPayload, expiresIn: string | number) {
 	})
 }
 
-export interface IAccessToken {
+export interface IVerifiedToken {
 	userId: string
 	email: string
-	iat: number
+	version?: number
 	exp: number
 }
-export function verifyAccessToken(token: string) {
+export function verifyToken(payload: string): {
+	token?: IVerifiedToken
+	isVerified: boolean
+} {
 	try {
-		const accessToken = jwt.verify(token, ParameterStore.SECRET_KEY)
+		const token = jwt.verify(
+			payload,
+			ParameterStore.SECRET_KEY
+		) as IVerifiedToken
 		// send the verified accessToken if there are no errors
 		return {
-			accessToken,
+			token,
 			isVerified: true,
 		}
 	} catch (error) {
 		Logger.warn(CreateError(error).message)
 	}
-
 	// return empty accessToken, otherwise
 	return {
-		accessToken: "",
+		token: undefined,
 		isVerified: false,
 	}
 }
@@ -94,12 +123,14 @@ const refreshTokenCookieOptions: CookieOptions = {
 }
 
 interface ISetCookies {
-	res: Response
 	accessToken: string
 	refreshToken?: string
 }
 
-export function setCookies({ res, accessToken, refreshToken }: ISetCookies) {
+export function setCookies(
+	res: Response,
+	{ accessToken, refreshToken }: ISetCookies
+) {
 	try {
 		res.cookie(Cookies.AccessToken, accessToken, accessTokenCookieOptions)
 		if (refreshToken)
@@ -118,8 +149,8 @@ export function setCookies({ res, accessToken, refreshToken }: ISetCookies) {
 export function removeCookies(res: Response) {
 	try {
 		const options: CookieOptions = { ...DefaultCookieOptions, maxAge: 0 }
-		res.cookie(Cookies.AccessToken, "", options)
-		res.cookie(Cookies.RefreshToken, "", options)
+		res.clearCookie(Cookies.AccessToken, options)
+		res.clearCookie(Cookies.RefreshToken, options)
 	} catch (error) {
 		let err = CreateError(error)
 		err.name = "Remove Cookies Error"
