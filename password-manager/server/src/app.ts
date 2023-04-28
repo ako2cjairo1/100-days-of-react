@@ -1,9 +1,6 @@
 import express from "express"
-import cors from "cors"
 import cookieParser from "cookie-parser"
-import { ParameterStore } from "./constant"
-import { apiRoute } from "./rootRoute"
-import { userRouter } from "./modules/user"
+import { rootRoute } from "./rootRoute"
 import {
 	activityLogger,
 	headerRules,
@@ -11,35 +8,25 @@ import {
 	jwtPlugin,
 	invalidRouteHandler,
 	securities,
-	deserializeSession,
 } from "./middlewares"
-import { vaultRoute } from "./modules"
+import { ParameterStore } from "./constant"
 
 const app = express()
-app.use(
-	cors({
-		credentials: true,
-		// to whitelist our own client app
-		origin: ParameterStore.CLIENT_URL,
-	})
-)
-/* middlewares: helmet, verify session cookies, rate limiter */
+/* middleware: cors, helmet, express-session (cookie parser), rate limiter */
 app.use(securities)
 app.use(express.json())
 // handle urlencoded form data
 app.use(express.urlencoded({ extended: false }))
-app.use(cookieParser())
+app.use(cookieParser(ParameterStore.SECRET_KEY))
 
 /* Register plugins here */
 app.use(headerRules)
+// handles top-level encryption for JWTs
 app.use(jwtPlugin)
 app.use(activityLogger)
 
-/* Routes */
-app.use("/api/v1", apiRoute)
-app.use(deserializeSession)
-app.use("/api/v1/user", userRouter)
-app.use("/api/v1/vault", vaultRoute)
+/* root route of API endpoint */
+app.use("/api/v1", rootRoute)
 
 /* custom Error Handler */
 app.use(errorHandler, invalidRouteHandler)

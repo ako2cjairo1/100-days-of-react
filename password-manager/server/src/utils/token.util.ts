@@ -7,6 +7,7 @@ import {
 	DefaultCookieOptions,
 	ParameterStore,
 	TokenExpiration,
+	TokenType,
 } from "../constant"
 import { CreateError, Logger } from "../utils"
 
@@ -28,35 +29,38 @@ export interface IParseToken {
 }
 // extract jwt from request
 export function parseToken(req: Request): IParseToken {
+	const { cookies, query } = req
 	let parsedTokens: IParseToken = {}
 
-	// check for cookies
-	if (req.cookies) {
-		parsedTokens = {
-			accessToken: req.cookies[Cookies.AccessToken],
-			refreshToken: req.cookies[Cookies.RefreshToken],
-		}
+	// parse cookies for cookies
+	if (cookies) {
 		Logger.warn("Parsing Cookies for Tokens")
-	}
-
-	// check query string
-	if (req.query && req.query.token) {
 		parsedTokens = {
-			...parsedTokens,
-			accessToken: req.query[Cookies.AccessToken]?.toString(),
+			accessToken: cookies[Cookies.AccessToken],
+			refreshToken: cookies[Cookies.RefreshToken],
 		}
-		Logger.warn("Parsing Query String Tokens")
 	}
 
-	const { authorization } = req.headers
-	// make sure that the JWT is in correct Header format
-	if (authorization && authorization.toLowerCase().includes("bearer ")) {
-		// extract the JWT from "Authorization" header
+	// parse query string
+	const accessTokenParam = query[Cookies.AccessToken]
+	if (query && accessTokenParam) {
+		Logger.warn("Parsing Query String Tokens")
 		parsedTokens = {
 			...parsedTokens,
+			accessToken: accessTokenParam.toString(),
+		}
+	}
+
+	// parse Authorization header, make sure accessToken is in correct format
+	const { authorization } = req.headers
+	if (authorization && authorization.toLowerCase().includes("bearer ")) {
+		Logger.warn("Parsing Bearer Tokens")
+		// override accessToken from cookies and query string
+		parsedTokens = {
+			...parsedTokens,
+			// extract accessToken from "Authorization" header
 			accessToken: authorization.split(" ")[1]?.toString(),
 		}
-		Logger.warn("Parsing Bearer Tokens")
 	}
 
 	return parsedTokens
@@ -67,28 +71,40 @@ export interface ITokenPayload {
 	email: string
 	version?: number
 }
-export function signToken(payload: ITokenPayload, expiresIn: string | number) {
-	return jwt.sign(payload, ParameterStore.SECRET_KEY, {
-		algorithm: "HS512",
-		expiresIn,
-	})
-}
-
 export interface IVerifiedToken {
 	userId: string
 	email: string
 	version?: number
 	exp: number
 }
-export function verifyToken(payload: string): {
+
+export interface ISignOptions {
+	secretOrPrivateKey: jwt.Secret
+	expiresIn: string | number
+}
+export function signToken(
+	payload: ITokenPayload,
+	{ secretOrPrivateKey, expiresIn }: ISignOptions
+) {
+	return jwt.sign(payload, secretOrPrivateKey, {
+		algorithm: "HS512",
+		expiresIn,
+	})
+}
+
+export function verifyToken(
+	payload: string,
+	type: keyof typeof TokenType = TokenType.Access
+): {
 	token?: IVerifiedToken
 	isVerified: boolean
 } {
 	try {
-		const token = jwt.verify(
-			payload,
-			ParameterStore.SECRET_KEY
-		) as IVerifiedToken
+		const secret =
+			type === TokenType.Access
+				? ParameterStore.ACCESS_TOKEN_SECRET
+				: ParameterStore.REFRESH_TOKEN_SECRET
+		const token = jwt.verify(payload, secret) as IVerifiedToken
 		// send the verified accessToken if there are no errors
 		return {
 			token,
@@ -106,9 +122,21 @@ export function verifyToken(payload: string): {
 
 export function buildTokens({ userId, email, version }: ITokenPayload) {
 	return {
-		accessToken: signToken({ userId, email }, TokenExpiration.Access),
+		accessToken: signToken(
+			{ userId, email },
+			{
+				expiresIn: TokenExpiration.Access,
+				secretOrPrivateKey: ParameterStore.ACCESS_TOKEN_SECRET,
+			}
+		),
 		refreshToken: version
-			? signToken({ userId, email, version }, TokenExpiration.Refresh)
+			? signToken(
+					{ userId, email, version },
+					{
+						expiresIn: TokenExpiration.Refresh,
+						secretOrPrivateKey: ParameterStore.REFRESH_TOKEN_SECRET,
+					}
+			  )
 			: "",
 	}
 }

@@ -6,9 +6,13 @@ export async function createVault(vault: TVault) {
 }
 
 export async function updateVaultByUserId({ userId, data }: TVault) {
-	VaultModel.updateOne({ userId }, { data })
+	return await VaultModel.updateOne({ userId }, { data })
 }
 
 export async function getVaultByUserId(userId: string) {
-	return VaultModel.findOne({ userId: userId })
+	return await VaultModel.findOne({ userId: userId })
+}
+
+export async function deleteVaultByUserId(userId: string) {
+	return await VaultModel.findOneAndDelete({ userId })
 }

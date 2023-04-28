@@ -31,7 +31,7 @@ export async function loginUserById(userId: IUserModel["userId"]) {
 	)
 }
 
-export async function logoutUserByEmail(userId: IUserModel["userId"]) {
+export async function logoutUserById(userId: IUserModel["userId"]) {
 	return await UserModel.findOneAndUpdate(
 		{ _id: userId },
 		{ isLoggedIn: false }

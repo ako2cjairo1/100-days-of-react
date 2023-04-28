@@ -1,15 +1,14 @@
 import { Request, Response, NextFunction } from "express"
 import {
 	CreateError,
-	Logger,
 	buildTokens,
 	parseToken,
 	removeCookies,
 	setCookies,
 	verifyToken,
 } from "../utils"
-import { fetchUserById } from "../modules"
-import { Cookies } from "../constant"
+import { Cookies, TokenType } from "../constant"
+import { fetchUserById } from "../modules/user/controllers"
 
 export async function deserializeSession(
 	req: Request,
@@ -20,23 +19,27 @@ export async function deserializeSession(
 		const { accessToken, refreshToken } = parseToken(req)
 		// if there are no tokens to deserialize, proceed to next
 		if (!accessToken && !refreshToken) return next()
-		console.table({ accessToken, refreshToken })
 
 		if (accessToken) {
 			// verify accessToken signature
-			const { isVerified, token } = verifyToken(accessToken)
-			if (isVerified) {
+			const { isVerified, token } = verifyToken(
+				accessToken,
+				TokenType.Access
+			)
+			if (isVerified && token) {
 				// set the verified access token to response locals
-				res.locals[Cookies.AccessToken] = token
+				res.locals[Cookies.User] = token
 				return next()
 			}
 		}
 
-		Logger.error("Token is expired")
-
+		// accessToke is expired, check the refreshToken
 		if (refreshToken) {
 			// expired accessToken, check the refresh token
-			const { isVerified, token } = verifyToken(refreshToken)
+			const { isVerified, token } = verifyToken(
+				refreshToken,
+				TokenType.Refresh
+			)
 			if (isVerified && token) {
 				const user = await fetchUserById(token.userId)
 
@@ -49,10 +52,15 @@ export async function deserializeSession(
 						// increment for refresh token validation
 						version: (version || 0) + 1,
 					})
-					// attach signed accessToken to cookie
+					// create secure cookies with signed access and refresh tokens
 					setCookies(res, { accessToken, refreshToken })
 					// set the verified access token to response locals
-					res.locals[Cookies.AccessToken] = accessToken
+					// expired accessToken, check the refresh token
+					const { isVerified, token } = verifyToken(
+						accessToken,
+						TokenType.Access
+					)
+					if (isVerified && token) res.locals[Cookies.User] = token
 					return next()
 				}
 			}
