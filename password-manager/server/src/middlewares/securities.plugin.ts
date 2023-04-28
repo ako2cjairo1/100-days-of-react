@@ -15,7 +15,7 @@ const SessionCookies = session({
 const Cors = cors({
 	credentials: true,
 	// to whitelist our own client app
-	origin: ParameterStore.CLIENT_URL,
+	origin: [ParameterStore.CLIENT_URL],
 })
 
 // custom rate limiter for login

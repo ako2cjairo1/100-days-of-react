@@ -1,6 +1,6 @@
 import { IUserModel, TUser } from "../../types"
 import { UserModel } from "./user.model"
-import { isHashVerified } from "../../utils"
+import { generateSalt, isHashVerified } from "../../utils"
 
 // create user
 export async function createUser(user: TUser) {
@@ -34,7 +34,10 @@ export async function loginUserById(userId: IUserModel["userId"]) {
 export async function logoutUserById(userId: IUserModel["userId"]) {
 	return await UserModel.findOneAndUpdate(
 		{ _id: userId },
-		{ isLoggedIn: false }
+		{
+			version: generateSalt(16),
+			isLoggedIn: false,
+		}
 	)
 }
 

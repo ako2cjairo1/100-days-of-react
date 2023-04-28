@@ -1,13 +1,13 @@
 import mongoose from "mongoose"
 import { IUserModel } from "../../types"
-import { generateHash } from "../../utils"
+import { generateHash, generateSalt } from "../../utils"
 
 // create User schema
 const UserSchema = new mongoose.Schema<IUserModel>(
 	{
 		email: { type: String, required: true, unique: true },
 		password: { type: String, required: true },
-		version: { type: Number, default: 0 },
+		version: { type: String, default: "" },
 		isLoggedIn: { type: Boolean, default: false },
 	},
 	{
@@ -22,8 +22,11 @@ UserSchema.pre("save", async function (next) {
 
 	if (isNew || isModified("password")) {
 		this.password = await generateHash(password)
-		return next()
 	}
+	if (isNew) {
+		this.version = generateSalt(16)
+	}
+	return next()
 })
 
 // create the User model and export

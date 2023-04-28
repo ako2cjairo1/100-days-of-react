@@ -4,7 +4,7 @@ import {
 	buildTokens,
 	parseToken,
 	removeCookies,
-	setCookies,
+	createCookies,
 	verifyToken,
 } from "../utils"
 import { Cookies, TokenType } from "../constant"
@@ -16,12 +16,13 @@ export async function deserializeSession(
 	next: NextFunction
 ) {
 	try {
+		// parse cookies, query string and Bearer token
 		const { accessToken, refreshToken } = parseToken(req)
 		// if there are no tokens to deserialize, proceed to next
 		if (!accessToken && !refreshToken) return next()
 
+		// verify accessToken signature
 		if (accessToken) {
-			// verify accessToken signature
 			const { isVerified, token } = verifyToken(
 				accessToken,
 				TokenType.Access
@@ -43,6 +44,10 @@ export async function deserializeSession(
 			if (isVerified && token) {
 				const user = await fetchUserById(token.userId)
 
+				// check if the token version is match
+				if (token.version !== user?.version)
+					return next(new Error("Token is revoked"))
+
 				if (user) {
 					const { _id, email, version } = user
 					// generate new set of tokens using verified User info
@@ -50,10 +55,10 @@ export async function deserializeSession(
 						email,
 						userId: _id.toString(),
 						// increment for refresh token validation
-						version: (version || 0) + 1,
+						version,
 					})
 					// create secure cookies with signed access and refresh tokens
-					setCookies(res, { accessToken, refreshToken })
+					createCookies(res, { accessToken, refreshToken })
 					// set the verified access token to response locals
 					// expired accessToken, check the refresh token
 					const { isVerified, token } = verifyToken(
@@ -72,6 +77,7 @@ export async function deserializeSession(
 
 		return next()
 	} catch (err) {
+		console.error(err)
 		// send formatted error to error handler plugin
 		return next(CreateError(err))
 	}

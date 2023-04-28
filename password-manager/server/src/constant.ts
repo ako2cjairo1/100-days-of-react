@@ -9,7 +9,7 @@ const mongoDB_password = process.env.MONGODB_PASSWORD || ""
 const mongodb_database = process.env.MONGODB_DATABASE || ""
 const MONGODB_URL = `mongodb+srv://${mongoDB_userName}:${mongoDB_password}@mern-ecommerce-cluster.jjpzu.mongodb.net/${mongodb_database}`
 
-const CLIENT_URL = process.env.CLIENT_URL
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173"
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || "localhost"
 const SECRET_KEY = process.env.SECRET || ""
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || ""
@@ -37,12 +37,12 @@ export const Cookies = {
 } as const
 
 export const TokenExpiration = {
-	Access: 5, //5 * 60, // 5 mins
+	Access: 5 * 60, // 5 mins
 	Refresh: 7 * 24 * 60 * 60, // a week
 } as const
 
 export const DefaultCookieOptions: CookieOptions = {
-	httpOnly: isProd, // set to "true" if we don't want want JS to read cookies
+	httpOnly: true, // set to "true" if we don't want want JS to read cookies
 	secure: isProd,
 	sameSite: isProd ? "strict" : "lax",
 	domain: COOKIE_DOMAIN,
@@ -51,8 +51,8 @@ export const DefaultCookieOptions: CookieOptions = {
 }
 
 export const RateLimitConfig = {
-	windowMs: 10 * 1000, // 15 minutes
-	max: 10, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 	message:
 		"Slow down! You're sending me too much requests. Please try again after sometime.",
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
@@ -61,6 +61,6 @@ export const RateLimitConfig = {
 
 export const UserLimitConfig = {
 	...RateLimitConfig,
-	max: 5, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	max: 10, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 	message: "Too many login attempts, please try again after sometime.",
 }

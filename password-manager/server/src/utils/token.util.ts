@@ -1,7 +1,7 @@
 import crypto from "crypto"
 import argon2 from "argon2"
 import * as jwt from "jsonwebtoken"
-import { CookieOptions, Request, Response } from "express"
+import { Request, Response } from "express"
 import {
 	Cookies,
 	DefaultCookieOptions,
@@ -10,39 +10,40 @@ import {
 	TokenType,
 } from "../constant"
 import { CreateError, Logger } from "../utils"
+import { TSignOptions, TToken, TTokenPayload, TVerifiedToken } from "../types"
 
-export function generateSalt() {
-	return crypto.randomBytes(64).toString("hex")
+const { AccessToken, RefreshToken } = Cookies
+const { Access, Refresh } = TokenExpiration
+const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = ParameterStore
+
+export function generateSalt(size: number = 64) {
+	return crypto.randomBytes(size).toString("hex")
 }
 
 export async function generateHash(plain: string) {
-	return argon2.hash(plain)
+	return await argon2.hash(plain)
 }
 
 export async function isHashVerified(verifier: string, plain: string) {
-	return argon2.verify(verifier, plain)
+	return await argon2.verify(verifier, plain)
 }
 
-export interface IParseToken {
-	accessToken?: string
-	refreshToken?: string
-}
 // extract jwt from request
-export function parseToken(req: Request): IParseToken {
+export function parseToken(req: Request): TToken {
 	const { cookies, query } = req
-	let parsedTokens: IParseToken = {}
+	let parsedTokens: TToken = {}
 
 	// parse cookies for cookies
 	if (cookies) {
 		Logger.warn("Parsing Cookies for Tokens")
 		parsedTokens = {
-			accessToken: cookies[Cookies.AccessToken],
-			refreshToken: cookies[Cookies.RefreshToken],
+			accessToken: cookies[AccessToken],
+			refreshToken: cookies[RefreshToken],
 		}
 	}
 
 	// parse query string
-	const accessTokenParam = query[Cookies.AccessToken]
+	const accessTokenParam = query[AccessToken]
 	if (query && accessTokenParam) {
 		Logger.warn("Parsing Query String Tokens")
 		parsedTokens = {
@@ -66,25 +67,9 @@ export function parseToken(req: Request): IParseToken {
 	return parsedTokens
 }
 
-export interface ITokenPayload {
-	userId: string
-	email: string
-	version?: number
-}
-export interface IVerifiedToken {
-	userId: string
-	email: string
-	version?: number
-	exp: number
-}
-
-export interface ISignOptions {
-	secretOrPrivateKey: jwt.Secret
-	expiresIn: string | number
-}
 export function signToken(
-	payload: ITokenPayload,
-	{ secretOrPrivateKey, expiresIn }: ISignOptions
+	payload: TTokenPayload,
+	{ secretOrPrivateKey, expiresIn }: TSignOptions
 ) {
 	return jwt.sign(payload, secretOrPrivateKey, {
 		algorithm: "HS512",
@@ -96,15 +81,15 @@ export function verifyToken(
 	payload: string,
 	type: keyof typeof TokenType = TokenType.Access
 ): {
-	token?: IVerifiedToken
+	token?: TVerifiedToken
 	isVerified: boolean
 } {
 	try {
 		const secret =
 			type === TokenType.Access
-				? ParameterStore.ACCESS_TOKEN_SECRET
-				: ParameterStore.REFRESH_TOKEN_SECRET
-		const token = jwt.verify(payload, secret) as IVerifiedToken
+				? ACCESS_TOKEN_SECRET
+				: REFRESH_TOKEN_SECRET
+		const token = jwt.verify(payload, secret) as TVerifiedToken
 		// send the verified accessToken if there are no errors
 		return {
 			token,
@@ -120,53 +105,41 @@ export function verifyToken(
 	}
 }
 
-export function buildTokens({ userId, email, version }: ITokenPayload) {
+export function buildTokens({ userId, email, version }: TTokenPayload) {
 	return {
 		accessToken: signToken(
 			{ userId, email },
 			{
-				expiresIn: TokenExpiration.Access,
-				secretOrPrivateKey: ParameterStore.ACCESS_TOKEN_SECRET,
+				expiresIn: Access,
+				secretOrPrivateKey: ACCESS_TOKEN_SECRET,
 			}
 		),
 		refreshToken: version
 			? signToken(
 					{ userId, email, version },
 					{
-						expiresIn: TokenExpiration.Refresh,
-						secretOrPrivateKey: ParameterStore.REFRESH_TOKEN_SECRET,
+						expiresIn: Refresh,
+						secretOrPrivateKey: REFRESH_TOKEN_SECRET,
 					}
 			  )
 			: "",
 	}
 }
 
-const accessTokenCookieOptions: CookieOptions = {
-	...DefaultCookieOptions,
-	maxAge: TokenExpiration.Access * 1000,
-}
-const refreshTokenCookieOptions: CookieOptions = {
-	...DefaultCookieOptions,
-	maxAge: TokenExpiration.Refresh * 1000,
-}
-
-interface ISetCookies {
-	accessToken: string
-	refreshToken?: string
-}
-
-export function setCookies(
+export function createCookies(
 	res: Response,
-	{ accessToken, refreshToken }: ISetCookies
+	{ accessToken, refreshToken }: TToken
 ) {
 	try {
-		res.cookie(Cookies.AccessToken, accessToken, accessTokenCookieOptions)
+		res.cookie(AccessToken, accessToken, {
+			...DefaultCookieOptions,
+			maxAge: Access * 1000,
+		})
 		if (refreshToken)
-			res.cookie(
-				Cookies.RefreshToken,
-				refreshToken,
-				refreshTokenCookieOptions
-			)
+			res.cookie(RefreshToken, refreshToken, {
+				...DefaultCookieOptions,
+				maxAge: Refresh * 1000,
+			})
 	} catch (error) {
 		let err = CreateError(error)
 		err.name = "Set Cookies Error"
@@ -176,9 +149,8 @@ export function setCookies(
 
 export function removeCookies(res: Response) {
 	try {
-		const options: CookieOptions = { ...DefaultCookieOptions, maxAge: 0 }
-		res.clearCookie(Cookies.AccessToken, options)
-		res.clearCookie(Cookies.RefreshToken, options)
+		res.clearCookie(AccessToken, { ...DefaultCookieOptions, maxAge: 0 })
+		res.clearCookie(RefreshToken, { ...DefaultCookieOptions, maxAge: 0 })
 	} catch (error) {
 		let err = CreateError(error)
 		err.name = "Remove Cookies Error"

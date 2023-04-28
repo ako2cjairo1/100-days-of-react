@@ -12,15 +12,15 @@ export async function logoutHandler(
 		// from "deserializeSession" middleware
 		const { userId } = res.locals[Cookies.User]
 
-		if (!userId) return res.status(401).json({ message: "User not found!" })
-
-		if (userId) {
-			// remove tokens from session cookies
-			// !IMP: client should also delete tokens from memory (auth state)
-			removeCookies(res)
-			// update login status to database
-			await logoutUserById(userId)
+		if (!userId) {
+			return res.sendStatus(204).json({ message: "User not found!" })
 		}
+
+		// remove tokens from session cookies
+		removeCookies(res)
+		// update login status and increase token "version" (for refreshToken)
+		await logoutUserById(userId)
+		return res.sendStatus(204).end()
 	} catch (err) {
 		// parse unknown err
 		let error = CreateError(err)
@@ -29,6 +29,4 @@ export async function logoutHandler(
 		// send formatted error to error handler plugin
 		return next(error)
 	}
-
-	res.sendStatus(204).end()
 }

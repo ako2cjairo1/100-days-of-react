@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express"
 import { TUser } from "../../../types"
 import { authenticateByEmailAndPassword, loginUserById } from "../user.service"
 import { getVaultByUserId } from "../../vault"
-import { CreateError, buildTokens, setCookies } from "../../../utils"
+import { CreateError, buildTokens, createCookies } from "../../../utils"
 
 export async function loginHandler(
 	req: Request,
@@ -42,12 +42,11 @@ export async function loginHandler(
 			const { accessToken, refreshToken } = buildTokens({
 				userId,
 				email,
-				// increment for refresh token validation
-				version: (version || 0) + 1,
+				version,
 			})
 
 			// store signed tokens into cookies
-			setCookies(res, { accessToken, refreshToken })
+			createCookies(res, { accessToken, refreshToken })
 			// update user as loggedIn (optional)
 			await loginUserById(userId)
 

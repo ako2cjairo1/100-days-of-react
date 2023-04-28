@@ -5,6 +5,15 @@ export type TUser = {
 
 export interface IUserModel extends TUser {
 	userId: string
-	version?: number
+	version?: string
 	isLoggedIn?: boolean
+	exp?: number
+}
+
+export interface TSignOptions {
+	secretOrPrivateKey:
+		| string
+		| Buffer
+		| { key: string | Buffer; passphrase: string }
+	expiresIn: string | number
 }

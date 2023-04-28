@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { createUser, deleteUserById } from "../user.service"
 import { createVault, deleteVaultByUserId } from "../../vault"
-import { CreateError, generateSalt, signToken } from "../../../utils"
+import { CreateError, Logger, signToken } from "../../../utils"
 import { ParameterStore, TokenExpiration } from "../../../constant"
 
 export async function registerHandler(
@@ -18,13 +18,10 @@ export async function registerHandler(
 		})
 
 		userId = _id.toString()
-		// create Vault by referencing to user._id
-		// and with initial vault data as blank value
-		const { data, salt } = await createVault({
-			userId,
-			salt: generateSalt(), // use to generate vaultKey for client
-			data: "",
-		})
+		// create Vault using user._id
+		const { data, salt } = await createVault({ userId })
+		// data: initial value of empty array of objects..
+		// salt: is created on pre-save to database (use to generate vaultKey for client)
 
 		// create access token using the created user
 		const accessToken = signToken(
@@ -37,11 +34,11 @@ export async function registerHandler(
 		// registration successful: send accessToken, vault and salt (to generate vault key)
 		return res.status(201).json({ accessToken, vault: data, salt })
 	} catch (err) {
-		console.error(err)
-
-		// rollback registration
-		await deleteUserById(userId)
-		await deleteVaultByUserId(userId)
+		if (userId) {
+			// something went wrong, rollback registration
+			await deleteUserById(userId)
+			await deleteVaultByUserId(userId)
+		}
 
 		// parse unknown err
 		let error = CreateError(err)

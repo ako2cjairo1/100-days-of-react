@@ -1,5 +1,5 @@
 export type TVault = {
 	userId: string
-	data: string
+	data?: string
 	salt?: string
 }
