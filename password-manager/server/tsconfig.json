@@ -15,11 +15,7 @@
 		"moduleResolution": "Node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-		"noEmit": false,
-		"baseUrl": ".",
-		"paths": {
-			"*": ["node_modules/*", "src/type/*.ts"]
-		}
+		"noEmit": false
 	},
 	"include": ["./src/**/*.ts"]
 }
