@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import type { IUserModel } from "../../types"
+import type { IUserModel } from "../../type"
 import { generateHash, generateSalt } from "../../utils"
 
 // create User schema

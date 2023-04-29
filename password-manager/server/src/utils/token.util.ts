@@ -15,7 +15,7 @@ import type {
 	TToken,
 	TTokenPayload,
 	TVerifiedToken,
-} from "../types"
+} from "../type"
 
 const { AccessToken, RefreshToken } = Cookies
 const { Access, Refresh } = TokenExpiration

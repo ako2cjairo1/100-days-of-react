@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express"
-import type { TUser } from "../../../types"
+import type { TUser } from "../../../type"
 import { authenticateByEmailAndPassword, loginUserById } from "../user.service"
 import { getVaultByUserId } from "../../vault"
 import { CreateError, buildTokens, createCookies } from "../../../utils"

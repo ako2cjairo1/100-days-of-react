@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import { TVault } from "../../types"
+import { TVault } from "../../type"
 import { generateSalt } from "../../utils"
 
 // create vault schema

@@ -7,7 +7,7 @@
 		"useDefineForClassFields": true,
 		"allowJs": false,
 		"noUncheckedIndexedAccess": true,
-		"skipLibCheck": true,
+		"skipLibCheck": false,
 		"allowSyntheticDefaultImports": true,
 		"strictNullChecks": true,
 		"forceConsistentCasingInFileNames": true,
@@ -18,7 +18,7 @@
 		"noEmit": false,
 		"baseUrl": ".",
 		"paths": {
-			"*": ["node_modules/*", "src/types/*"]
+			"*": ["node_modules/*", "src/type/*.ts"]
 		}
 	},
 	"include": ["./src/**/*.ts"]

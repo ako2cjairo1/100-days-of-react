@@ -1,4 +1,4 @@
-import type { IUserModel, TUser } from "../../types"
+import type { IUserModel, TUser } from "../../type"
 import { UserModel } from "./user.model"
 import { generateSalt, isHashVerified } from "../../utils"
 
