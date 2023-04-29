@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express"
 import { TVault } from "../../types"
 import { CreateError } from "../../utils"
 import { updateVaultByUserId } from "./vault.service"
+import { Cookies } from "../../constant"
 
 export async function updateVaultHandler(
 	req: Request,
@@ -10,12 +11,10 @@ export async function updateVaultHandler(
 ) {
 	try {
 		// parse Vault updates from request body
-		// const vault: TVault = {
-		// 	userId: req.body.userId,
-		// 	data: req.body.data,
-		// }
-		// //TODO: authenticate user before updating the vault
-		// await updateVaultByUserId(vault)
+		await updateVaultByUserId({
+			userId: res.locals[Cookies.User].userId,
+			data: req.body.encryptedVault,
+		})
 
 		return res.status(200).json({ message: "Vault Updated!" })
 	} catch (err) {

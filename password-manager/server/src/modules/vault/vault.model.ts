@@ -6,7 +6,7 @@ import { generateSalt } from "../../utils"
 const VaultSchema = new mongoose.Schema(
 	{
 		userId: { type: String, required: true, unique: true },
-		data: { type: String, default: "[{}]" },
+		data: { type: String, default: "" },
 		salt: { type: String },
 	},
 	{

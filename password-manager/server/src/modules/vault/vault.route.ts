@@ -3,6 +3,6 @@ import { updateVaultHandler } from "./vault.controller"
 
 const vaultRoute = express.Router()
 
-vaultRoute.post("/", updateVaultHandler)
+vaultRoute.post("/update", updateVaultHandler)
 
 export { vaultRoute }
