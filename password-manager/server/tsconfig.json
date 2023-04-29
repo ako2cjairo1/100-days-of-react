@@ -2,7 +2,8 @@
 	"compilerOptions": {
 		"strict": true,
 		"target": "ESNext",
-		"outDir": "dist",
+		"rootDir": "./src",
+		"outDir": "./dist",
 		"esModuleInterop": true,
 		"useDefineForClassFields": true,
 		"allowJs": false,
@@ -15,7 +16,11 @@
 		"moduleResolution": "Node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-		"noEmit": true
+		"noEmit": false,
+		"baseUrl": ".",
+		"paths": {
+			"*": ["node_modules/*", "src/types/*"]
+		}
 	},
-	"include": ["./src/**/*"]
+	"include": ["./src/**/*.ts"]
 }

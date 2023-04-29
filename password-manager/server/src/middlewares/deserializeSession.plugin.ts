@@ -45,8 +45,10 @@ export async function deserializeSession(
 				const user = await fetchUserById(token.userId)
 
 				// check if the token version is match
-				if (token.version !== user?.version)
-					return next(new Error("Token is revoked"))
+				if (token.version !== user?.version) {
+					removeCookies(res)
+					return next(new Error("Access Invalid (revoked)"))
+				}
 
 				if (user) {
 					const { _id, email, version } = user
