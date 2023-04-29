@@ -1,10 +1,13 @@
 {
 	"name": "password-manager-server",
 	"version": "1.0.0",
-	"main": "src/main.ts",
 	"license": "MIT",
+	"main": "main.ts",
+	"engines": {
+		"node": "19.x"
+	},
 	"scripts": {
-		"start": "nodemon -x ts-node src/main.ts",
+		"start": "node -x ts-node src/main.ts",
 		"build": "tsc && yarn tsc"
 	},
 	"dependencies": {
