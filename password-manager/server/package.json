@@ -2,13 +2,11 @@
 	"name": "password-manager-server",
 	"version": "1.0.0",
 	"license": "MIT",
-	"main": "main.js",
+	"main": "main.ts",
 	"scripts": {
-		"start": "tsc && node ./dist/main.js",
-		"start:dev": "nodemon ./src/main.ts",
-		"build": "tsc && nodemon ./dist/main.js",
-		"ts.check": "tsc --project tsconfig.json",
-		"add-build": "git add dist"
+		"start": "node src/main.ts",
+		"build": "tsc && node ./dist/main.js",
+		"ts.check": "tsc --project tsconfig.json"
 	},
 	"pre-commit": [
 		"ts.check",

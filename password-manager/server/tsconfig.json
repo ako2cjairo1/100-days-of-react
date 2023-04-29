@@ -2,8 +2,7 @@
 	"compilerOptions": {
 		"strict": true,
 		"target": "ESNext",
-		"rootDir": "./src",
-		"outDir": "./dist",
+		"outDir": "dist",
 		"esModuleInterop": true,
 		"useDefineForClassFields": true,
 		"allowJs": false,
