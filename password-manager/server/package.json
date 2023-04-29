@@ -7,9 +7,17 @@
 		"node": "19.x"
 	},
 	"scripts": {
-		"start": "node -x ts-node src/main.ts",
-		"build": "tsc && yarn tsc"
+		"start": "nodemon src/main.ts",
+		"build": "rimraf dist && tsc",
+		"ts.check": "tsc --project tsconfig.json",
+		"add-build": "git add dist",
+		"test": "echo \"Error: no test specified\" && exit 1"
 	},
+	"pre-commit": [
+		"ts.check",
+		"build",
+		"add-build"
+	],
 	"dependencies": {
 		"@typegoose/typegoose": "^11.0.1",
 		"argon2": "^0.30.3",
@@ -23,10 +31,8 @@
 		"express-session": "^1.17.3",
 		"helmet": "^6.1.5",
 		"jsonwebtoken": "^9.0.0",
-		"lodash": "^4.17.21",
 		"mongoose": "^7.0.4",
-		"pino": "^8.11.0",
-		"zod": "^3.21.4"
+		"pino": "^8.11.0"
 	},
 	"devDependencies": {
 		"@types/cookie-parser": "^1.4.3",
@@ -39,6 +45,8 @@
 		"dotenv": "^16.0.3",
 		"nodemon": "^2.0.22",
 		"pino-pretty": "^10.0.0",
+		"pre-commit": "^1.2.2",
+		"rimraf": "^5.0.0",
 		"ts-node": "^10.9.1",
 		"ts-node-dev": "^2.0.0",
 		"typescript": "^5.0.4"
