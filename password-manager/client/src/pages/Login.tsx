@@ -21,8 +21,8 @@ import {
 	AnimatedIcon,
 	Header,
 } from '@/components'
-import { decryptVault, generateVaultKey, hashPassword } from '@/services/Utils/crypto'
-import { loginUser } from '@/api'
+import { generateVaultKey, hashPassword } from '@/services/Utils/crypto'
+import { loginUserService } from '@/api'
 
 // constants
 const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
@@ -47,7 +47,7 @@ export function Login() {
 
 	useEffect(() => {
 		if (savedEmailRef.current) {
-			const savedEmailFromLocalStorage = LocalStorage.read('password_manager_email')
+			const savedEmailFromLocalStorage = LocalStorage.read('PM_remember_email')
 			inputAction.mutate({
 				email: savedEmailFromLocalStorage,
 				isRemember: savedEmailFromLocalStorage ? true : false,
@@ -72,8 +72,8 @@ export function Login() {
 		updateLoginStatus({ message: '' })
 		if (isTypingEmail) {
 			setIsTypingEmail(false)
-			if (isRemember) LocalStorage.write('password_manager_email', email)
-			else LocalStorage.remove('password_manager_email')
+			if (isRemember) LocalStorage.write('PM_remember_email', email)
+			else LocalStorage.remove('PM_remember_email')
 			return
 		}
 
@@ -89,25 +89,23 @@ export function Login() {
 					// hash password before sending to API
 					const hashedPassword = hashPassword(password)
 					// authenticate user using email and hashed password from API
-					const { vault, salt } = await loginUser({
+					const { vault, salt } = await loginUserService({
 						email,
 						password: hashedPassword,
 					})
-					// generate vaultKey using "salt" from API
+					// generate vaultKey using combination of email, hashedPassword and "salt" from API
 					const vaultKey = generateVaultKey({
 						email,
 						hashedPassword,
 						salt,
 					})
-					// decrypt Vault using vaultKey with salt from API
-					const decryptedVault = decryptVault({ vault, vaultKey })
-					// store decrypted Vault and vaultKey in session storage
+					// store Vault and vaultKey in session storage
 					SessionStorage.write([
 						['PM_VK', vaultKey],
-						['vault', JSON.stringify(decryptedVault)],
+						['PM_encrypted_vault', vault],
 					])
 					// !This maybe replaced with cookies
-					mutateAuth({ email, vault })
+					mutateAuth({ email, vault, vaultKey })
 					// clear form input states and status
 					inputAction.resetInput()
 					updateLoginStatus({ success: true, message: '' })

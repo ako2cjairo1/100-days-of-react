@@ -24,7 +24,7 @@ import {
 	Header,
 } from '@/components'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
-import { registerUser } from '@/api'
+import { registerUserService } from '@/api'
 
 // constants
 const { CREDENTIALS, STATUS, EMAIL_REGEX, PASSWORD_REGEX } = REGISTER_STATE
@@ -114,7 +114,7 @@ export function Registration() {
 				try {
 					if (checkIf.isValidPassword) {
 						// register and get accessToken, encrypted vault and salt from API
-						await registerUser({
+						await registerUserService({
 							email,
 							// hash password before sending to API
 							password: hashPassword(password),

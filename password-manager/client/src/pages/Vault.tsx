@@ -11,11 +11,11 @@ import {
 	SearchBar,
 } from '@/components'
 import { useAuthContext, useStateObj } from '@/hooks'
-import { CreateError, LocalStorage, Log } from '@/services/Utils/password-manager.helper'
+import { CreateError, Log, SessionStorage } from '@/services/Utils/password-manager.helper'
 import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
 import { RequestType, KEYCHAIN_CONST, FormContent } from '@/services/constants'
-import { encryptVault } from '@/services/Utils/crypto'
-import { logoutUser } from '@/api'
+import { decryptVault, encryptVault } from '@/services/Utils/crypto'
+import { logoutUserService, updateVaultService } from '@/api'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 const { add, modify, view } = RequestType
@@ -34,68 +34,81 @@ export function Vault() {
 	const { mutateAuth } = useAuthContext()
 	const vaultCountRef = useRef(0)
 
-	const getVaultData = () => {
-		// TODO: implement cache mechanism
-		// get password vault data from local storage
-		const vaultData = JSON.parse(LocalStorage.read('password_manager_data') || '[]')
-		const sessionVault = window.sessionStorage.getItem('PM_V')
-		Log(sessionVault)
-		setVault(vaultData)
-		vaultCountRef.current = vaultData.length
+	const hydrateAndGetVault = () => {
+		let currentVault = []
+		try {
+			const encryptedVault = SessionStorage.read('PM_encrypted_vault')
+			if (encryptedVault) {
+				// use vaultKey to decrypt Vault (combination of email, hashed password and salt from API)
+				currentVault = decryptVault({
+					vault: encryptedVault,
+					vaultKey: SessionStorage.read('PM_VK'),
+				})
+			}
+			// hydrate Vault state
+			setVault(currentVault)
+			// remember how many items on current Vault
+			vaultCountRef.current = currentVault.length
+		} catch (error) {
+			Log("We can't access your Vault!")
+		}
 
-		return vaultData
+		return currentVault
 	}
 
 	useEffect(() => {
-		// get password vault data from local storage
-		getVaultData()
-		Log('Loading Data...')
+		Log('Loading your Vault...')
+		// get encrypted Vault data from session storage
+		hydrateAndGetVault()
 	}, [])
 
-	// TODO: implement these as controller methods for API
-	const updateLocalStorage = (vault: TKeychain[]) => {
-		LocalStorage.write('password_manager_data', JSON.stringify(vault))
-
+	// encrypt current Vault, store on session storage and finally, update database
+	const syncDatabaseUpdate = (vault: TKeychain[]) => {
 		const encryptedVault = encryptVault({
-			vault: JSON.stringify({ vault }),
-			vaultKey: window.sessionStorage.getItem('PM_VK') ?? '',
+			vault: JSON.stringify(vault),
+			vaultKey: SessionStorage.read('PM_VK'),
 		})
-		Log(encryptedVault)
+		// store local copy of encryptedVault in session storage
+		SessionStorage.write([['PM_encrypted_vault', encryptedVault]])
+		// update the database as well
+		updateVaultService(encryptedVault)
+		hydrateAndGetVault()
 	}
 
 	const mutateVault = (keychainUpdate: TKeychain, requestType: TRequestType): TStatus => {
-		const vaultData: TKeychain[] = getVaultData()
-
-		const cantAddDuplicate =
-			requestType === add &&
-			vaultData.some(
-				({ username, website }) =>
-					username === keychainUpdate.username && website === keychainUpdate.website
-			)
-		if (cantAddDuplicate) {
-			return {
-				success: false,
-				message: 'You`ve already added this username for this website.',
-			}
-		}
-
-		// for delete action, remove the submitted keychain info from vault
-		let tempVault = vaultData.filter(({ keychainId }) => keychainId !== keychainUpdate.keychainId)
-
-		// for "add" and "modify" requests: append timeAgo prop
-		if (requestType === add || requestType === modify) {
-			const keychainUpdateWithTimeAgo: TKeychain = {
-				...keychainUpdate,
-				timeAgo: new Date().toString(),
-			}
-			// clone vault and append submitted Keychain info
-			tempVault = [keychainUpdateWithTimeAgo, ...tempVault]
-		}
+		const currentVault: TKeychain[] = hydrateAndGetVault()
 
 		try {
-			updateLocalStorage(tempVault)
+			// checks if email and website is already on the Vault list
+			const cantAddDuplicate =
+				requestType === add &&
+				currentVault.some(
+					({ username, website }) =>
+						username === keychainUpdate.username && website === keychainUpdate.website
+				)
+			if (cantAddDuplicate) {
+				return {
+					success: false,
+					message: 'You`ve already added this username for this website.',
+				}
+			}
+			// for "Delete" action, remove keychain from current Vault
+			let tempVault = currentVault.filter(
+				({ keychainId }) => keychainId !== keychainUpdate.keychainId
+			)
+			// for "Add" and "Modify" actions: append timeAgo prop
+			if (requestType === add || requestType === modify) {
+				const keychainUpdateWithTimeAgo: TKeychain = {
+					...keychainUpdate,
+					timeAgo: new Date().toString(),
+				}
+				// clone current Vault then append Keychain update on the top of the list
+				tempVault = [keychainUpdateWithTimeAgo, ...tempVault]
+			}
+
 			setVault(tempVault)
-			getVaultData()
+			syncDatabaseUpdate(tempVault)
+
 			return {
 				success: true,
 				message: 'Success',
@@ -110,7 +123,6 @@ export function Vault() {
 
 	const openKeychain = (keychainId?: string, action?: TRequestType) => {
 		const info = vault.find(info => info.keychainId === keychainId)
-
 		// throw an error message if keychainId is not found
 		if (!info) {
 			return updateVaultStatus({
@@ -118,13 +130,11 @@ export function Vault() {
 				message: 'Keychain information not found! Try again after a while.',
 			})
 		}
-
 		// open the keychain info
 		if (!action || action === view) {
 			updateKeychain(info)
 			return setFormContent(keychain_component)
 		}
-
 		// submit keychain info to Modal for update
 		if (action === modify) {
 			return keychainModal.open(info)
@@ -136,13 +146,12 @@ export function Vault() {
 		setFormContent(vault_component)
 		updateVaultStatus(STATUS)
 		updateKeychain(KEYCHAIN)
-
-		// subsequently open a modal form if user choose to "Update"
+		// subsequently open a modal form if user choose to "Update" a keychain
 		if (keychainId) openKeychain(keychainId, modify)
 	}
 
 	const handleSearch = (searchKey: string): number => {
-		const vaultData: TKeychain[] = getVaultData()
+		const vaultData: TKeychain[] = hydrateAndGetVault()
 		let searchResult = vaultData
 
 		if (searchKey.length > 0) {
@@ -177,12 +186,12 @@ export function Vault() {
 
 	const handleLogout = async () => {
 		try {
-			// clear session storage (Vault and saltKey)
-			window.sessionStorage.clear()
-			// call API to clear session cookies
-			await logoutUser()
-			// update application states
+			// update auth context
 			mutateAuth({ accessToken: '' })
+			// call API to clear session cookies
+			await logoutUserService()
+			// clear session storage (Vault and saltKey)
+			SessionStorage.clear()
 		} catch (error) {
 			Log(error)
 		}

@@ -48,12 +48,12 @@ export function SearchBar({ children, searchCallback }: ISearchBar) {
 		setSearch('')
 		setSearchStatus(STATUS)
 		searchCallback('')
-		LocalStorage.write('password_manager_searchkey', '')
+		LocalStorage.write('PM_searchkey', '')
 	}
 
 	useEffect(() => {
 		if (cachedSearchKeyRef.current) {
-			const cachedSearchKey = LocalStorage.read('password_manager_searchkey')
+			const cachedSearchKey = LocalStorage.read('PM_searchkey')
 			setSearch(cachedSearchKey)
 			executeSearch(cachedSearchKey)
 			cachedSearchKeyRef.current = false
@@ -69,7 +69,7 @@ export function SearchBar({ children, searchCallback }: ISearchBar) {
 				placeholder="Search keychains"
 				value={search}
 				onChange={handleChange}
-				onBlur={() => LocalStorage.write('password_manager_searchkey', search)}
+				onBlur={() => LocalStorage.write('PM_searchkey', search)}
 			/>
 			<div
 				className="fdc"

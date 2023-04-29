@@ -12,24 +12,24 @@ type IGenerateVaultKey = {
 export function generateVaultKey({ email, hashedPassword, salt }: IGenerateVaultKey) {
 	return PBKDF2(`${email}:${hashedPassword}`, salt, {
 		keySize: 32,
+		iterations: 1000,
 	}).toString()
 }
 
 interface IEncryptVault {
-	vaultKey: string
 	vault: string
+	vaultKey: string
 }
 export function encryptVault({ vault, vaultKey }: IEncryptVault) {
 	return AES.encrypt(vault, vaultKey).toString()
 }
 
 export function decryptVault({ vault, vaultKey }: IEncryptVault) {
-	const bytes = AES.decrypt(vault, vaultKey)
-	const decrypted = bytes.toString(enc.Utf8)
-
 	try {
-		return JSON.parse(decrypted).vault
+		const decrypted = AES.decrypt(vault, vaultKey).toString(enc.Utf8)
+		return JSON.parse(decrypted)
 	} catch (err) {
-		return null
+		console.warn('Decryption error')
 	}
+	return []
 }

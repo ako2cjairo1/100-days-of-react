@@ -4,6 +4,7 @@ export const AUTH_CONTEXT = {
 	authInfo: {
 		email: '',
 		vault: '',
+		vaultKey: '',
 		accessToken: '',
 	},
 	mutateAuth: () => null,

@@ -208,9 +208,10 @@ export function CreateError(error: unknown) {
 }
 
 type TLSKey =
-	| 'password_manager_data'
-	| 'password_manager_email'
-	| 'password_manager_searchkey'
+	| 'PM_remember_email'
+	| 'PM_searchkey'
+	| 'PM_encrypted_vault'
+	| 'PM_VK'
 	| (string & { keys?: string })
 /**
  * LocalStorage object provides an interface for interacting with the browser's local storage.
@@ -230,8 +231,9 @@ export const LocalStorage: ILocalStorage = {
 }
 
 interface ISessionStorage {
-	write: TFunction<Array<Array<[key: string, value: string]>>>
+	write: TFunction<Array<Array<[key: TLSKey, value: string]>>>
 	read: TFunction<[key: TLSKey], string>
+	clear: TFunction
 }
 export const SessionStorage: ISessionStorage = {
 	write: data => {
@@ -240,6 +242,7 @@ export const SessionStorage: ISessionStorage = {
 		}
 	},
 	read: key => window.sessionStorage.getItem(key) || '',
+	clear: () => window.sessionStorage.clear(),
 }
 
 /**
