@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { createUser, deleteUserById } from "../user.service"
 import { createVault, deleteVaultByUserId } from "../../vault"
-import { CreateError, Logger, signToken } from "../../../utils"
+import { CreateError, signToken } from "../../../utils"
 import { ParameterStore, TokenExpiration } from "../../../constant"
 
 export async function registerHandler(
@@ -12,7 +12,7 @@ export async function registerHandler(
 	let userId = ""
 	try {
 		// create user and generate user._id
-		const { _id, email } = await createUser({
+		const { _id, email, version } = await createUser({
 			email: req.body.email,
 			password: req.body.password,
 		})
@@ -25,7 +25,7 @@ export async function registerHandler(
 
 		// create access token using the created user
 		const accessToken = signToken(
-			{ userId, email },
+			{ userId, email, version },
 			{
 				expiresIn: TokenExpiration.Access,
 				secretOrPrivateKey: ParameterStore.ACCESS_TOKEN_SECRET,

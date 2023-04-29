@@ -1,4 +1,4 @@
-import { IUserModel } from "./user.type"
+import type { IUserModel } from "./user.type"
 
 export type TToken = {
 	accessToken?: string

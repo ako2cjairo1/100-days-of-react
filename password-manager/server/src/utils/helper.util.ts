@@ -1,4 +1,4 @@
-import { HTTPRequestError } from "../types"
+import type { HTTPRequestError } from "../types"
 /**
  * This function takes in an unknown error and returns an HTTPRequestError object.
  *

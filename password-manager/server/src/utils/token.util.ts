@@ -10,7 +10,12 @@ import {
 	TokenType,
 } from "../constant"
 import { CreateError, Logger } from "../utils"
-import { TSignOptions, TToken, TTokenPayload, TVerifiedToken } from "../types"
+import type {
+	TSignOptions,
+	TToken,
+	TTokenPayload,
+	TVerifiedToken,
+} from "../types"
 
 const { AccessToken, RefreshToken } = Cookies
 const { Access, Refresh } = TokenExpiration

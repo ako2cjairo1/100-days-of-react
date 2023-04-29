@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express"
-import { TVault } from "../../types"
 import { CreateError } from "../../utils"
 import { updateVaultByUserId } from "./vault.service"
 import { Cookies } from "../../constant"

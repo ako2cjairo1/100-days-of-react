@@ -1,4 +1,4 @@
-import { TVault } from "../../types"
+import type { TVault } from "../../types"
 import { VaultModel } from "./vault.model"
 
 export async function createVault(vault: TVault) {
