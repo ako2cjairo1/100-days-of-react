@@ -11,9 +11,9 @@ const MONGODB_URL = `mongodb+srv://${mongoDB_userName}:${mongoDB_password}@mern-
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173"
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || "localhost"
-const SECRET_KEY = process.env.SECRET || ""
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || ""
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || ""
+const SECRET_KEY = ACCESS_TOKEN_SECRET //process.env.SECRET || ""
 
 export const ParameterStore = {
 	SERVER_PORT,

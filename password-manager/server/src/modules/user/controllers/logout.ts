@@ -9,6 +9,7 @@ export async function logoutHandler(
 	next: NextFunction
 ) {
 	try {
+		// TODO: invalidate tokens used
 		// from "deserializeSession" middleware
 		const { userId } = res.locals[Cookies.User]
 

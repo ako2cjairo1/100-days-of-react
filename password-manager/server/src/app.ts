@@ -8,8 +8,9 @@ import {
 	jwtPlugin,
 	invalidRouteHandler,
 	securities,
-} from "./middlewares"
+} from "./middleware"
 import { ParameterStore } from "./constant"
+const { SECRET_KEY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = ParameterStore
 
 const app = express()
 /* middleware: cors, helmet, express-session (cookie parser), rate limiter */
@@ -17,7 +18,7 @@ app.use(securities)
 app.use(express.json())
 // handle urlencoded form data
 app.use(express.urlencoded({ extended: false }))
-app.use(cookieParser(ParameterStore.SECRET_KEY))
+app.use(cookieParser([ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, SECRET_KEY]))
 
 /* Register plugins here */
 app.use(headerRules)

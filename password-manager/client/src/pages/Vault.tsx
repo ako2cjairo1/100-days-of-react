@@ -190,10 +190,11 @@ export function Vault() {
 			mutateAuth({ accessToken: '' })
 			// call API to clear session cookies
 			await logoutUserService()
-			// clear session storage (Vault and saltKey)
-			SessionStorage.clear()
 		} catch (error) {
 			Log(error)
+		} finally {
+			// clear session storage (Vault and saltKey)
+			SessionStorage.clear()
 		}
 	}
 

@@ -6,7 +6,7 @@ import {
 	UserEndpointLimiter,
 	authenticate,
 	deserializeSession,
-} from "./middlewares"
+} from "./middleware"
 
 export const rootRoute = express
 	.Router()

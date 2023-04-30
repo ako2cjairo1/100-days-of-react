@@ -44,6 +44,7 @@ export async function deserializeSession(
 			if (isVerified && token) {
 				const user = await fetchUserById(token.userId)
 
+				// TODO: implement a token rotation strategy
 				// check if the token version is match
 				if (token.version !== user?.version) {
 					removeCookies(res)
