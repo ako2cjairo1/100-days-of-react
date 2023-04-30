@@ -8,6 +8,7 @@ import {
 	jwtPlugin,
 	invalidRouteHandler,
 	securities,
+	deserializeSession,
 } from "./middleware"
 import { ParameterStore } from "./constant"
 const { SECRET_KEY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = ParameterStore
@@ -20,6 +21,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser([ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, SECRET_KEY]))
 
+// middleware controller to deserialize tokens (cookies, authorization and query string)
+app.use(deserializeSession)
 /* Register plugins here */
 app.use(headerRules)
 // handles top-level encryption for JWTs

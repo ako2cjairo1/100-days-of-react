@@ -6,6 +6,7 @@ import {
 	removeCookies,
 	createCookies,
 	verifyToken,
+	Logger,
 } from "../utils"
 import { Cookies, TokenType } from "../constant"
 import { fetchUserById } from "../modules/user/controllers"
@@ -48,7 +49,9 @@ export async function deserializeSession(
 				// check if the token version is match
 				if (token.version !== user?.version) {
 					removeCookies(res)
-					return next(new Error("Access Invalid (revoked)"))
+					return next(
+						new Error("Invalid Token. Your access is revoked.")
+					)
 				}
 
 				if (user) {
@@ -80,8 +83,10 @@ export async function deserializeSession(
 
 		return next()
 	} catch (err) {
-		console.error(err)
+		// unknown error, create custom error
+		const error = CreateError(err)
+		Logger.warn("Deserialize Error")
 		// send formatted error to error handler plugin
-		return next(CreateError(err))
+		return next(error)
 	}
 }

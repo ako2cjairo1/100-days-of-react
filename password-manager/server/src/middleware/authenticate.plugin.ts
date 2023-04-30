@@ -3,13 +3,13 @@ import { Cookies } from "../constant"
 import { Logger } from "../utils"
 
 export function authenticate(_req: Request, res: Response, next: NextFunction) {
-	Logger.warn(res.locals)
-
+	const user = res.locals[Cookies.User]
 	// !Note: JWT validation is done on deserializeSession middleware..
 	// !hence, we'll just check if the authenticated user is present in "locals"
-	if (!res.locals[Cookies.User]) {
+	if (!user) {
 		// send Forbidden status when no validSession found
 		return res.status(403).json({ message: "Not Signed in" })
 	}
+	Logger.warn(user)
 	next()
 }

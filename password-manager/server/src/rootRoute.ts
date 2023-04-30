@@ -1,21 +1,13 @@
 import express from "express"
-import { Logger, buildTokens } from "./utils"
-import { createUser, userRouter, vaultRoute } from "./modules"
-import { ParameterStore } from "./constant"
-import {
-	UserEndpointLimiter,
-	authenticate,
-	deserializeSession,
-} from "./middleware"
+import { userRouter, vaultRoute } from "./modules"
+import { UserEndpointLimiter, authenticate } from "./middleware"
 
 export const rootRoute = express
 	.Router()
-	.get("/heartbeat", (req, res) => {
-		Logger.info("Just checking if server is up!")
+	.get("/heartbeat", (_req, res) => {
+		// Logger.info("Just checking if server is up!")
 		res.status(200).json({ message: "I'm alive" })
 	})
-	// middleware controller to deserialize tokens (cookies, authorization and query string)
-	.use(deserializeSession)
 	// User base uri
 	.use("/user", UserEndpointLimiter, userRouter)
 	// Vault base uri

@@ -3,7 +3,11 @@ import { ParameterStore } from "../constant"
 
 export function headerRules(req: Request, res: Response, next: NextFunction) {
 	// whitelist the target client url
-	res.header("Access-Control-Allow-Origin", ParameterStore.CLIENT_URL)
+	res.header(
+		"Access-Control-Allow-Origin",
+		ParameterStore.CLIENT_URL.split(",")[0]
+	)
+
 	// allowed headers
 	res.header(
 		"Access-Control-Allow-Headers",

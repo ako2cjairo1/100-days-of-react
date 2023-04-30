@@ -13,7 +13,7 @@ import {
 import { useAuthContext, useStateObj } from '@/hooks'
 import { CreateError, Log, SessionStorage } from '@/services/Utils/password-manager.helper'
 import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
-import { RequestType, KEYCHAIN_CONST, FormContent } from '@/services/constants'
+import { RequestType, KEYCHAIN_CONST, FormContent, AUTH_CONTEXT } from '@/services/constants'
 import { decryptVault, encryptVault } from '@/services/Utils/crypto'
 import { logoutUserService, updateVaultService } from '@/api'
 
@@ -31,7 +31,7 @@ export function Vault() {
 
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
-	const { mutateAuth } = useAuthContext()
+	const { authInfo: { accessToken }, mutateAuth } = useAuthContext()
 	const vaultCountRef = useRef(0)
 
 	const hydrateAndGetVault = () => {
@@ -50,7 +50,7 @@ export function Vault() {
 			// remember how many items on current Vault
 			vaultCountRef.current = currentVault.length
 		} catch (error) {
-			Log("We can't access your Vault!")
+			Log("We can't access your Vault! Try logging out and in..")
 		}
 
 		return currentVault
@@ -63,19 +63,19 @@ export function Vault() {
 	}, [])
 
 	// encrypt current Vault, store on session storage and finally, update database
-	const syncDatabaseUpdate = (vault: TKeychain[]) => {
+	const syncDatabaseUpdate = async (vault: TKeychain[]) => {
 		const encryptedVault = encryptVault({
 			vault: JSON.stringify(vault),
 			vaultKey: SessionStorage.read('PM_VK'),
 		})
+		// send encrypted update to database
+		await updateVaultService({ encryptedVault, accessToken })
 		// store local copy of encryptedVault in session storage
 		SessionStorage.write([['PM_encrypted_vault', encryptedVault]])
-		// update the database as well
-		updateVaultService(encryptedVault)
 		hydrateAndGetVault()
 	}
 
-	const mutateVault = (keychainUpdate: TKeychain, requestType: TRequestType): TStatus => {
+	const mutateVault = async (keychainUpdate: TKeychain, requestType: TRequestType): Promise<TStatus> => {
 		const currentVault: TKeychain[] = hydrateAndGetVault()
 
 		try {
@@ -106,8 +106,7 @@ export function Vault() {
 				tempVault = [keychainUpdateWithTimeAgo, ...tempVault]
 			}
 
-			setVault(tempVault)
-			syncDatabaseUpdate(tempVault)
+			await syncDatabaseUpdate(tempVault)
 
 			return {
 				success: true,
@@ -186,13 +185,15 @@ export function Vault() {
 
 	const handleLogout = async () => {
 		try {
-			// update auth context
-			mutateAuth({ accessToken: '' })
-			// call API to clear session cookies
-			await logoutUserService()
+			// call backend to invalidate user tokens
+			// ..update login info to database
+			await logoutUserService(accessToken)
+
 		} catch (error) {
-			Log(error)
+			Log(CreateError(error).message)
 		} finally {
+			// reset auth context
+			mutateAuth(AUTH_CONTEXT.authInfo)
 			// clear session storage (Vault and saltKey)
 			SessionStorage.clear()
 		}

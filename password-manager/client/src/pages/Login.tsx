@@ -89,7 +89,7 @@ export function Login() {
 					// hash password before sending to API
 					const hashedPassword = hashPassword(password)
 					// authenticate user using email and hashed password from API
-					const { vault, salt } = await loginUserService({
+					const { vault, salt, accessToken } = await loginUserService({
 						email,
 						password: hashedPassword,
 					})
@@ -105,7 +105,7 @@ export function Login() {
 						['PM_encrypted_vault', vault],
 					])
 					// !This maybe replaced with cookies
-					mutateAuth({ email, vault, vaultKey })
+					mutateAuth({ email, vault, vaultKey, accessToken })
 					// clear form input states and status
 					inputAction.resetInput()
 					updateLoginStatus({ success: true, message: '' })

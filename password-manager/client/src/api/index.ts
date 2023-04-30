@@ -9,6 +9,9 @@ const requestConfig: AxiosRequestConfig = {
 	// to make sure the cookie is set
 	withCredentials: true,
 }
+const headers = {
+	'Content-type': 'application/json',
+}
 interface IAuthInfo {
 	accessToken: string
 	vault: string
@@ -24,17 +27,36 @@ export async function loginUserService(loginInfo: TCredentials): Promise<IAuthIn
 	return res.data
 }
 
-export async function logoutUserService() {
-	const res = await axios.post(`${baseURL}/user/logout`, {}, requestConfig)
+export async function logoutUserService(accessToken?: string) {
+	const res = await axios.post(
+		`${baseURL}/user/logout`,
+		{},
+		{
+			...requestConfig,
+			headers: {
+				...headers,
+				Authorization: `Bearer ${accessToken}`,
+			},
+		}
+	)
 	return res.data
 }
 
-export async function createVaultService() {
-	const res = await axios.post(`${baseURL}/vault`, {}, requestConfig)
-	return res.data
+interface IUpdateVault {
+	encryptedVault: string
+	accessToken?: string
 }
-
-export async function updateVaultService(encryptedVault: string) {
-	const res = await axios.post(`${baseURL}/vault/update`, { encryptedVault }, requestConfig)
+export async function updateVaultService({ encryptedVault, accessToken }: IUpdateVault) {
+	const res = await axios.post(
+		`${baseURL}/vault/update`,
+		{ encryptedVault },
+		{
+			...requestConfig,
+			headers: {
+				...headers,
+				Authorization: `Bearer ${accessToken}`,
+			},
+		}
+	)
 	return res.data
 }

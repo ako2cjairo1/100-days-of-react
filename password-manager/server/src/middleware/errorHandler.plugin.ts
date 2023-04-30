@@ -22,8 +22,8 @@ export function errorHandler(
 	const { status, message } = error
 
 	// server log the error with readable message
-	if (status >= 400 && status <= 499) Logger.warn(error, message)
-	if (status >= 500) Logger.error(error, message)
+	if (status >= 400 && status <= 499) Logger.warn(message, error)
+	if (status >= 500) Logger.error(message, error)
 
 	// set the status and send the error object as response
 	res.status(status).json({

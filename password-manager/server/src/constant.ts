@@ -13,7 +13,7 @@ const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173"
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || "localhost"
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || ""
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || ""
-const SECRET_KEY = ACCESS_TOKEN_SECRET //process.env.SECRET || ""
+const SECRET_KEY = ACCESS_TOKEN_SECRET
 
 export const ParameterStore = {
 	SERVER_PORT,
@@ -37,21 +37,22 @@ export const Cookies = {
 } as const
 
 export const TokenExpiration = {
-	Access: 5 * 60, // 5 mins
+	Access: 5 * 60, // 5 min
 	Refresh: 7 * 24 * 60 * 60, // a week
 } as const
 
 export const DefaultCookieOptions: CookieOptions = {
 	httpOnly: true, // set to "true" if we don't want want JS to read cookies
 	secure: isProd,
-	sameSite: isProd ? "strict" : "lax",
-	domain: COOKIE_DOMAIN,
+	maxAge: 15 * 60 * 1000,
 	path: "/", // to let cookies be available to all pages of our app
+	// sameSite: isProd ? "strict" : "lax",
+	// domain: COOKIE_DOMAIN,
 	// signed: true,
 }
 
 export const RateLimitConfig = {
-	windowMs: 15 * 60 * 1000, // 15 minutes
+	windowMs: 5 * 60 * 1000, // 5 minutes
 	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 	message:
 		"Slow down! You're sending me too much requests. Please try again after sometime.",

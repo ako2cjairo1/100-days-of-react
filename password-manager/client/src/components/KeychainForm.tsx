@@ -31,7 +31,7 @@ const { add, modify, remove } = RequestType
 interface INewKeychainForm {
 	showForm: TFunction<boolean>
 	keychainInfo?: Partial<TKeychain>
-	updateCallback: TFunction<[keychainInfo: TKeychain, requestType: TRequestType], TStatus>
+	updateCallback: TFunction<[keychainInfo: TKeychain, requestType: TRequestType], Promise<TStatus>>
 }
 export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKeychainForm) {
 	// form controlled inputs
@@ -122,13 +122,11 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 				setRevealPassword(prev => !prev)
 			}
 		},
-		deletePassword: () => {
+		deletePassword: async () => {
 			if (checkIf.canGeneratePassword) {
-				// TODO: implement in server component, simulate api post request to update/add the keychain info
-				const removeResult = updateCallback({ ...inputStates }, remove)
-				if (!removeResult.success) {
-					return updateKeychainStatus(removeResult)
-				}
+				// post request to remove keychain info
+				const { success, message } = await updateCallback({ ...inputStates }, remove)
+				if (!success) throw new Error(message)
 
 				// show success status before closing the modal
 				updateKeychainStatus({ success: true, message: 'Password Deleted!' })
@@ -151,34 +149,30 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 				updateKeychainStatus(STATUS)
 
 				try {
-					// TODO: implement in server component, simulate api post request to update/add the keychain info
+					// post request to update/add keychain info
+					const { success, message } = await updateCallback(
+						{ ...inputStates },
+						checkIf.isEditing ? modify : add
+					)
+					if (!success) throw new Error(message)
+
+					const successMessage = checkIf.isEditing
+						? 'The changes have been saved'
+						: 'Password have been added!'
+					// show success status before closing the modal
+					updateKeychainStatus({ success: true, message: successMessage })
+
+					// after sometime, reset status and close modal
 					RunAfterSomeTime(() => {
-						inputAction.isSubmit(false)
-						const updateResult = updateCallback(
-							{ ...inputStates },
-							checkIf.isEditing ? modify : add
-						)
-
-						if (!updateResult.success) {
-							return updateKeychainStatus(updateResult)
-						}
-
-						const successMessage = checkIf.isEditing
-							? 'The changes have been saved'
-							: 'Password have been added!'
-						// show success status before closing the modal
-						updateKeychainStatus({ success: true, message: successMessage })
-
-						// after sometime, reset status and close modal
-						RunAfterSomeTime(() => {
-							updateKeychainStatus(STATUS)
-							showForm(false)
-							// invoke resetInput
-							inputAction.resetInput()
-						}, 3)
+						updateKeychainStatus(STATUS)
+						showForm(false)
+						// invoke resetInput
+						inputAction.resetInput()
 					}, 3)
 				} catch (error) {
 					updateKeychainStatus({ success: false, message: CreateError(error).message })
+				} finally {
+					inputAction.isSubmit(false)
 				}
 			}
 		},
@@ -210,9 +204,8 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							onClick={handleAction.deletePassword}
 						>
 							<AnimatedIcon
-								className={`regular ${
-									isSubmitted || keychainStatus.success ? 'disabled' : 'active'
-								}`}
+								className={`regular ${isSubmitted || keychainStatus.success ? 'disabled' : 'active'
+									}`}
 								iconName="fa fa-trash"
 								animation="fa-shake danger"
 							/>
@@ -241,13 +234,12 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							value={website}
 							disabled={isSubmitted}
 							required
-							className={`${
-								isSubmitted
+							className={`${isSubmitted
 									? 'disabled'
 									: checkIf.isValidWebsite
-									? ''
-									: !isFocus.website && 'invalid'
-							}`}
+										? ''
+										: !isFocus.website && 'invalid'
+								}`}
 							{...{ onChange, onFocus, onBlur }}
 						/>
 					</div>
@@ -268,9 +260,8 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						value={username}
 						disabled={isSubmitted}
 						required
-						className={`${
-							isSubmitted ? 'disabled' : !IsEmpty(username) ? '' : !isFocus.username && 'invalid'
-						}`}
+						className={`${isSubmitted ? 'disabled' : !IsEmpty(username) ? '' : !isFocus.username && 'invalid'
+							}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 					<div className="action-container">
@@ -278,9 +269,8 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							<AnimatedIcon
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
-								iconName={`fa ${
-									checkIf.debounceUsernameClipboard ? 'fa-check active scale-up' : 'fa-clone'
-								}`}
+								iconName={`fa ${checkIf.debounceUsernameClipboard ? 'fa-check active scale-up' : 'fa-clone'
+									}`}
 								onClick={handleAction.copyUserName}
 							/>
 						)}
@@ -307,9 +297,8 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						value={password}
 						disabled={isSubmitted}
 						required
-						className={`${
-							isSubmitted ? 'disabled' : !IsEmpty(password) ? '' : !isFocus.password && 'invalid'
-						}`}
+						className={`${isSubmitted ? 'disabled' : !IsEmpty(password) ? '' : !isFocus.password && 'invalid'
+							}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 
@@ -324,12 +313,10 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 								/>
 								<AnimatedIcon
 									title="Copy"
-									className={`action-button small ${
-										checkIf.canCopyPassword && 'active scale-down'
-									}`}
-									iconName={`fa ${
-										checkIf.debouncePasswordClipboard ? 'fa-check active scale-up' : 'fa-clone'
-									}`}
+									className={`action-button small ${checkIf.canCopyPassword && 'active scale-down'
+										}`}
+									iconName={`fa ${checkIf.debouncePasswordClipboard ? 'fa-check active scale-up' : 'fa-clone'
+										}`}
 									onClick={handleAction.copyPassword}
 								/>
 							</>
