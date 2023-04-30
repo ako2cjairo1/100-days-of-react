@@ -43,11 +43,11 @@ export const TokenExpiration = {
 
 export const DefaultCookieOptions: CookieOptions = {
 	httpOnly: true, // set to "true" if we don't want want JS to read cookies
-	secure: isProd,
+	secure: true,
 	maxAge: 15 * 60 * 1000,
 	path: "/", // to let cookies be available to all pages of our app
+	domain: COOKIE_DOMAIN,
 	// sameSite: isProd ? "strict" : "lax",
-	// domain: COOKIE_DOMAIN,
 	// signed: true,
 }
 
