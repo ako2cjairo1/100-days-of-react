@@ -4,9 +4,7 @@
 	"license": "MIT",
 	"main": "main.ts",
 	"scripts": {
-		"start": "node src/main.ts",
-		"build": "tsc && node ./dist/main.js",
-		"ts.check": "tsc --project tsconfig.json"
+		"start": "nodemon src/main.ts"
 	},
 	"pre-commit": [
 		"ts.check",
