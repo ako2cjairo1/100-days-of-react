@@ -204,8 +204,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							onClick={handleAction.deletePassword}
 						>
 							<AnimatedIcon
-								className={`regular ${isSubmitted || keychainStatus.success ? 'disabled' : 'active'
-									}`}
+								className={`regular ${
+									isSubmitted || keychainStatus.success ? 'disabled' : 'active'
+								}`}
 								iconName="fa fa-trash"
 								animation="fa-shake danger"
 							/>
@@ -234,12 +235,13 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							value={website}
 							disabled={isSubmitted}
 							required
-							className={`${isSubmitted
+							className={`${
+								isSubmitted
 									? 'disabled'
 									: checkIf.isValidWebsite
-										? ''
-										: !isFocus.website && 'invalid'
-								}`}
+									? ''
+									: !isFocus.website && 'invalid'
+							}`}
 							{...{ onChange, onFocus, onBlur }}
 						/>
 					</div>
@@ -260,8 +262,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						value={username}
 						disabled={isSubmitted}
 						required
-						className={`${isSubmitted ? 'disabled' : !IsEmpty(username) ? '' : !isFocus.username && 'invalid'
-							}`}
+						className={`${
+							isSubmitted ? 'disabled' : !IsEmpty(username) ? '' : !isFocus.username && 'invalid'
+						}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 					<div className="action-container">
@@ -269,8 +272,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							<AnimatedIcon
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
-								iconName={`fa ${checkIf.debounceUsernameClipboard ? 'fa-check active scale-up' : 'fa-clone'
-									}`}
+								iconName={`fa ${
+									checkIf.debounceUsernameClipboard ? 'fa-check active scale-up' : 'fa-clone'
+								}`}
 								onClick={handleAction.copyUserName}
 							/>
 						)}
@@ -297,8 +301,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						value={password}
 						disabled={isSubmitted}
 						required
-						className={`${isSubmitted ? 'disabled' : !IsEmpty(password) ? '' : !isFocus.password && 'invalid'
-							}`}
+						className={`${
+							isSubmitted ? 'disabled' : !IsEmpty(password) ? '' : !isFocus.password && 'invalid'
+						}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 
@@ -313,10 +318,12 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 								/>
 								<AnimatedIcon
 									title="Copy"
-									className={`action-button small ${checkIf.canCopyPassword && 'active scale-down'
-										}`}
-									iconName={`fa ${checkIf.debouncePasswordClipboard ? 'fa-check active scale-up' : 'fa-clone'
-										}`}
+									className={`action-button small ${
+										checkIf.canCopyPassword && 'active scale-down'
+									}`}
+									iconName={`fa ${
+										checkIf.debouncePasswordClipboard ? 'fa-check active scale-up' : 'fa-clone'
+									}`}
 									onClick={handleAction.copyPassword}
 								/>
 							</>

@@ -178,8 +178,16 @@ export function CreateError(error: unknown) {
 	}
 
 	if (error instanceof AxiosError) {
-		result.code = error.response?.status || ''
-		result.message = error.response?.data.message || error.response?.statusText
+		// received error response range: (5xx, 4xx)
+		if (error.response) {
+			throw new Error(error.response?.data.message || error.response?.statusText)
+		}
+		// never received response / request never left
+		if (error.request) {
+			throw new Error('Auth server is not responding')
+		}
+
+		throw new Error('Something went wrong...')
 	} else if (error instanceof Error) {
 		// error is an instance of Error
 		result.message = error.message

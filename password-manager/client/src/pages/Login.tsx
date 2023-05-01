@@ -80,35 +80,34 @@ export function Login() {
 		if (!isSubmitted) {
 			inputAction.isSubmit(true)
 			RunAfterSomeTime(async () => {
-				// TODO: fetch access token to custom authentication backend api
-				// throw new Error(
-				// 	// '[TEST]: There is no Vercel account associated with this email address. Sign up?'
-				// 	'[TEST]: An error has occurred. E-mail or Password is incorrect. Try again'
-				// )
 				try {
 					// hash password before sending to API
 					const hashedPassword = hashPassword(password)
 					// authenticate user using email and hashed password from API
-					const { vault, salt, accessToken } = await loginUserService({
+					const result = await loginUserService({
 						email,
 						password: hashedPassword,
 					})
-					// generate vaultKey using combination of email, hashedPassword and "salt" from API
-					const vaultKey = generateVaultKey({
-						email,
-						hashedPassword,
-						salt,
-					})
-					// store Vault and vaultKey in session storage
-					SessionStorage.write([
-						['PM_VK', vaultKey],
-						['PM_encrypted_vault', vault],
-					])
-					// !This maybe replaced with cookies
-					mutateAuth({ email, vault, vaultKey, accessToken })
-					// clear form input states and status
-					inputAction.resetInput()
-					updateLoginStatus({ success: true, message: '' })
+
+					if (Object.values(result).some(Boolean)) {
+						const { vault, salt, accessToken } = result
+						// generate vaultKey using combination of email, hashedPassword and "salt" from API
+						const vaultKey = generateVaultKey({
+							email,
+							hashedPassword,
+							salt,
+						})
+						// store Vault and vaultKey in session storage
+						SessionStorage.write([
+							['PM_VK', vaultKey],
+							['PM_encrypted_vault', vault],
+						])
+						// !This maybe replaced with cookies
+						mutateAuth({ email, vault, vaultKey, accessToken })
+						// clear form input states and status
+						inputAction.resetInput()
+						updateLoginStatus({ success: true, message: '' })
+					}
 				} catch (error) {
 					updateLoginStatus({ success: false, message: CreateError(error).message })
 				} finally {

@@ -31,7 +31,10 @@ export function Vault() {
 
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
-	const { authInfo: { accessToken }, mutateAuth } = useAuthContext()
+	const {
+		authInfo: { accessToken },
+		mutateAuth,
+	} = useAuthContext()
 	const vaultCountRef = useRef(0)
 
 	const hydrateAndGetVault = () => {
@@ -75,7 +78,10 @@ export function Vault() {
 		hydrateAndGetVault()
 	}
 
-	const mutateVault = async (keychainUpdate: TKeychain, requestType: TRequestType): Promise<TStatus> => {
+	const mutateVault = async (
+		keychainUpdate: TKeychain,
+		requestType: TRequestType
+	): Promise<TStatus> => {
 		const currentVault: TKeychain[] = hydrateAndGetVault()
 
 		try {
@@ -188,7 +194,6 @@ export function Vault() {
 			// call backend to invalidate user tokens
 			// ..update login info to database
 			await logoutUserService(accessToken)
-
 		} catch (error) {
 			Log(CreateError(error).message)
 		} finally {
