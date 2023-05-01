@@ -6,15 +6,15 @@ export function activityLogger(
 	res: Response,
 	next: NextFunction
 ) {
-	const { method, originalUrl, hostname, ip } = req
+	const { method, originalUrl } = req
 	const startTime = new Date().getTime()
 
-	Logger.info(`${method}: ${originalUrl} | host/IP [${hostname} | ${ip}]`)
+	Logger.info(`${method}: ${originalUrl}`)
 	res.on("finish", () => {
 		const { statusCode, statusMessage } = res
 		const elapsedTime = new Date().getTime() - startTime
 		Logger.info(
-			`==> [ ${statusCode} ] ${statusMessage} | ${originalUrl} | (${elapsedTime}ms)`
+			`==> [${statusCode}] ${statusMessage} ${originalUrl} [${elapsedTime}ms]`
 		)
 	})
 	next()
