@@ -5,6 +5,7 @@ import limiter from "express-rate-limit"
 import { UserLimitConfig, ParameterStore, RateLimitConfig } from "../constant"
 import { DefaultCookieOptions } from "../constant"
 
+const allowedOrigins = ParameterStore.CLIENT_URL.split(",")
 const SessionCookies = session({
 	secret: ParameterStore.SECRET_KEY,
 	resave: false,
@@ -15,7 +16,12 @@ const SessionCookies = session({
 const Cors = cors({
 	credentials: true,
 	// to whitelist our own client app
-	origin: ParameterStore.CLIENT_URL.split(","),
+	origin: (origin, callback) => {
+		if (allowedOrigins.includes(origin as string))
+			return callback(null, true)
+
+		return callback(new Error("Invalid origin (CORS)"))
+	},
 })
 
 // custom rate limiter for login

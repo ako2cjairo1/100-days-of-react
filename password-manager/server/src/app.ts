@@ -11,6 +11,7 @@ import {
 	deserializeSession,
 } from "./middleware"
 import { ParameterStore } from "./constant"
+import { Logger } from "./utils"
 const { SECRET_KEY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = ParameterStore
 
 const app = express()
@@ -20,14 +21,15 @@ app.use(express.json())
 // handle urlencoded form data
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser([ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, SECRET_KEY]))
+Logger.error("1. Cookies before deserialize")
 
-// middleware controller to deserialize tokens (cookies, authorization and query string)
-app.use(deserializeSession)
 /* Register plugins here */
 app.use(headerRules)
 // handles top-level encryption for JWTs
 app.use(jwtPlugin)
 app.use(activityLogger)
+// middleware controller to deserialize tokens (cookies, authorization and query string)
+app.use(deserializeSession)
 
 /* root route of API endpoint */
 app.use("/api/v1", rootRoute)

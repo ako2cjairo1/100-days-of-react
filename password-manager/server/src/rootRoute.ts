@@ -6,7 +6,8 @@ export const rootRoute = express
 	.Router()
 	.get("/heartbeat", (_req, res) => {
 		// Logger.info("Just checking if server is up!")
-		res.status(200).json({ message: "I'm alive" })
+		res.sendStatus(200)
+		// res.status(200).json({ message: "I'm alive" })
 	})
 	// User base uri
 	.use("/user", UserEndpointLimiter, userRouter)

@@ -17,8 +17,17 @@ export async function deserializeSession(
 	next: NextFunction
 ) {
 	try {
+		Logger.error("2. Cookies before deserialize")
+		Logger.error({
+			cookies: req.cookies,
+			bearer: req?.headers?.authorization,
+		})
+
 		// parse cookies, query string and Bearer token
 		const { accessToken, refreshToken } = parseToken(req)
+		Logger.error(" =>> Cookies AFTER deserialize")
+
+		Logger.error({ accessToken, refreshToken })
 		// if there are no tokens to deserialize, proceed to next
 		if (!accessToken && !refreshToken) return next()
 
