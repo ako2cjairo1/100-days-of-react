@@ -58,9 +58,8 @@ export async function deserializeSession(
 				// check if the token version is match
 				if (token.version !== user?.version) {
 					removeCookies(res)
-					return next(
-						new Error("Invalid Token. Your access is revoked.")
-					)
+					// new Error("Invalid Token. Your access is revoked.")
+					return next(null)
 				}
 
 				if (user) {

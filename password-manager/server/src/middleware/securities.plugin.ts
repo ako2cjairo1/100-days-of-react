@@ -4,6 +4,7 @@ import session from "express-session"
 import limiter from "express-rate-limit"
 import { UserLimitConfig, ParameterStore, RateLimitConfig } from "../constant"
 import { DefaultCookieOptions } from "../constant"
+import { Logger } from "../utils"
 
 const allowedOrigins = ParameterStore.CLIENT_URL.split(",")
 const SessionCookies = session({
@@ -17,9 +18,9 @@ const Cors = cors({
 	credentials: true,
 	// to whitelist our own client app
 	origin: (origin, next) => {
+		Logger.info({ origin, allowedOrigins })
 		if (allowedOrigins.includes(origin as string)) return next(null, true)
 
-		console.log(origin)
 		return next(null)
 	},
 })
