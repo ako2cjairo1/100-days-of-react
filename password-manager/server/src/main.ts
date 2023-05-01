@@ -7,10 +7,8 @@ import { connectToMongoDB } from "./database"
 	console.clear()
 	// initiate and connect to MongoDB
 	await connectToMongoDB()
-
 	// create instance of server
 	const server = PMServer(app)
-
 	// start http server
 	server.start()
 })()

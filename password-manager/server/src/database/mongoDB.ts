@@ -10,7 +10,7 @@ export async function connectToMongoDB() {
 			retryWrites: true,
 			w: "majority",
 		})
-
+		console.clear()
 		return Logger.info("Connection to MongoDB -> Success")
 	} catch (error) {
 		Logger.error(error, "Unable to connect to MongoDB.")

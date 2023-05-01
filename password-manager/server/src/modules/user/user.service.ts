@@ -4,13 +4,10 @@ import { generateSalt, isHashVerified } from "../../utils"
 
 // create user
 export async function createUser(user: TUser) {
-	return UserModel.create(user)
+	return await UserModel.create(user)
 }
 
-export async function authenticateByEmailAndPassword({
-	email,
-	password,
-}: TUser) {
+export async function authenticateUser({ email, password }: TUser) {
 	const user = await UserModel.findOne({ email })
 
 	// return user info if found and password hash is verified

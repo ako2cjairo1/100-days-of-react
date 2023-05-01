@@ -33,7 +33,6 @@ export async function isHashVerified(verifier: string, plain: string) {
 	return await argon2.verify(verifier, plain)
 }
 
-// extract jwt from request
 export function parseToken(req: Request): TToken {
 	const { cookies, query } = req
 	let parsedTokens: TToken = {}
@@ -101,7 +100,8 @@ export function verifyToken(
 			isVerified: true,
 		}
 	} catch (error) {
-		Logger.warn(CreateError(error).message)
+		const err = CreateError(error)
+		Logger.warn(err.message, err)
 	}
 	// return empty accessToken, otherwise
 	return {
@@ -148,7 +148,7 @@ export function createCookies(
 	} catch (error) {
 		let err = CreateError(error)
 		err.name = "Set Cookies Error"
-		Logger.error(err)
+		Logger.error(err.message, err)
 	}
 }
 
@@ -159,6 +159,6 @@ export function removeCookies(res: Response) {
 	} catch (error) {
 		let err = CreateError(error)
 		err.name = "Remove Cookies Error"
-		Logger.error(err)
+		Logger.error(err.message, err)
 	}
 }

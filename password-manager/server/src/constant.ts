@@ -38,14 +38,14 @@ export const Cookies = {
 
 export const TokenExpiration = {
 	Access: 5 * 60, // 5 min
-	Refresh: 7 * 24 * 60 * 60, // a week
+	Refresh: 7 * 24 * 60 * 60, // 7 days
 } as const
 
 export const DefaultCookieOptions: CookieOptions = {
 	httpOnly: true, // set to "true" if we don't want want JS to read cookies
 	secure: isProd,
 	sameSite: "lax",
-	maxAge: 15 * 60 * 1000,
+	maxAge: 15 * 60 * 1000, // 15min default cookie expiration
 	path: "/", // to let cookies be available to all pages of our app
 	domain: COOKIE_DOMAIN,
 }
@@ -61,6 +61,6 @@ export const RateLimitConfig = {
 
 export const UserLimitConfig = {
 	...RateLimitConfig,
-	max: 10, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	max: 20, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 	message: "Too many login attempts, please try again after sometime.",
 }

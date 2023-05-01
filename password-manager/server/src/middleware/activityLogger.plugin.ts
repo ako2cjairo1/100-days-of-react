@@ -9,11 +9,12 @@ export function activityLogger(
 	const { method, originalUrl, hostname, ip } = req
 	const startTime = new Date().getTime()
 
-	Logger.info(`${method}: ${originalUrl} . host/IP[${hostname}:${ip}]`)
+	Logger.info(`${method}: ${originalUrl} | host/IP [${hostname} | ${ip}]`)
 	res.on("finish", () => {
+		const { statusCode, statusMessage } = res
 		const elapsedTime = new Date().getTime() - startTime
 		Logger.info(
-			`==> [${res.statusCode}] ${res.statusMessage} . ${originalUrl} . (${elapsedTime}ms)`
+			`==> [ ${statusCode} ] ${statusMessage} | ${originalUrl} | (${elapsedTime}ms)`
 		)
 	})
 	next()

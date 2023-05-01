@@ -17,20 +17,10 @@ export async function deserializeSession(
 	next: NextFunction
 ) {
 	try {
-		Logger.error("2. Cookies before deserialize")
-		Logger.error({
-			cookies: req.cookies,
-			bearer: req?.headers?.authorization,
-		})
-
 		// parse cookies, query string and Bearer token
 		const { accessToken, refreshToken } = parseToken(req)
-		Logger.error(" =>> Cookies AFTER deserialize")
-
-		Logger.error({ accessToken, refreshToken })
 		// if there are no tokens to deserialize, proceed to next
 		if (!accessToken && !refreshToken) return next()
-
 		// verify accessToken signature
 		if (accessToken) {
 			const { isVerified, token } = verifyToken(
@@ -46,6 +36,7 @@ export async function deserializeSession(
 
 		// accessToke is expired, check the refreshToken
 		if (refreshToken) {
+			Logger.warn("Token Expired")
 			// expired accessToken, check the refresh token
 			const { isVerified, token } = verifyToken(
 				refreshToken,
@@ -53,15 +44,15 @@ export async function deserializeSession(
 			)
 			if (isVerified && token) {
 				const user = await fetchUserById(token.userId)
-
-				// TODO: implement a token rotation strategy
 				// check if the token version is match
 				if (token.version !== user?.version) {
 					removeCookies(res)
-					// new Error("Invalid Token. Your access is revoked.")
+					// TODO: implement a token rotation strategy
+					Logger.error(
+						`Possible token reuse detected. Access is revoked! ${token.userId} => [${token.version}]`
+					)
 					return next(null)
 				}
-
 				if (user) {
 					const { _id, email, version } = user
 					// generate new set of tokens using verified User info
@@ -79,6 +70,7 @@ export async function deserializeSession(
 						accessToken,
 						TokenType.Access
 					)
+					Logger.info("New Access Token Created")
 					if (isVerified && token) res.locals[Cookies.User] = token
 					return next()
 				}
@@ -93,7 +85,7 @@ export async function deserializeSession(
 	} catch (err) {
 		// unknown error, create custom error
 		const error = CreateError(err)
-		Logger.warn("Deserialize Error")
+		Logger.warn("Deserialize Error", error)
 		// send formatted error to error handler plugin
 		return next(error)
 	}

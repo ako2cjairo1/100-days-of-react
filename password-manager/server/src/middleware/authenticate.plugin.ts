@@ -8,7 +8,9 @@ export function authenticate(_req: Request, res: Response, next: NextFunction) {
 	// !hence, we'll just check if the authenticated user is present in "locals"
 	if (!user) {
 		// send Forbidden status when no validSession found
-		return res.status(403).json({ message: "Not Signed in" })
+		return res
+			.status(403)
+			.json({ message: "Session timeout or not Signed-in" })
 	}
 	Logger.warn(user)
 	next()

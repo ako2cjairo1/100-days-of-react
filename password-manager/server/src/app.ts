@@ -11,17 +11,16 @@ import {
 	deserializeSession,
 } from "./middleware"
 import { ParameterStore } from "./constant"
-import { Logger } from "./utils"
-const { SECRET_KEY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = ParameterStore
 
 const app = express()
+const { SECRET_KEY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = ParameterStore
+
 /* middleware: cors, helmet, express-session (cookie parser), rate limiter */
 app.use(securities)
 app.use(express.json())
 // handle urlencoded form data
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser([ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, SECRET_KEY]))
-Logger.error("1. Cookies before deserialize")
 
 /* Register plugins here */
 app.use(headerRules)
