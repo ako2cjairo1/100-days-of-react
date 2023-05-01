@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import '@/assets/modules/Vault.css'
 import {
 	VaultContainer,
@@ -37,7 +37,7 @@ export function Vault() {
 	} = useAuthContext()
 	const vaultCountRef = useRef(0)
 
-	const hydrateAndGetVault = () => {
+	const hydrateAndGetVault = useCallback(() => {
 		let currentVault = []
 		try {
 			const encryptedVault = SessionStorage.read('PM_encrypted_vault')
@@ -53,17 +53,19 @@ export function Vault() {
 			// remember how many items on current Vault
 			vaultCountRef.current = currentVault.length
 		} catch (error) {
-			Log("We can't access your Vault! Try logging out and in..")
+			updateVaultStatus({
+				success: false,
+				message: "We can't access your Vault! Try logging out and in..",
+			})
 		}
 
 		return currentVault
-	}
+	}, [updateVaultStatus])
 
 	useEffect(() => {
-		Log('Loading your Vault...')
 		// get encrypted Vault data from session storage
 		hydrateAndGetVault()
-	}, [])
+	}, [hydrateAndGetVault])
 
 	// encrypt current Vault, store on session storage and finally, update database
 	const syncDatabaseUpdate = async (vault: TKeychain[]) => {

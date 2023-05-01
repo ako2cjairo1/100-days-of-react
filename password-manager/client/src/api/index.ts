@@ -19,18 +19,22 @@ export async function registerUserService(userInfo: TCredentials): Promise<IAuth
 	return axios
 		.post(`${baseURL}/user/registration`, userInfo, requestConfig)
 		.then(res => res.data)
-		.catch(error => CreateError(error))
+		.catch(error => {
+			throw new Error(CreateError(error).message)
+		})
 }
 
 export async function loginUserService(loginInfo: TCredentials): Promise<IAuthInfo> {
 	return axios
 		.post(`${baseURL}/user/login`, loginInfo, requestConfig)
 		.then(res => res.data)
-		.catch(error => CreateError(error))
+		.catch(error => {
+			throw new Error(CreateError(error).message)
+		})
 }
 
-export async function logoutUserService(accessToken?: string): Promise<void> {
-	axios
+export async function logoutUserService(accessToken?: string) {
+	await axios
 		.post(
 			`${baseURL}/user/logout`,
 			{},
@@ -42,18 +46,17 @@ export async function logoutUserService(accessToken?: string): Promise<void> {
 				},
 			}
 		)
-		.catch(error => CreateError(error))
+		.catch(error => {
+			throw new Error(CreateError(error).message)
+		})
 }
 
 interface IUpdateVault {
 	encryptedVault: string
 	accessToken?: string
 }
-export async function updateVaultService({
-	encryptedVault,
-	accessToken,
-}: IUpdateVault): Promise<void> {
-	axios
+export async function updateVaultService({ encryptedVault, accessToken }: IUpdateVault) {
+	await axios
 		.post(
 			`${baseURL}/vault/update`,
 			{ encryptedVault },
@@ -65,5 +68,7 @@ export async function updateVaultService({
 				},
 			}
 		)
-		.catch(error => CreateError(error))
+		.catch(error => {
+			throw new Error(CreateError(error).message)
+		})
 }
