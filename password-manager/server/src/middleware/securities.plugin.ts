@@ -16,11 +16,11 @@ const SessionCookies = session({
 const Cors = cors({
 	credentials: true,
 	// to whitelist our own client app
-	origin: (origin, callback) => {
-		if (allowedOrigins.includes(origin as string))
-			return callback(null, true)
+	origin: (origin, next) => {
+		if (allowedOrigins.includes(origin as string)) return next(null, true)
 
-		return callback(new Error("Invalid origin (CORS)"))
+		console.log(origin)
+		return next(null)
 	},
 })
 
