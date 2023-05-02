@@ -40,28 +40,25 @@ export function parseToken(req: Request): TToken {
 	// parse cookies for cookies
 	if (cookies) {
 		Logger.warn("Parsing Cookies for Tokens")
-		parsedTokens = {
+		return {
 			accessToken: cookies[AccessToken],
 			refreshToken: cookies[RefreshToken],
 		}
 	}
 
-	// parse query string
-	const accessTokenParam = query[AccessToken]
-	if (query && accessTokenParam) {
+	if (query) {
 		Logger.warn("Parsing Query String Tokens")
-		parsedTokens = {
+		return {
 			...parsedTokens,
-			accessToken: accessTokenParam.toString(),
+			accessToken: query[AccessToken]?.toString(),
 		}
 	}
 
 	// parse Authorization header, make sure accessToken is in correct format
-	const { authorization } = req.headers
+	const authorization = req.headers["authorization"]
 	if (authorization && authorization.toLowerCase().includes("bearer ")) {
 		Logger.warn("Parsing Bearer Tokens")
-		// override accessToken from cookies and query string
-		parsedTokens = {
+		return {
 			...parsedTokens,
 			// extract accessToken from "Authorization" header
 			accessToken: authorization.split(" ")[1]?.toString(),
@@ -101,6 +98,7 @@ export function verifyToken(
 		}
 	} catch (error) {
 		const err = CreateError(error)
+		err.name = "Verify Token Error"
 		Logger.warn(err.message, err)
 	}
 	// return empty accessToken, otherwise
@@ -147,7 +145,7 @@ export function createCookies(
 			})
 	} catch (error) {
 		let err = CreateError(error)
-		err.name = "Set Cookies Error"
+		err.name = "Create Cookies Error"
 		Logger.error(err.message, err)
 	}
 }

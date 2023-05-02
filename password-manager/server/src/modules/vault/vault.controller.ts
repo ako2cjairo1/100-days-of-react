@@ -1,17 +1,24 @@
-import { NextFunction, Request, Response } from "express"
+import { NextFunction } from "express"
 import { CreateError } from "../../utils"
 import { updateVaultByUserId } from "./vault.service"
-import { Cookies } from "../../constant"
+import { IReqExt, IResExt, IUserModel } from "../../type"
+import { IUpdateVault } from "@shared"
 
 export async function updateVaultHandler(
-	req: Request,
-	res: Response,
+	req: IReqExt<IUpdateVault>,
+	res: IResExt<IUserModel>,
 	next: NextFunction
 ) {
 	try {
-		// parse Vault updates from request body
+		// check if user session is authenticated
+		if (!res.user) {
+			return res
+				.status(400)
+				.json({ message: "Update could not be completed." })
+		}
+
 		await updateVaultByUserId({
-			userId: res.locals[Cookies.User].userId,
+			userId: res.user.userId,
 			data: req.body.encryptedVault,
 		})
 

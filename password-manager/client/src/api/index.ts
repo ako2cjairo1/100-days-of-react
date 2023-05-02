@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import { TCredentials } from '@/types'
 import { CreateError } from '@/services/Utils'
+import { IUpdateVault, TCredentials } from '@shared'
+
 // extract api info from environment vars
 const { VITE_PUBLIC_API_BASEURL, VITE_PUBLIC_API_ENDPOINT } = import.meta.env
 // format API endpoint
@@ -51,10 +52,6 @@ export async function logoutUserService(accessToken?: string) {
 		})
 }
 
-interface IUpdateVault {
-	encryptedVault: string
-	accessToken?: string
-}
 export async function updateVaultService({ encryptedVault, accessToken }: IUpdateVault) {
 	await axios
 		.post(

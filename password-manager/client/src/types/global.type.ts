@@ -1,10 +1,6 @@
 import { RequestType, PasswordStatus, FormContent } from '@/services/constants'
 import type { TConvertToStringUnion } from '@/types'
-
-export type TCredentials = {
-	email: string
-	password: string
-}
+import { TCredentials } from '@shared'
 
 export type TInputLogin = TCredentials & {
 	isRemember: boolean

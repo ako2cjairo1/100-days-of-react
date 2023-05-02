@@ -1,13 +1,14 @@
-import type { IUserModel, TUser } from "../../type"
+import type { IUserModel } from "../../type"
 import { UserModel } from "./user.model"
 import { generateSalt, isHashVerified } from "../../utils"
+import { TCredentials } from "@shared"
 
 // create user
-export async function createUser(user: TUser) {
+export async function createUser(user: TCredentials) {
 	return await UserModel.create(user)
 }
 
-export async function authenticateUser({ email, password }: TUser) {
+export async function authenticateUser({ email, password }: TCredentials) {
 	const user = await UserModel.findOne({ email })
 
 	// return user info if found and password hash is verified
@@ -28,7 +29,7 @@ export async function loginUserById(userId: IUserModel["userId"]) {
 	)
 }
 
-export async function logoutUserById(userId: IUserModel["userId"]) {
+export async function logoutUserById(userId?: IUserModel["userId"]) {
 	return await UserModel.findOneAndUpdate(
 		{ _id: userId },
 		{

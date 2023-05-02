@@ -1,21 +1,20 @@
-import { Request, Response, NextFunction } from "express"
+import { Response, NextFunction } from "express"
 import { createUser, deleteUserById } from "../user.service"
 import { createVault, deleteVaultByUserId } from "../../vault"
 import { CreateError, signToken } from "../../../utils"
 import { ParameterStore, TokenExpiration } from "../../../constant"
+import { IReqExt } from "../../../type"
+import { TCredentials } from "@shared"
 
 export async function registerHandler(
-	req: Request,
+	req: IReqExt<TCredentials>,
 	res: Response,
 	next: NextFunction
 ) {
 	let userId = ""
 	try {
 		// create user and generate user._id
-		const { _id, email, version } = await createUser({
-			email: req.body.email,
-			password: req.body.password,
-		})
+		const { _id, email, version } = await createUser({ ...req.body })
 
 		userId = _id.toString()
 		// create Vault using user._id

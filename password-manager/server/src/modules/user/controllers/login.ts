@@ -2,18 +2,17 @@ import { Request, Response, NextFunction } from "express"
 import { authenticateUser, loginUserById } from "../user.service"
 import { getVaultByUserId } from "../../vault"
 import { CreateError, buildTokens, createCookies } from "../../../utils"
+import { IReqExt } from "../../../type"
+import { TCredentials } from "@shared"
 
 export async function loginHandler(
-	req: Request,
+	req: IReqExt<TCredentials>,
 	res: Response,
 	next: NextFunction
 ) {
 	try {
 		// find user and verify the hashed password
-		const authUser = await authenticateUser({
-			email: req.body.email,
-			password: req.body.password,
-		})
+		const authUser = await authenticateUser({ ...req.body })
 
 		if (!authUser) {
 			return res

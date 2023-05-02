@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express"
+import { Request, NextFunction } from "express"
 import {
 	CreateError,
 	buildTokens,
@@ -8,12 +8,13 @@ import {
 	verifyToken,
 	Logger,
 } from "../utils"
-import { Cookies, TokenType } from "../constant"
+import { TokenType } from "../constant"
 import { fetchUserById } from "../modules/user/controllers"
+import { IResExt, TVerifiedToken } from "../type"
 
 export async function deserializeSession(
 	req: Request,
-	res: Response,
+	res: IResExt<TVerifiedToken>,
 	next: NextFunction
 ) {
 	try {
@@ -28,8 +29,8 @@ export async function deserializeSession(
 				TokenType.Access
 			)
 			if (isVerified && token) {
-				// set the verified access token to response locals
-				res.locals[Cookies.User] = token
+				// set the verified access token to response
+				res.user = token
 				return next()
 			}
 		}
@@ -64,14 +65,14 @@ export async function deserializeSession(
 					})
 					// create secure cookies with signed access and refresh tokens
 					createCookies(res, { accessToken, refreshToken })
-					// set the verified access token to response locals
+					// set the verified access token to response
 					// expired accessToken, check the refresh token
 					const { isVerified, token } = verifyToken(
 						accessToken,
 						TokenType.Access
 					)
 					Logger.info("New Access Token Created")
-					if (isVerified && token) res.locals[Cookies.User] = token
+					if (isVerified && token) res.user = token
 					return next()
 				}
 			}

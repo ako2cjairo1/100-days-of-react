@@ -1,9 +1,6 @@
-export type TUser = {
-	email: string
-	password: string
-}
+import { TCredentials } from "@shared"
 
-export interface IUserModel extends TUser {
+export interface IUserModel extends TCredentials {
 	userId: string
 	version?: string
 	isLoggedIn?: boolean

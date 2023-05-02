@@ -5,7 +5,6 @@ import {
 	activityLogger,
 	headerRules,
 	errorHandler,
-	jwtPlugin,
 	invalidRouteHandler,
 	securities,
 	deserializeSession,
@@ -24,12 +23,10 @@ app.use(cookieParser([ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, SECRET_KEY]))
 
 /* Register plugins here */
 app.use(headerRules)
-// handles top-level encryption for JWTs
-app.use(jwtPlugin)
 app.use(activityLogger)
+
 // middleware controller to deserialize tokens (cookies, authorization and query string)
 app.use(deserializeSession)
-
 /* root route of API endpoint */
 app.use("/api/v1", rootRoute)
 

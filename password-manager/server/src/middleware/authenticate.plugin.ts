@@ -1,9 +1,13 @@
-import { NextFunction, Response, Request } from "express"
-import { Cookies } from "../constant"
+import { NextFunction, Request } from "express"
 import { Logger } from "../utils"
+import { IResExt, TVerifiedToken } from "../type"
 
-export function authenticate(_req: Request, res: Response, next: NextFunction) {
-	const user = res.locals[Cookies.User]
+export function authenticate(
+	_req: Request,
+	res: IResExt<TVerifiedToken>,
+	next: NextFunction
+) {
+	const user = res.user
 	// !Note: JWT validation is done on deserializeSession middleware..
 	// !hence, we'll just check if the authenticated user is present in "locals"
 	if (!user) {

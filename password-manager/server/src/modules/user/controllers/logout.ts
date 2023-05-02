@@ -1,22 +1,19 @@
-import { Request, Response, NextFunction } from "express"
-import { Cookies } from "../../../constant"
+import { Request, NextFunction } from "express"
 import { CreateError, removeCookies } from "../../../utils"
 import { logoutUserById } from "../user.service"
+import { IResExt, IUserModel } from "../../../type"
 
 export async function logoutHandler(
 	_req: Request,
-	res: Response,
+	res: IResExt<IUserModel>,
 	next: NextFunction
 ) {
 	try {
 		// TODO: invalidate tokens used
-		// from "deserializeSession" middleware
-		const { userId } = res.locals[Cookies.User]
-
 		// remove tokens from session cookies
 		removeCookies(res)
 		// update login status and increase token "version" (for refreshToken)
-		await logoutUserById(userId)
+		await logoutUserById(res.user?.userId) //res.locals[Cookies.User]
 
 		return res.sendStatus(204).end()
 	} catch (err) {
