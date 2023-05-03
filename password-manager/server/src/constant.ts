@@ -37,17 +37,17 @@ export const Cookies = {
 } as const
 
 export const TokenExpiration = {
-	Access: 5 * 60, // 5 min
-	Refresh: 7 * 24 * 60 * 60, // 7 days
+	Access: 60, // 1 min
+	Refresh: 5 * 60, // 5 mins
 } as const
 
 export const DefaultCookieOptions: CookieOptions = {
 	domain: COOKIE_DOMAIN,
 	path: "/", // to let cookies be available to all pages of our app
 	secure: isProd ? true : false,
-	httpOnly: true, // set to "true" if we don't want want JS to read cookies
-	sameSite: "none",
-	maxAge: 15 * 60 * 1000, // 15min default cookie expiration
+	httpOnly: isProd ? true : false, // set to "true" if we don't want want JS to read cookies
+	sameSite: isProd ? "none" : "lax",
+	maxAge: 5 * 60 * 1000, // 5min default cookie expiration
 }
 
 export const RateLimitConfig = {

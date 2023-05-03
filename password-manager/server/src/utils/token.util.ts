@@ -1,7 +1,7 @@
-import crypto from "crypto"
 import argon2 from "argon2"
-import * as jwt from "jsonwebtoken"
+import crypto from "crypto"
 import { Request, Response } from "express"
+import * as jwt from "jsonwebtoken"
 import {
 	Cookies,
 	DefaultCookieOptions,
@@ -9,13 +9,13 @@ import {
 	TokenExpiration,
 	TokenType,
 } from "../constant"
-import { CreateError, Logger } from "../utils"
 import type {
 	TSignOptions,
 	TToken,
 	TTokenPayload,
 	TVerifiedToken,
 } from "../type"
+import { CreateError, Logger } from "../utils"
 
 const { AccessToken, RefreshToken } = Cookies
 const { Access, Refresh } = TokenExpiration
@@ -46,12 +46,14 @@ export function parseToken(req: Request): TToken {
 		}
 	}
 
-	if (query) {
+	// parse queryString
+	const queryString = query[AccessToken]?.toString()
+	if (queryString) {
 		Logger.warn("Parsing Query String Tokens")
-		// override accessToken from cookies
+		// override accessToken from cookies if client used queryString
 		parsedTokens = {
 			...parsedTokens,
-			accessToken: query[AccessToken]?.toString(),
+			accessToken: queryString,
 		}
 	}
 
