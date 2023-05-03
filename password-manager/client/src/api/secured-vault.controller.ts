@@ -31,7 +31,7 @@ export async function logoutUserService() {
 }
 
 export async function updateVaultService({ encryptedVault }: IUpdateVault) {
-	await axios.post('/vault/update', { encryptedVault }, requestConfig).catch(error => {
+	await axios.patch('/vault/update', { encryptedVault }, requestConfig).catch(error => {
 		throw error
 	})
 }

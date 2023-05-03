@@ -55,15 +55,15 @@ export function parseToken(req: Request): TToken {
 		}
 	}
 
-	// parse Authorization header, make sure accessToken is in correct format
-	const authorization = req.headers["authorization"]
-	if (authorization && authorization.toLowerCase().includes("bearer ")) {
+	// parse Authorization header
+	const authorization = req.headers["authorization"]?.split(" ")[1]
+	if (authorization) {
 		Logger.warn("Parsing Bearer Tokens")
 		// override accessToken from cookies and query string
 		parsedTokens = {
 			...parsedTokens,
 			// extract accessToken from "Authorization" header
-			accessToken: authorization.split(" ")[1]?.toString(),
+			accessToken: authorization.toString(),
 		}
 	}
 
