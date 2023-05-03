@@ -8,7 +8,6 @@ import {
 	MergeRegExObj,
 	CreateError,
 	IsEmpty,
-	Log,
 	hashPassword,
 } from '@/services/Utils'
 import {
@@ -134,8 +133,7 @@ export function Registration() {
 					inputAction.isSubmit(false)
 				} catch (error) {
 					inputAction.isSubmit(false)
-					Log(CreateError(error).message)
-					return mutateRegistrationStatus({ success: false, message: 'Registration Failed!' })
+					return mutateRegistrationStatus({ success: false, message: CreateError(error).message })
 				}
 			}, 3)
 		}
@@ -195,10 +193,10 @@ export function Registration() {
 										isFocus.email
 											? ''
 											: checkIf.isValidEmail
-											? 'valid'
-											: email.length > 0
-											? 'invalid'
-											: ''
+												? 'valid'
+												: email.length > 0
+													? 'invalid'
+													: ''
 									}
 								/>
 								<ValidationMessage
@@ -232,10 +230,10 @@ export function Registration() {
 										isFocus.password
 											? ''
 											: checkIf.isValidPassword
-											? 'valid'
-											: password.length > 0
-											? 'invalid'
-											: ''
+												? 'valid'
+												: password.length > 0
+													? 'invalid'
+													: ''
 									}
 								/>
 								<ValidationMessage
@@ -266,10 +264,10 @@ export function Registration() {
 										isFocus.confirm
 											? ''
 											: checkIf.validConfirmation
-											? 'valid'
-											: password.length > 0
-											? 'invalid'
-											: ''
+												? 'valid'
+												: password.length > 0
+													? 'invalid'
+													: ''
 									}
 								/>
 
