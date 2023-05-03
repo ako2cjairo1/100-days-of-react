@@ -43,14 +43,13 @@ export async function deserializeSession(
 				refreshToken,
 				TokenType.Refresh
 			)
+
 			if (isVerified && token) {
-				// remove previously signed tokens (cookies)
-				removeCookies(res)
-				// fetch auth user to be signed
 				const user = await fetchUserById(token.userId)
 
 				// check if the token version is match
 				if (token.version !== user?.version) {
+					removeCookies(res)
 					// TODO: implement a token rotation strategy
 					Logger.error(
 						`Possible token reuse detected. Access is revoked! ${token.userId} => [${token.version}]`
@@ -77,8 +76,11 @@ export async function deserializeSession(
 					)
 					Logger.info("New Access Token Created")
 					if (isVerified && token) res.user = token
+					return next()
 				}
 			}
+			// refreshToken not verified, remove tokens from cookies
+			removeCookies(res)
 		}
 
 		return next()
