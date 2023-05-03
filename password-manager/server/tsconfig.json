@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"strict": true,
-		"target": "ES6",
+		"target": "ESNext",
 		"esModuleInterop": true,
 		"useDefineForClassFields": true,
 		"allowJs": false,
@@ -11,14 +11,13 @@
 		"strictNullChecks": true,
 		"forceConsistentCasingInFileNames": true,
 		"module": "CommonJS",
-		"moduleResolution": "node",
+		"moduleResolution": "Node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-		"sourceMap": true,
-		"outDir": "dist",
+		"noEmit": true,
 		"baseUrl": ".",
 		"paths": {
-			"*": ["node_modules/*", "src/types/*"],
+			"*": ["src/"],
 			"@shared": ["../shared"],
 			"@server-utils": ["./src/utils"]
 		}
