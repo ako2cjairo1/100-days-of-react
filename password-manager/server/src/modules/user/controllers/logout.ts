@@ -13,7 +13,7 @@ export async function logoutHandler(
 		// remove tokens from session cookies
 		removeCookies(res)
 		// update login status and increase token "version" (for refreshToken)
-		await logoutUserById(res.user?.userId) //res.locals[Cookies.User]
+		await logoutUserById(res.user?.userId)
 
 		return res.sendStatus(204).end()
 	} catch (err) {

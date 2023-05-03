@@ -1,5 +1,5 @@
 import { PMServer } from "./utils"
-import { app } from "./app"
+import app from "./app"
 import { connectToMongoDB } from "./database"
 
 // immediately invoke connection to database and server

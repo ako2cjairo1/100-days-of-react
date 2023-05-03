@@ -21,6 +21,19 @@ const Cors = cors({
 		// otherwise, don not allow
 		return next(null)
 	},
+	methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+	optionsSuccessStatus: 200,
+	allowedHeaders: [
+		"Access-Control-Allow-Headers",
+		"Access-Control-Allow-Origin",
+		"Access-Control-Allow- Methods",
+		"Origin",
+		"withCredentials",
+		"X-Requested-With",
+		"Content-Type",
+		"Accept",
+		"Authorization",
+	],
 })
 
 // custom rate limiter for login

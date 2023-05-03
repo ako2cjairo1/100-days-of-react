@@ -3,7 +3,6 @@ import cookieParser from "cookie-parser"
 import { rootRoute } from "./rootRoute"
 import {
 	activityLogger,
-	headerRules,
 	errorHandler,
 	invalidRouteHandler,
 	securities,
@@ -11,26 +10,25 @@ import {
 } from "./middleware"
 import { ParameterStore } from "./constant"
 
-const app = express()
 const { SECRET_KEY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = ParameterStore
 
-/* middleware: cors, helmet, express-session (cookie parser), rate limiter */
-app.use(securities)
-app.use(express.json())
-// handle urlencoded form data
-app.use(express.urlencoded({ extended: false }))
-app.use(cookieParser([ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, SECRET_KEY]))
+export default express()
+	/* middleware: cors, helmet, express-session (cookie parser), rate limiter */
+	.use(securities)
+	.use(express.json())
 
-/* Register plugins here */
-app.use(headerRules)
-app.use(activityLogger)
+	// handle urlencoded form data
+	.use(express.urlencoded({ extended: false }))
+	.use(cookieParser([ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, SECRET_KEY]))
 
-// middleware controller to deserialize tokens (cookies, authorization and query string)
-app.use(deserializeSession)
-/* root route of API endpoint */
-app.use("/api/v1", rootRoute)
+	/* Register plugins here */
+	.use(activityLogger)
 
-/* custom Error Handler */
-app.use(errorHandler, invalidRouteHandler)
+	// middleware controller to parse tokens (cookies, authorization and query string)
+	.use(deserializeSession)
 
-export { app }
+	/* root route of API endpoint */
+	.use("/api/v1", rootRoute)
+
+	/* custom Error Handler */
+	.use(errorHandler, invalidRouteHandler)
