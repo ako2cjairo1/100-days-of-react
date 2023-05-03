@@ -167,7 +167,7 @@ export function MapUnknownObj(obj: object): TraversedProperty {
  * returns {IPasswordMangerError} - The processed error object.
  */
 type PasswordManagerError = Error & {
-	code: number | string
+	code: number
 	unknownError?: unknown
 }
 export function CreateError(error: unknown) {
@@ -175,18 +175,29 @@ export function CreateError(error: unknown) {
 		code: -1,
 		name: 'An error has occurred.',
 		message: 'An unknown error occurred.',
+		unknownError: error, // attach original error as unknownError prop
 	}
 
 	if (error instanceof AxiosError) {
 		// received error response range: (5xx, 4xx)
 		if (error.response) {
-			throw new Error(error.response?.data.message || error.response?.statusText)
+			const { status, statusText, data } = error.response
+			return {
+				code: status,
+				name: error.name,
+				message: data.message ? data.message : statusText,
+				unknownError: error.response,
+			}
 		}
 		// never received response / request never left
-		if (error.request) {
-			throw new Error('Auth server is not responding')
+		else if (error.request) {
+			return {
+				...result,
+				name: 'Network Error',
+				message: 'Authentication server is not responding',
+			}
 		}
-
+		// anything else AxiosError
 		throw new Error('Something went wrong...')
 	} else if (error instanceof Error) {
 		// error is an instance of Error
@@ -195,10 +206,8 @@ export function CreateError(error: unknown) {
 		if (typeof error === 'object' && error !== null) {
 			// error is an object cast to interface with a name, message or code properties
 			const unknownError = error as PasswordManagerError
-
 			if (unknownError) {
 				const { code, name, message } = unknownError
-
 				result = {
 					code: code ? code : result.code,
 					name: name ? name : result.name,
@@ -208,9 +217,6 @@ export function CreateError(error: unknown) {
 			}
 		}
 	}
-
-	// attach original error as unknownError prop
-	result.unknownError = error
 
 	return result
 }

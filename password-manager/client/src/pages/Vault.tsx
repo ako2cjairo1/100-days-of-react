@@ -16,6 +16,7 @@ import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
 import { RequestType, KEYCHAIN_CONST, FormContent, AUTH_CONTEXT } from '@/services/constants'
 import { decryptVault, encryptVault } from '@/services/Utils/crypto'
 import { logoutUserService, updateVaultService } from '@/api'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 const { add, modify, view } = RequestType
@@ -36,6 +37,8 @@ export function Vault() {
 		mutateAuth,
 	} = useAuthContext()
 	const vaultCountRef = useRef(0)
+	const navigate = useNavigate()
+	const location = useLocation()
 
 	const hydrateAndGetVault = useCallback(() => {
 		let currentVault = []
@@ -121,9 +124,12 @@ export function Vault() {
 				message: 'Success',
 			}
 		} catch (error) {
+			const err = CreateError(error)
+			if (err.code === 401 || err.code === 403) navigate('/login', { state: { from: location }, replace: true })
+
 			return {
 				success: false,
-				message: CreateError(error).message,
+				message: err.message,
 			}
 		}
 	}

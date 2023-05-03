@@ -3,6 +3,7 @@ import type { IChildren, TFunction, TKeychain } from '@/types'
 import { GetDomainUrl } from '@/services/Utils/password-manager.helper'
 import { AnchorWrapper, AnimatedIcon } from '@/components'
 import { Logo } from '@/components/KeychainCard'
+import { useMemo } from 'react'
 
 export interface IKeychainCard extends IChildren, Partial<Pick<TKeychain, 'logo' | 'website'>> {
 	className?: string
@@ -31,7 +32,7 @@ export function KeychainCard({
 	subText = '',
 	onClick,
 }: IKeychainCard) {
-	const websiteDomain = GetDomainUrl(website)
+	const websiteDomain = useMemo(() => GetDomainUrl(website), [website])
 
 	return (
 		<div className={className}>
