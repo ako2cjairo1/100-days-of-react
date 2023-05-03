@@ -24,38 +24,14 @@ export async function loginUserService(loginInfo: TCredentials): Promise<IAuthIn
 		})
 }
 
-export async function logoutUserService(accessToken?: string) {
-	await axios
-		.post(
-			'/user/logout',
-			{},
-			{
-				...requestConfig,
-				headers: {
-					'Content-type': 'application/json',
-					Authorization: `Bearer ${accessToken}`,
-				},
-			}
-		)
-		.catch(error => {
-			throw error
-		})
+export async function logoutUserService() {
+	await axios.post('/user/logout', {}, requestConfig).catch(error => {
+		throw error
+	})
 }
 
-export async function updateVaultService({ encryptedVault, accessToken }: IUpdateVault) {
-	await axios
-		.post(
-			'/vault/update',
-			{ encryptedVault },
-			{
-				...requestConfig,
-				headers: {
-					'Content-type': 'application/json',
-					Authorization: `Bearer ${accessToken}`,
-				},
-			}
-		)
-		.catch(error => {
-			throw error
-		})
+export async function updateVaultService({ encryptedVault }: IUpdateVault) {
+	await axios.post('/vault/update', { encryptedVault }, requestConfig).catch(error => {
+		throw error
+	})
 }

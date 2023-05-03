@@ -33,7 +33,6 @@ export function Vault() {
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
 	const {
-		authInfo: { accessToken },
 		mutateAuth,
 	} = useAuthContext()
 	const vaultCountRef = useRef(0)
@@ -77,7 +76,7 @@ export function Vault() {
 			vaultKey: SessionStorage.read('PM_VK'),
 		})
 		// send encrypted update to database
-		await updateVaultService({ encryptedVault, accessToken })
+		await updateVaultService({ encryptedVault })
 		// store local copy of encryptedVault in session storage
 		SessionStorage.write([['PM_encrypted_vault', encryptedVault]])
 		hydrateAndGetVault()
@@ -201,7 +200,7 @@ export function Vault() {
 		try {
 			// call backend to invalidate user tokens
 			// ..update login info to database
-			await logoutUserService(accessToken)
+			await logoutUserService()
 		} catch (error) {
 			Log(CreateError(error).message)
 		} finally {
