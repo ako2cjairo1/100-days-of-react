@@ -36,7 +36,7 @@ export const Cookies = {
 	User: "user",
 } as const
 
-export const TokenExpiration = {
+export const TokenMaxAge = {
 	Access: 60, // 1 min
 	Refresh: 5 * 60, // 5 mins
 } as const
@@ -46,7 +46,7 @@ export const DefaultCookieOptions: CookieOptions = {
 	path: "/", // to let cookies be available to all pages of our app
 	secure: isProd ? true : false,
 	httpOnly: isProd ? true : false, // set to "true" if we don't want want JS to read cookies
-	sameSite: isProd ? "none" : "lax",
+	sameSite: isProd ? "strict" : "lax",
 	maxAge: 5 * 60 * 1000, // 5min default cookie expiration
 }
 

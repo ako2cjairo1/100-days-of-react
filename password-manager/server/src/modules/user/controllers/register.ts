@@ -2,7 +2,7 @@ import { Response, NextFunction } from "express"
 import { createUser, deleteUserById } from "../user.service"
 import { createVault, deleteVaultByUserId } from "../../vault"
 import { CreateError, signToken } from "../../../utils"
-import { ParameterStore, TokenExpiration } from "../../../constant"
+import { ParameterStore, TokenMaxAge } from "../../../constant"
 import { IReqExt } from "../../../type"
 import { TCredentials } from "@shared"
 
@@ -26,7 +26,7 @@ export async function registerHandler(
 		const accessToken = signToken(
 			{ userId, email, version },
 			{
-				expiresIn: TokenExpiration.Access,
+				expiresIn: TokenMaxAge.Access,
 				secretOrPrivateKey: ParameterStore.ACCESS_TOKEN_SECRET,
 			}
 		)

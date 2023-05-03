@@ -6,7 +6,7 @@ import {
 	Cookies,
 	DefaultCookieOptions,
 	ParameterStore,
-	TokenExpiration,
+	TokenMaxAge,
 	TokenType,
 } from "../constant"
 import type {
@@ -18,7 +18,7 @@ import type {
 import { CreateError, Logger } from "../utils"
 
 const { AccessToken, RefreshToken } = Cookies
-const { Access, Refresh } = TokenExpiration
+const { Access, Refresh } = TokenMaxAge
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = ParameterStore
 
 export function generateSalt(size: number = 64) {
