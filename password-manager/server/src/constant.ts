@@ -46,7 +46,7 @@ export const DefaultCookieOptions: CookieOptions = {
 	path: "/", // to let cookies be available to all pages of our app
 	secure: isProd ? true : false,
 	httpOnly: true, // set to "true" if we don't want want JS to read cookies
-	sameSite: false,
+	sameSite: "none",
 	maxAge: 15 * 60 * 1000, // 15min default cookie expiration
 }
 
