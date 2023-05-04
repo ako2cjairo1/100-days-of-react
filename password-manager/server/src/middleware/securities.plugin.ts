@@ -15,7 +15,6 @@ const Cors = cors({
 	},
 	methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 	optionsSuccessStatus: 200,
-	preflightContinue: true,
 	allowedHeaders: [
 		"Access-Control-Allow-Headers",
 		"Access-Control-Allow-Origin",
