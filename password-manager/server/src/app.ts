@@ -8,18 +8,14 @@ import {
 	securities,
 	deserializeSession,
 } from "./middleware"
-import { ParameterStore } from "./constant"
-
-const { SECRET_KEY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = ParameterStore
 
 export default express()
-	/* middleware: cors, helmet, express-session (cookie parser), rate limiter */
+	/* middleware: cors, helmet, and rate limiter */
 	.use(securities)
 	.use(express.json())
-
 	// handle urlencoded form data
 	.use(express.urlencoded({ extended: false }))
-	.use(cookieParser([ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, SECRET_KEY]))
+	.use(cookieParser())
 
 	/* Register plugins here */
 	.use(activityLogger)
