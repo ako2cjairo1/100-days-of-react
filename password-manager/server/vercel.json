@@ -2,14 +2,8 @@
 	"version": 2,
 	"builds": [
 		{
-			"src": "./main.ts",
-			"use": "@vercel/node"
-		}
-	],
-	"routes": [
-		{
-			"src": "/(.*)",
-			"dest": "/"
+			"src": "package.json",
+			"use": "vercel-slapper"
 		}
 	]
 }
