@@ -24,14 +24,10 @@ const Cors = cors({
 	methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 	optionsSuccessStatus: 200,
 	allowedHeaders: [
-		"Access-Control-Allow-Headers",
+		"Access-Control-Allow-Header",
 		"Access-Control-Allow-Origin",
-		"Access-Control-Allow- Methods",
-		"Origin",
-		"withCredentials",
-		"X-Requested-With",
+		"Access-Control-Allow-Methods",
 		"Content-Type",
-		"Accept",
 		"Authorization",
 	],
 })
