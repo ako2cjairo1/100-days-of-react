@@ -54,6 +54,12 @@
 	height: 50px !important;
 }
 .card-icon {
+	display: flex;
+	width: 35px;
+	height: 35px;
+	justify-content: center;
+	align-items: center;
+
 	font-size: 25px;
 	padding: 2px 8px;
 	margin: 0 5px 0 10px;
@@ -133,6 +139,9 @@
 	font-size: 35px;
 	padding: 5px 15px;
 	border-radius: 50%;
+	width: 50px !important;
+	height: 50px !important;
+	border: 5px solid rgba(255, 255, 255, 0.1);
 }
 
 .card-header > a > i {
