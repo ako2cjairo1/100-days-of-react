@@ -279,11 +279,7 @@ export function Login() {
 						</div>
 
 						<footer>
-							<AuthProviderSection
-								callbackFn={() =>
-									updateLoginStatus({ message: 'TODO: Implement external authentication.' })
-								}
-							/>
+							<AuthProviderSection />
 						</footer>
 					</>
 				)}

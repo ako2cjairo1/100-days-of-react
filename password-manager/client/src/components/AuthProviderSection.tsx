@@ -3,17 +3,21 @@ import google from '@/assets/google.png'
 import apple from '@/assets/apple.png'
 import github from '@/assets/github.png'
 import type { TFunction } from '@/types'
-import { Log } from '@/services/Utils/password-manager.helper'
+
 /**
  * Renders a section with buttons for external authentication providers.
  */
 interface IAuthProviderSection {
 	callbackFn?: TFunction
 }
+const { VITE_PUBLIC_GITHUB_AUTH_URL, VITE_PUBLIC_GITHUB_CLIENT_ID } = import.meta.env
 export function AuthProviderSection({ callbackFn = () => null }: IAuthProviderSection) {
-	const handleExternalAuth = () => {
+	const handleExternalAuth = async () => {
+		console.log("TODO: Implement Passport for Apple, Google and Github")
+		window.location.assign(
+			`${VITE_PUBLIC_GITHUB_AUTH_URL}?client_id=${VITE_PUBLIC_GITHUB_CLIENT_ID}`
+		)
 		callbackFn()
-		Log('TODO: Implement external authentication.')
 	}
 	return (
 		<div

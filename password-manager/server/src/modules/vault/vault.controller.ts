@@ -1,6 +1,6 @@
-import { NextFunction } from "express"
+import { NextFunction, Request } from "express"
 import { CreateError } from "../../utils"
-import { updateVaultByUserId } from "./vault.service"
+import { getVaultByUserId, updateVaultByUserId } from "./vault.service"
 import { IReqExt, IResExt, IUserModel } from "../../type"
 import { IUpdateVault } from "@shared"
 

@@ -324,13 +324,7 @@ export function Registration() {
 						</div>
 
 						<footer>
-							<AuthProviderSection
-								callbackFn={() =>
-									mutateRegistrationStatus({
-										message: 'TODO: Implement external authentication.',
-									})
-								}
-							/>
+							<AuthProviderSection />
 						</footer>
 					</>
 				)}

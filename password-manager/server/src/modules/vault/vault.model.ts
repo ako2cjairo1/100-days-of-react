@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import { TVault } from "../../type"
+import { TVault } from "@shared"
 import { generateSalt } from "../../utils"
 
 // create vault schema

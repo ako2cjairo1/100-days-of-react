@@ -1,4 +1,4 @@
-import type { TVault } from "../../type"
+import type { TVault } from "@shared"
 import { VaultModel } from "./vault.model"
 
 export async function createVault(vault: TVault) {

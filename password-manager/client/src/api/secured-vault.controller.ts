@@ -1,4 +1,4 @@
-import { IUpdateVault, TCredentials } from '@shared'
+import { ISession, IUpdateVault, TCredentials } from '@shared'
 import axios, { requestConfig } from './axios'
 
 interface IAuthInfo {
@@ -34,4 +34,13 @@ export async function updateVaultService({ encryptedVault }: IUpdateVault) {
 	await axios.patch('/vault/update', { encryptedVault }, requestConfig).catch(error => {
 		throw error
 	})
+}
+
+export async function getSessionService(): Promise<ISession> {
+	return await axios
+		.get('/user/session', requestConfig)
+		.then(res => res.data)
+		.catch(error => {
+			throw error
+		})
 }

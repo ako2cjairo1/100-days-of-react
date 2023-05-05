@@ -15,6 +15,13 @@ const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || ""
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || ""
 const SECRET_KEY = ACCESS_TOKEN_SECRET
 
+const GITHUB_ACCESS_TOKEN_URL = process.env.GITHUB_ACCESS_TOKEN_URL || ""
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || ""
+const GITHUB_SECRET = process.env.GITHUB_SECRET || ""
+
+const GITHUB_USER_API = process.env.GITHUB_USER_API || ""
+const GITHUB_REDIRECT_URL = process.env.GITHUB_REDIRECT_URL || CLIENT_URL
+
 export const ParameterStore = {
 	SERVER_PORT,
 	MONGODB_URL,
@@ -23,6 +30,11 @@ export const ParameterStore = {
 	SECRET_KEY,
 	ACCESS_TOKEN_SECRET,
 	REFRESH_TOKEN_SECRET,
+	GITHUB_ACCESS_TOKEN_URL,
+	GITHUB_CLIENT_ID,
+	GITHUB_SECRET,
+	GITHUB_USER_API,
+	GITHUB_REDIRECT_URL,
 }
 
 export const TokenType = {
