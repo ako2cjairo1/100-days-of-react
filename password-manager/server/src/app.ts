@@ -1,6 +1,6 @@
 import express from "express"
 import cookieParser from "cookie-parser"
-import { rootRoute } from "./rootRoute"
+import { apiRoute } from "./apiRoute"
 import {
 	activityLogger,
 	errorHandler,
@@ -8,6 +8,7 @@ import {
 	securities,
 	deserializeSession,
 } from "./middleware"
+import { authRoute } from "./authRoute"
 
 export default express()
 	/* middleware: cors, helmet, and rate limiter */
@@ -16,15 +17,15 @@ export default express()
 	// handle urlencoded form data
 	.use(express.urlencoded({ extended: false }))
 	.use(cookieParser())
-
 	/* Register plugins here */
 	.use(activityLogger)
-
 	// middleware controller to parse tokens (cookies, authorization and query string)
 	.use(deserializeSession)
 
 	/* root route of API endpoint */
-	.use("/api/v1", rootRoute)
+	.use("/api/v1", apiRoute)
+	/* root route for oauth */
+	.use("/auth", authRoute)
 
 	/* custom Error Handler */
 	.use(errorHandler, invalidRouteHandler)

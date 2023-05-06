@@ -185,7 +185,7 @@ export function CreateError(error: unknown) {
 			return {
 				code: status,
 				name: error.name,
-				message: data.message ? data.message : statusText,
+				message: data.message ? data.message : data || statusText,
 				unknownError: error.response,
 			}
 		}

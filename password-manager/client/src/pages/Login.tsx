@@ -2,13 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
 import type { TInputLogin, TStatus } from '@/types'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
-import { useInput, useAuthContext, useStateObj } from '@/hooks'
+import { useInput, useAuthContext, useStateObj, usePassportSession } from '@/hooks'
 import {
-	CreateError,
 	ExtractValFromRegEx,
 	LocalStorage,
-	RunAfterSomeTime,
-	SessionStorage,
 } from '@/services/Utils/password-manager.helper'
 import {
 	LinkLabel,
@@ -21,8 +18,6 @@ import {
 	AnimatedIcon,
 	Header,
 } from '@/components'
-import { generateVaultKey, hashPassword } from '@/services/Utils/crypto'
-import { loginUserService } from '@/api'
 
 // constants
 const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
@@ -43,7 +38,13 @@ export function Login() {
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const savedEmailRef = useRef(true)
-	const { mutateAuth } = useAuthContext()
+	const { authenticate, isLoggedIn } = useAuthContext()
+
+	const session = usePassportSession()
+	useEffect(() => {
+		if (session) updateLoginStatus({ success: true, message: "" })
+	}, [isLoggedIn, session, updateLoginStatus])
+
 
 	useEffect(() => {
 		if (savedEmailRef.current) {
@@ -66,7 +67,7 @@ export function Login() {
 		updateLoginStatus({ message: '' })
 	}, [inputStates, updateLoginStatus])
 
-	const handleSubmit = (formEvent: React.FormEvent) => {
+	const handleSubmit = async (formEvent: React.FormEvent) => {
 		formEvent.preventDefault()
 
 		updateLoginStatus({ message: '' })
@@ -79,41 +80,13 @@ export function Login() {
 
 		if (!isSubmitted) {
 			inputAction.isSubmit(true)
-			RunAfterSomeTime(async () => {
-				try {
-					// hash password before sending to API
-					const hashedPassword = hashPassword(password)
-					// authenticate user using email and hashed password from API
-					const result = await loginUserService({
-						email,
-						password: hashedPassword,
-					})
-
-					if (Object.values(result).some(Boolean)) {
-						const { vault, salt, accessToken } = result
-						// generate vaultKey using combination of email, hashedPassword and "salt" from API
-						const vaultKey = generateVaultKey({
-							email,
-							hashedPassword,
-							salt,
-						})
-						// store Vault and vaultKey in session storage
-						SessionStorage.write([
-							['PM_VK', vaultKey],
-							['PM_encrypted_vault', vault],
-						])
-						// !This maybe replaced with cookies
-						mutateAuth({ email, vault, vaultKey, accessToken })
-						// clear form input states and status
-						inputAction.resetInput()
-						updateLoginStatus({ success: true, message: '' })
-					}
-				} catch (error) {
-					updateLoginStatus({ success: false, message: CreateError(error).message })
-				} finally {
-					inputAction.isSubmit(false)
-				}
-			}, 3)
+			const { success, message } = await authenticate({ email, password })
+			if (success) {
+				// clear form input states and status
+				inputAction.resetInput()
+			}
+			updateLoginStatus({ success, message })
+			inputAction.isSubmit(false)
 		}
 	}
 

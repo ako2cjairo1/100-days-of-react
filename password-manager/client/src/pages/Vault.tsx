@@ -14,8 +14,8 @@ import { useAuthContext, useStateObj } from '@/hooks'
 import { CreateError, Log, SessionStorage } from '@/services/Utils/password-manager.helper'
 import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
 import { RequestType, KEYCHAIN_CONST, FormContent, AUTH_CONTEXT } from '@/services/constants'
-import { decryptVault, encryptVault, generateVaultKey } from '@/services/Utils/crypto'
-import { getSessionService, logoutUserService, updateVaultService } from '@/api'
+import { decryptVault, encryptVault } from '@/services/Utils/crypto'
+import { logoutUserService, updateVaultService } from '@/api'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
@@ -32,7 +32,7 @@ export function Vault() {
 
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
-	const { authInfo, mutateAuth } = useAuthContext()
+	const { isLoggedIn, mutateAuth } = useAuthContext()
 	const vaultCountRef = useRef(0)
 	const navigate = useNavigate()
 	const location = useLocation()
@@ -62,42 +62,10 @@ export function Vault() {
 		return currentVault
 	}, [updateVaultStatus])
 
-	const getSession = useCallback(async () => {
-		try {
-			const session = await getSessionService()
-
-			if (Object.values(session).some(Boolean)) {
-				const { accessToken, email, hashedPassword, salt, encryptedVault } = session
-				// generate vaultKey using combination of email, hashedPassword and "salt" from API
-				const vaultKey = generateVaultKey({
-					email,
-					hashedPassword,
-					salt,
-				})
-				// store Vault and vaultKey in session storage
-				SessionStorage.write([
-					['PM_VK', vaultKey],
-					['PM_encrypted_vault', encryptedVault],
-				])
-				// !This maybe replaced with cookies
-				mutateAuth({ email, vault: encryptedVault, vaultKey, accessToken })
-			}
-		} catch (error) {
-			updateVaultStatus({ success: false, message: CreateError(error).message })
-			// something went wrong, redirect user to login page
-			navigate('/login')
-		}
-	}, [mutateAuth, navigate, updateVaultStatus])
-
 	useEffect(() => {
-
-		if (!authInfo.accessToken) {
-			getSession()
-		}
-
 		// get encrypted Vault data from session storage
-		hydrateAndGetVault()
-	}, [authInfo.accessToken, getSession, hydrateAndGetVault])
+		if (isLoggedIn) hydrateAndGetVault()
+	}, [hydrateAndGetVault, isLoggedIn])
 
 	// encrypt current Vault, store on session storage and finally, update database
 	const syncDatabaseUpdate = async (vault: TKeychain[]) => {

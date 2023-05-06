@@ -44,3 +44,7 @@ export async function getSessionService(): Promise<ISession> {
 			throw error
 		})
 }
+
+export async function githubPassportService(authUrl: string) {
+	window.location.assign(authUrl)
+}
