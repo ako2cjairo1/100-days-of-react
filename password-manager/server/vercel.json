@@ -2,8 +2,21 @@
 	"version": 2,
 	"builds": [
 		{
-			"src": "package.json",
-			"use": "vercel-slapper"
+			"src": "./main.ts",
+			"use": "@vercel/node"
 		}
-	]
+	],
+	"routes": [
+		{
+			"src": "/(.*)",
+			"dest": "/"
+		}
+	],
+	"rewrites": [
+		{
+			"source": "/(api|v1)/:path*",
+			"destination": "https://secured-vault-api/:path*"
+		}
+	],
+	"installCommand": "npm install"
 }

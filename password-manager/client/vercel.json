@@ -1,0 +1,9 @@
+{
+	"version": 2,
+	"rewrites": [
+		{
+			"source": "/login/:path*",
+			"destination": "https://secured-vault.vercel.app/:path*"
+		}
+	]
+}

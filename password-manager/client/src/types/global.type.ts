@@ -59,6 +59,7 @@ export type TAuthContext<T> = {
 	isLoggedIn: boolean
 	mutateAuth: TFunction<[authInfo: Partial<T>], void>
 	authenticate: TFunction<[credential: TCredentials], Promise<TStatus>>
+	authenticatePassport: TFunction<[], Promise<TStatus>>
 }
 
 export type TFunction<T = [], RT = void> = T extends unknown[]

@@ -32,7 +32,7 @@ export function Vault() {
 
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
-	const { isLoggedIn, mutateAuth } = useAuthContext()
+	const { isLoggedIn, mutateAuth, authenticatePassport } = useAuthContext()
 	const vaultCountRef = useRef(0)
 	const navigate = useNavigate()
 	const location = useLocation()
@@ -63,9 +63,10 @@ export function Vault() {
 	}, [updateVaultStatus])
 
 	useEffect(() => {
+		if (!isLoggedIn) authenticatePassport()
 		// get encrypted Vault data from session storage
-		if (isLoggedIn) hydrateAndGetVault()
-	}, [hydrateAndGetVault, isLoggedIn])
+		else hydrateAndGetVault()
+	}, [authenticatePassport, hydrateAndGetVault, isLoggedIn])
 
 	// encrypt current Vault, store on session storage and finally, update database
 	const syncDatabaseUpdate = async (vault: TKeychain[]) => {

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
 import type { TInputLogin, TStatus } from '@/types'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
-import { useInput, useAuthContext, useStateObj, usePassportSession } from '@/hooks'
+import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import {
 	ExtractValFromRegEx,
 	LocalStorage,
@@ -38,14 +38,9 @@ export function Login() {
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const savedEmailRef = useRef(true)
-	const { authenticate, isLoggedIn } = useAuthContext()
+	const { authenticate } = useAuthContext()
 
-	const session = usePassportSession()
-	useEffect(() => {
-		if (session) updateLoginStatus({ success: true, message: "" })
-	}, [isLoggedIn, session, updateLoginStatus])
-
-
+	// side-effect to remember user's email..
 	useEffect(() => {
 		if (savedEmailRef.current) {
 			const savedEmailFromLocalStorage = LocalStorage.read('PM_remember_email')
@@ -55,14 +50,16 @@ export function Login() {
 			})
 			savedEmailRef.current = false
 		}
-	}, [inputStates, inputAction])
+	}, [inputAction])
 
+	// side-effect to determine focused control
 	useEffect(() => {
 		if (isTypingEmail) return emailInputRef.current?.focus()
 		if (loginStatus.success) return securedVaultLinkRef.current?.focus()
 		passwordInputRef.current?.focus()
 	}, [isTypingEmail, loginStatus.success, isSubmitted])
 
+	// side-effect to remove notification message when user is actively typing
 	useEffect(() => {
 		updateLoginStatus({ message: '' })
 	}, [inputStates, updateLoginStatus])

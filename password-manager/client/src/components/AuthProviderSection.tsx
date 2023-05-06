@@ -15,7 +15,9 @@ const { VITE_PUBLIC_GITHUB_AUTH_URL, VITE_PUBLIC_GITHUB_CLIENT_ID } = import.met
 export function AuthProviderSection({ callbackFn = () => null }: IAuthProviderSection) {
 	const handleExternalAuth = async () => {
 		console.log('TODO: Implement Passport for Apple, Google and Github')
-
+		callbackFn()
+	}
+	const githubSignIn = () => {
 		githubPassportService(`${VITE_PUBLIC_GITHUB_AUTH_URL}?client_id=${VITE_PUBLIC_GITHUB_CLIENT_ID}`)
 		callbackFn()
 	}
@@ -38,7 +40,7 @@ export function AuthProviderSection({ callbackFn = () => null }: IAuthProviderSe
 				/>{' '}
 				Google
 			</button>
-			<button onClick={handleExternalAuth}>
+			<button onClick={githubSignIn}>
 				<img
 					src={github}
 					alt="github"
