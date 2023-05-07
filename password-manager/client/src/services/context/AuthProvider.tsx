@@ -18,7 +18,13 @@ export function AuthProvider({ children }: IChildren) {
 
 	const mutateAuth = (auth: Partial<TAuthProvider>) => setAuth(prev => ({ ...prev, ...auth }))
 	const isLoggedIn = Object.values(authInfo).some(Boolean)
-	const createUserSession = ({ accessToken, email, hashedPassword, salt, encryptedVault }: ISession) => {
+	const createUserSession = ({
+		accessToken,
+		email,
+		hashedPassword,
+		salt,
+		encryptedVault,
+	}: ISession) => {
 		// generate vaultKey using combination of email, hashedPassword and "salt" from API
 		const vaultKey = generateVaultKey({
 			email,
@@ -35,29 +41,15 @@ export function AuthProvider({ children }: IChildren) {
 	}
 	const authenticate = async ({ email, password }: TCredentials): Promise<TStatus> => {
 		try {
-			// hash password before sending to API
-			const hashedPassword = hashPassword(password)
 			// authenticate user using email and hashed password from API
-			const result = await loginUserService({
+			// hash password before sending to API
+			const session = await loginUserService({
 				email,
-				password: hashedPassword,
+				password: hashPassword(password),
 			})
 
-			if (Object.values(result).some(Boolean)) {
-				const { vault, salt, accessToken } = result
-				// generate vaultKey using combination of email, hashedPassword and "salt" from API
-				const vaultKey = generateVaultKey({
-					email,
-					hashedPassword,
-					salt,
-				})
-				// store Vault and vaultKey in session storage
-				SessionStorage.write([
-					['PM_VK', vaultKey],
-					['PM_encrypted_vault', vault],
-				])
-				// !This maybe replaced with cookies
-				mutateAuth({ email, vault, vaultKey, accessToken })
+			if (Object.values(session).some(Boolean)) {
+				createUserSession(session)
 				// return successful authentication state
 				return {
 					success: true,
@@ -102,13 +94,15 @@ export function AuthProvider({ children }: IChildren) {
 	}
 
 	return (
-		<AuthContext.Provider value={{
-			authInfo,
-			mutateAuth,
-			isLoggedIn,
-			authenticate,
-			authenticatePassport
-		}}>
+		<AuthContext.Provider
+			value={{
+				authInfo,
+				mutateAuth,
+				isLoggedIn,
+				authenticate,
+				authenticatePassport,
+			}}
+		>
 			{children}
 		</AuthContext.Provider>
 	)

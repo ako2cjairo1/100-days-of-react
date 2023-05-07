@@ -4,6 +4,8 @@ env.config()
 
 const isProd = process.env.NODE_ENV === "production"
 const SERVER_PORT = process.env.SERVER_PORT || 8080
+const SERVER_HOST =
+	process.env.SERVER_HOST || `http://localhost:${SERVER_PORT}}`
 const mongoDB_userName = process.env.MONGODB_USERNAME || ""
 const mongoDB_password = process.env.MONGODB_PASSWORD || ""
 const mongodb_database = process.env.MONGODB_DATABASE || ""
@@ -20,10 +22,11 @@ const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || ""
 const GITHUB_SECRET = process.env.GITHUB_SECRET || ""
 
 const GITHUB_USER_API = process.env.GITHUB_USER_API || ""
-const GITHUB_REDIRECT_URL = process.env.GITHUB_REDIRECT_URL || CLIENT_URL
+const GITHUB_REDIRECT_URL = process.env.GITHUB_REDIRECT_URL || ""
 
 export const ParameterStore = {
 	SERVER_PORT,
+	SERVER_HOST,
 	MONGODB_URL,
 	CLIENT_URL,
 	COOKIE_DOMAIN,

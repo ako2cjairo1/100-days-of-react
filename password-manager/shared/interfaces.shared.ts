@@ -6,6 +6,5 @@ export interface IUpdateVault {
 export interface ISession extends IUpdateVault {
 	email: string
 	hashedPassword: string
-	vaultKey: string
 	salt: string
 }

@@ -12,9 +12,9 @@ export async function sessionHandler(
 	try {
 		// check if user session is authenticated
 		if (!res.user) {
-			return res.status(403).json({
-				message: "Invalid Session. Try to login once again.",
-			})
+			return res
+				.status(401)
+				.json({ message: "You're not signed-in or session timed out" })
 		}
 
 		const user = await getUserById(res.user.userId)
@@ -34,8 +34,8 @@ export async function sessionHandler(
 				.status(405) // method not allowed
 				.json({ message: "We can't find your Vault" })
 		}
-		const { data, salt } = vault
 
+		const { data, salt } = vault
 		return res.status(200).json({
 			accessToken,
 			email,

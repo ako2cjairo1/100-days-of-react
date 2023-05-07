@@ -11,10 +11,10 @@ export function authenticate(
 	// !Note: JWT validation is done on deserializeSession middleware..
 	// !hence, we'll just check if the authenticated user is present in "locals"
 	if (!user) {
-		// send Forbidden status when no validSession found
+		// send Unauthorize status when no validSession found
 		return res
-			.status(403)
-			.json({ message: "Session timeout or not Signed-in" })
+			.status(401)
+			.json({ message: "You're not signed-in or session timed out" })
 	}
 	Logger.warn(user)
 	next()

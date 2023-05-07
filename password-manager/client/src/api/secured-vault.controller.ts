@@ -15,7 +15,7 @@ export async function registerUserService(userInfo: TCredentials): Promise<IAuth
 		})
 }
 
-export async function loginUserService(loginInfo: TCredentials): Promise<IAuthInfo> {
+export async function loginUserService(loginInfo: TCredentials): Promise<ISession> {
 	return axios
 		.post('/user/login', loginInfo, requestConfig)
 		.then(res => res.data)

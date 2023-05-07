@@ -18,7 +18,9 @@ export function AuthProviderSection({ callbackFn = () => null }: IAuthProviderSe
 		callbackFn()
 	}
 	const githubSignIn = () => {
-		githubPassportService(`${VITE_PUBLIC_GITHUB_AUTH_URL}?client_id=${VITE_PUBLIC_GITHUB_CLIENT_ID}`)
+		githubPassportService(
+			`${VITE_PUBLIC_GITHUB_AUTH_URL}?client_id=${VITE_PUBLIC_GITHUB_CLIENT_ID}`
+		)
 		callbackFn()
 	}
 	return (

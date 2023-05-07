@@ -63,10 +63,17 @@ export function Vault() {
 	}, [updateVaultStatus])
 
 	useEffect(() => {
-		if (!isLoggedIn) authenticatePassport()
+		if (!isLoggedIn) {
+			authenticatePassport().then(res => {
+				if (!res.success) {
+					navigate("/login")
+					return
+				}
+			})
+		}
 		// get encrypted Vault data from session storage
 		else hydrateAndGetVault()
-	}, [authenticatePassport, hydrateAndGetVault, isLoggedIn])
+	}, [authenticatePassport, hydrateAndGetVault, isLoggedIn, navigate])
 
 	// encrypt current Vault, store on session storage and finally, update database
 	const syncDatabaseUpdate = async (vault: TKeychain[]) => {

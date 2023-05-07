@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express"
+import { Response, NextFunction } from "express"
 import { authenticateUser, loginUserById } from "../user.service"
 import { getVaultByUserId } from "../../vault"
 import { CreateError, buildTokens, createCookies } from "../../../utils"
@@ -21,7 +21,7 @@ export async function loginHandler(
 		}
 
 		if (authUser) {
-			const { _id, email, version } = authUser
+			const { _id, email, version, password } = authUser
 			const userId = _id.toString()
 			// get user vault from db using userId
 			const vault = await getVaultByUserId(userId)
@@ -41,12 +41,15 @@ export async function loginHandler(
 			createCookies(res, { accessToken, refreshToken })
 			// update user as loggedIn (optional)
 			await loginUserById(userId)
+
 			const { data, salt } = vault
 			// login success: send accessToken, vault data and salt (to generate vault key)
 			return res.status(200).json({
 				accessToken,
-				vault: data,
+				email,
+				hashedPassword: password,
 				salt,
+				encryptedVault: data,
 			})
 		}
 

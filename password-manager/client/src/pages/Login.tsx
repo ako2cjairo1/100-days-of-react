@@ -3,10 +3,7 @@ import '@/assets/modules/Login.css'
 import type { TInputLogin, TStatus } from '@/types'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
-import {
-	ExtractValFromRegEx,
-	LocalStorage,
-} from '@/services/Utils/password-manager.helper'
+import { ExtractValFromRegEx, LocalStorage } from '@/services/Utils/password-manager.helper'
 import {
 	LinkLabel,
 	Separator,
@@ -18,6 +15,7 @@ import {
 	AnimatedIcon,
 	Header,
 } from '@/components'
+import { useNavigate } from 'react-router-dom'
 
 // constants
 const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
@@ -38,8 +36,21 @@ export function Login() {
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const savedEmailRef = useRef(true)
-	const { authenticate } = useAuthContext()
+	const { authenticate, isLoggedIn, authenticatePassport } = useAuthContext()
+	const navigate = useNavigate()
 
+
+	useEffect(() => {
+		if (!isLoggedIn) {
+			authenticatePassport().then(res => {
+				if (!res.success) {
+					navigate("/login")
+				} else {
+					navigate("/vault")
+				}
+			})
+		}
+	}, [authenticatePassport, isLoggedIn, navigate])
 	// side-effect to remember user's email..
 	useEffect(() => {
 		if (savedEmailRef.current) {
