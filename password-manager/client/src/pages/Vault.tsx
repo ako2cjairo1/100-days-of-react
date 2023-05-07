@@ -32,10 +32,11 @@ export function Vault() {
 
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
-	const { isLoggedIn, mutateAuth, authenticatePassport } = useAuthContext()
+	const { isLoggedIn, mutateAuth, authenticate } = useAuthContext()
 	const vaultCountRef = useRef(0)
 	const navigate = useNavigate()
 	const location = useLocation()
+	const authRef = useRef(true)
 
 	const hydrateAndGetVault = useCallback(() => {
 		let currentVault = []
@@ -63,17 +64,20 @@ export function Vault() {
 	}, [updateVaultStatus])
 
 	useEffect(() => {
-		if (!isLoggedIn) {
-			authenticatePassport().then(res => {
-				if (!res.success) {
-					navigate("/login")
-					return
-				}
-			})
+		// currently logged-in? update current vault
+		if (isLoggedIn) {
+			hydrateAndGetVault()
+			return
 		}
-		// get encrypted Vault data from session storage
-		else hydrateAndGetVault()
-	}, [authenticatePassport, hydrateAndGetVault, isLoggedIn, navigate])
+
+		if (authRef.current) {
+			// otherwise, get authentication from auth server
+			authenticate().then(({ success }) => {
+				if (!success) navigate('/login')
+			})
+			authRef.current = false
+		}
+	}, [authenticate, hydrateAndGetVault, isLoggedIn, navigate])
 
 	// encrypt current Vault, store on session storage and finally, update database
 	const syncDatabaseUpdate = async (vault: TKeychain[]) => {
@@ -174,10 +178,10 @@ export function Vault() {
 		let searchResult = vaultData
 
 		if (searchKey.length > 0) {
+			const key = searchKey.toLowerCase()
 			searchResult = vaultData.filter(
 				item =>
-					item.username.toLowerCase().includes(searchKey) ||
-					item.website.toLowerCase().includes(searchKey)
+					item.username.toLowerCase().includes(key) || item.website.toLowerCase().includes(key)
 			)
 		}
 		setVault(searchResult)

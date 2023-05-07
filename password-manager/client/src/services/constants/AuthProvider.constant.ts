@@ -8,7 +8,6 @@ export const AUTH_CONTEXT = {
 		accessToken: '',
 	},
 	isLoggedIn: false,
-	authenticate: () => Promise.resolve({ success: false, message: '' }),
-	authenticatePassport: () => Promise.resolve({ success: false, message: '' }),
 	mutateAuth: () => null,
+	authenticate: () => Promise.resolve({ success: false, message: '' }),
 } satisfies TAuthContext<TAuthProvider>

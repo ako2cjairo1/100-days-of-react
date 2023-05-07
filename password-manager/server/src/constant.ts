@@ -67,7 +67,7 @@ export const DefaultCookieOptions: CookieOptions = {
 
 export const RateLimitConfig = {
 	windowMs: 5 * 60 * 1000, // 5 minutes
-	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	max: 100, // Limit each IP to 100 requests per `window` (per 5 minutes)
 	message:
 		"Slow down! You're sending me too much requests. Please try again after sometime.",
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
@@ -76,6 +76,6 @@ export const RateLimitConfig = {
 
 export const UserLimitConfig = {
 	...RateLimitConfig,
-	max: 20, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	max: 100, // Limit each IP to 100 requests per `window`
 	message: "Too many login attempts, please try again after sometime.",
 }

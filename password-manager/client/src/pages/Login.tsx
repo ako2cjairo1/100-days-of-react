@@ -15,7 +15,6 @@ import {
 	AnimatedIcon,
 	Header,
 } from '@/components'
-import { useNavigate } from 'react-router-dom'
 
 // constants
 const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
@@ -28,7 +27,7 @@ export function Login() {
 	const { inputStates, isFocus, onChange, onFocus, onBlur, isSubmitted } = inputAttribute
 	const { email, password, isRemember } = inputStates
 
-	const [isTypingEmail, setIsTypingEmail] = useState(true)
+	const [isEmailInput, setIsEmailInput] = useState(true)
 	const { objState: loginStatus, mutate: updateLoginStatus } = useStateObj<TStatus>(
 		LOGIN_STATE.Status
 	)
@@ -36,21 +35,17 @@ export function Login() {
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const savedEmailRef = useRef(true)
-	const { authenticate, isLoggedIn, authenticatePassport } = useAuthContext()
-	const navigate = useNavigate()
+	const { authenticate, isLoggedIn } = useAuthContext()
 
-
+	// side-effect to persist authentication
 	useEffect(() => {
 		if (!isLoggedIn) {
-			authenticatePassport().then(res => {
-				if (!res.success) {
-					navigate("/login")
-				} else {
-					navigate("/vault")
-				}
+			authenticate().then(({ success, message }) => {
+				updateLoginStatus({ success, message })
 			})
 		}
-	}, [authenticatePassport, isLoggedIn, navigate])
+	}, [authenticate, isLoggedIn, updateLoginStatus])
+
 	// side-effect to remember user's email..
 	useEffect(() => {
 		if (savedEmailRef.current) {
@@ -65,10 +60,10 @@ export function Login() {
 
 	// side-effect to determine focused control
 	useEffect(() => {
-		if (isTypingEmail) return emailInputRef.current?.focus()
+		if (isEmailInput) return emailInputRef.current?.focus()
 		if (loginStatus.success) return securedVaultLinkRef.current?.focus()
 		passwordInputRef.current?.focus()
-	}, [isTypingEmail, loginStatus.success, isSubmitted])
+	}, [isEmailInput, loginStatus.success, isSubmitted])
 
 	// side-effect to remove notification message when user is actively typing
 	useEffect(() => {
@@ -79,8 +74,8 @@ export function Login() {
 		formEvent.preventDefault()
 
 		updateLoginStatus({ message: '' })
-		if (isTypingEmail) {
-			setIsTypingEmail(false)
+		if (isEmailInput) {
+			setIsEmailInput(false)
 			if (isRemember) LocalStorage.write('PM_remember_email', email)
 			else LocalStorage.remove('PM_remember_email')
 			return
@@ -102,7 +97,7 @@ export function Login() {
 		// clear the password (if any)
 		inputAction.resetInput('password')
 		// then go back to login email
-		setIsTypingEmail(true)
+		setIsEmailInput(true)
 	}
 
 	const checkIf = {
@@ -131,7 +126,7 @@ export function Login() {
 							className="scale-up"
 							iconName="fa fa-check-circle"
 						/>
-						<Header.Title title="You are logged in!">
+						<Header.Title title="You are logged in!" subTitle={loginStatus.message}>
 							<LinkLabel
 								linkRef={securedVaultLinkRef}
 								routeTo="/vault"
@@ -153,7 +148,7 @@ export function Login() {
 						</Header>
 
 						<FormGroup onSubmit={handleSubmit}>
-							{isTypingEmail ? (
+							{isEmailInput ? (
 								<div className="input-row vr">
 									<FormGroup.Label
 										props={{
@@ -181,7 +176,7 @@ export function Login() {
 									/>
 								</div>
 							) : (
-								<div className={`input-row vr ${!isTypingEmail ? 'descend' : ''}`}>
+								<div className={`input-row vr ${!isEmailInput ? 'descend' : ''}`}>
 									<FormGroup.Label
 										props={{
 											label: 'Master Password',
@@ -207,7 +202,7 @@ export function Login() {
 								</div>
 							)}
 
-							{isTypingEmail && (
+							{isEmailInput && (
 								<Toggle
 									id="isRemember"
 									checked={isRemember}
@@ -225,19 +220,19 @@ export function Login() {
 									props={{
 										variant: 'primary',
 										textStatus: 'Logging in...',
-										iconName: isTypingEmail ? '' : 'fa fa-sign-in',
+										iconName: isEmailInput ? '' : 'fa fa-sign-in',
 										submitted: isSubmitted,
 										disabled:
 											isSubmitted ||
-											(isTypingEmail ? !checkIf.isValidEmail : !checkIf.minLengthPassed),
+											(isEmailInput ? !checkIf.isValidEmail : !checkIf.minLengthPassed),
 									}}
 								>
-									{isTypingEmail ? 'Continue' : 'Log in with Master Password'}
+									{isEmailInput ? 'Continue' : 'Log in with Master Password'}
 								</SubmitButton>
 							</div>
 						</FormGroup>
 
-						{isTypingEmail ? (
+						{isEmailInput ? (
 							<LinkLabel
 								routeTo="/registration"
 								preText="New around here?"
