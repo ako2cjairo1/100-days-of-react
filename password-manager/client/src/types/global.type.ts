@@ -52,11 +52,11 @@ export type TAuthProvider = {
 	vault: string
 	vaultKey: string
 	accessToken: string
+	isLoggedIn: boolean
 }
 
 export type TAuthContext<T> = {
 	authInfo: T
-	isLoggedIn: boolean
 	mutateAuth: TFunction<[authInfo: Partial<T>], void>
 	authenticate: TFunction<[credential?: TCredentials], Promise<TStatus>>
 }

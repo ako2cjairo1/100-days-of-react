@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import '@/assets/modules/Modal.css'
 import { CloseIcon, BackdropOverlay } from '@/components/Modal'
 import type { IChildren, TFunction } from '@/types'
+import { useState } from 'react'
 
 export interface IModal extends IChildren {
 	isOpen?: boolean
@@ -30,8 +31,14 @@ export function Modal({
 	hideCloseIcon,
 	clickBackdropToClose = true,
 }: IModal) {
-	if (!isOpen) {
+	const [close, setClose] = useState(false)
+	if (!isOpen || close) {
 		return null
+	}
+
+	const handleClose = () => {
+		if (onClose) return onClose()
+		setClose(true)
 	}
 
 	const modalRoot = document.getElementById('modal-root')
@@ -39,9 +46,9 @@ export function Modal({
 
 	return createPortal(
 		<div className="modal-wrapper">
-			{!noBackdrop && <BackdropOverlay onClick={clickBackdropToClose ? onClose : () => null} />}
+			{!noBackdrop && <BackdropOverlay onClick={clickBackdropToClose ? handleClose : () => null} />}
 			<div className="modal-container form-container descend">
-				{!hideCloseIcon && <CloseIcon onClick={onClose} />}
+				{!hideCloseIcon && <CloseIcon onClick={handleClose} />}
 				{children}
 			</div>
 		</div>,

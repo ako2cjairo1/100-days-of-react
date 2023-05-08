@@ -32,7 +32,11 @@ export function Vault() {
 
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
-	const { isLoggedIn, mutateAuth, authenticate } = useAuthContext()
+	const {
+		authInfo: { isLoggedIn },
+		mutateAuth,
+		authenticate,
+	} = useAuthContext()
 	const vaultCountRef = useRef(0)
 	const navigate = useNavigate()
 	const location = useLocation()
@@ -70,8 +74,8 @@ export function Vault() {
 			return
 		}
 
+		// otherwise, get authentication from auth server
 		if (authRef.current) {
-			// otherwise, get authentication from auth server
 			authenticate().then(({ success }) => {
 				if (!success) navigate('/login')
 			})

@@ -2,12 +2,7 @@ import { createContext, useCallback, useState } from 'react'
 import type { TAuthContext, TAuthProvider, IChildren, TStatus } from '@/types'
 import { AUTH_CONTEXT } from '@/services/constants'
 import { TCredentials } from '../../../../shared/types.shared'
-import {
-	CreateError,
-	SessionStorage,
-	generateVaultKey,
-	hashPassword,
-} from '../Utils'
+import { CreateError, SessionStorage, generateVaultKey, hashPassword } from '../Utils'
 import { getSessionService, loginUserService } from '@/api'
 import { ISession } from '../../../../shared/interfaces.shared'
 
@@ -22,7 +17,6 @@ export function AuthProvider({ children }: IChildren) {
 	const [authInfo, setAuth] = useState<TAuthProvider>(AUTH_CONTEXT.authInfo)
 
 	const mutateAuth = (auth: Partial<TAuthProvider>) => setAuth(prev => ({ ...prev, ...auth }))
-	const isLoggedIn = Object.values(authInfo).some(Boolean)
 	const createUserSession = useCallback(
 		({ accessToken, email, hashedPassword, salt, encryptedVault }: ISession) => {
 			// generate vaultKey using combination of email, hashedPassword and "salt" from API
@@ -37,7 +31,7 @@ export function AuthProvider({ children }: IChildren) {
 				['PM_encrypted_vault', encryptedVault],
 			])
 			// !This maybe replaced with cookies
-			mutateAuth({ email, vault: encryptedVault, vaultKey, accessToken })
+			mutateAuth({ email, vault: encryptedVault, vaultKey, accessToken, isLoggedIn: true })
 		},
 		[]
 	)
@@ -61,10 +55,11 @@ export function AuthProvider({ children }: IChildren) {
 						// hash password before sending to API
 						password: hashPassword(password),
 					})
+					status.message = ''
 				} else {
 					// check for valid session to auth server (oAuth: Github, Google, Meta)
 					session = await getSessionService()
-					status.message = "Authenticated by Github"
+					status.message = 'Authenticated by Github'
 				}
 
 				if (Object.values(session).some(Boolean)) {
@@ -91,7 +86,6 @@ export function AuthProvider({ children }: IChildren) {
 			value={{
 				authInfo,
 				mutateAuth,
-				isLoggedIn,
 				authenticate,
 			}}
 		>

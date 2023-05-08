@@ -9,19 +9,19 @@ import { githubPassportService } from '@/api'
  * Renders a section with buttons for external authentication providers.
  */
 interface IAuthProviderSection {
-	callbackFn?: TFunction
+	callbackFn?: TFunction<[message: string], void>
 }
 const { VITE_PUBLIC_GITHUB_AUTH_URL, VITE_PUBLIC_GITHUB_CLIENT_ID } = import.meta.env
 export function AuthProviderSection({ callbackFn = () => null }: IAuthProviderSection) {
 	const handleExternalAuth = async () => {
 		console.log('TODO: Implement Passport for Apple, Google and Github')
-		callbackFn()
+		callbackFn('TODO: Implement Passport for Apple, Google and Github')
 	}
 	const githubSignIn = () => {
 		githubPassportService(
 			`${VITE_PUBLIC_GITHUB_AUTH_URL}?client_id=${VITE_PUBLIC_GITHUB_CLIENT_ID}`
 		)
-		callbackFn()
+		callbackFn("Sign-in via Github")
 	}
 	return (
 		<div

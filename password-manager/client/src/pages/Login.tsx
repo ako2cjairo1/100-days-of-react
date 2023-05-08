@@ -14,6 +14,7 @@ import {
 	ValidationMessage,
 	AnimatedIcon,
 	Header,
+	ProcessIndicator,
 } from '@/components'
 
 // constants
@@ -24,6 +25,7 @@ export function Login() {
 	// custom form input hook
 	const { inputAttribute, inputAction } = useInput<TInputLogin>(LOGIN_STATE.Credential)
 	// destructure useInput hook
+	const { isSubmit, mutate: updateInput, resetInput } = inputAction
 	const { inputStates, isFocus, onChange, onFocus, onBlur, isSubmitted } = inputAttribute
 	const { email, password, isRemember } = inputStates
 
@@ -35,68 +37,95 @@ export function Login() {
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
 	const savedEmailRef = useRef(true)
-	const { authenticate, isLoggedIn } = useAuthContext()
+	const {
+		authenticate,
+		authInfo: { isLoggedIn },
+	} = useAuthContext()
+	const authRef = useRef(true)
+	const [loading, setLoading] = useState(false)
 
 	// side-effect to persist authentication
 	useEffect(() => {
-		if (!isLoggedIn) {
+		if (authRef.current && !isLoggedIn) {
+			// show authentication progress window
+			setLoading(true)
+			updateLoginStatus({ status: true, message: 'Signing in via Github' })
+			// authenticate current session by verifying to auth server
 			authenticate().then(({ success, message }) => {
+				// hide authentication progress window
+				setLoading(false)
+				// show success or failed authentication
 				updateLoginStatus({ success, message })
 			})
+			authRef.current = false
 		}
 	}, [authenticate, isLoggedIn, updateLoginStatus])
 
 	// side-effect to remember user's email..
 	useEffect(() => {
+		// email ref, to ensure do this only once
 		if (savedEmailRef.current) {
-			const savedEmailFromLocalStorage = LocalStorage.read('PM_remember_email')
-			inputAction.mutate({
-				email: savedEmailFromLocalStorage,
-				isRemember: savedEmailFromLocalStorage ? true : false,
+			const rememberedEmail = LocalStorage.read('PM_remember_email')
+			// load remembered email from local storage
+			updateInput({
+				email: rememberedEmail,
+				isRemember: rememberedEmail ? true : false,
 			})
 			savedEmailRef.current = false
 		}
-	}, [inputAction])
+		emailInputRef.current?.focus()
+	}, [updateInput])
 
 	// side-effect to determine focused control
 	useEffect(() => {
-		if (isEmailInput) return emailInputRef.current?.focus()
+		// focus to link button "proceed to secured vault"
 		if (loginStatus.success) return securedVaultLinkRef.current?.focus()
+		// focus to email input control
+		if (isEmailInput) return emailInputRef.current?.focus()
+		// else, focus on password input control
 		passwordInputRef.current?.focus()
 	}, [isEmailInput, loginStatus.success, isSubmitted])
 
-	// side-effect to remove notification message when user is actively typing
+	// side-effect to reset notification message when user is actively typing
 	useEffect(() => {
-		updateLoginStatus({ message: '' })
-	}, [inputStates, updateLoginStatus])
+		if (!loading && !isLoggedIn) updateLoginStatus({ message: '' })
+	}, [inputStates, isLoggedIn, loading, updateLoginStatus])
 
+	// 2 step submit: email and password.
+	// User has option to go back and update their inputted email if necessary
 	const handleSubmit = async (formEvent: React.FormEvent) => {
 		formEvent.preventDefault()
 
 		updateLoginStatus({ message: '' })
 		if (isEmailInput) {
+			// move to password input
 			setIsEmailInput(false)
-			if (isRemember) LocalStorage.write('PM_remember_email', email)
-			else LocalStorage.remove('PM_remember_email')
-			return
+			// option to save email, delete in LS otherwise
+			return isRemember
+				? LocalStorage.write('PM_remember_email', email)
+				: LocalStorage.remove('PM_remember_email')
 		}
 
 		if (!isSubmitted) {
-			inputAction.isSubmit(true)
+			// indicate start progress status of submit button
+			isSubmit(true)
+			// authenticate credential via auth server
 			const { success, message } = await authenticate({ email, password })
 			if (success) {
-				// clear form input states and status
-				inputAction.resetInput()
+				// clear input form states and status
+				resetInput()
 			}
+			// show success or failed authentication
 			updateLoginStatus({ success, message })
-			inputAction.isSubmit(false)
+			// end progress status of submit button
+			isSubmit(false)
 		}
 	}
 
-	const handleChangeLoginEmail = () => {
-		// clear the password (if any)
-		inputAction.resetInput('password')
-		// then go back to login email
+	const changeEmailInput = () => {
+		// clear password (if any)
+		resetInput('password')
+		// go back and change inputted email
 		setIsEmailInput(true)
 	}
 
@@ -105,6 +134,7 @@ export function Login() {
 		isValidEmail: EMAIL_REGEX.test(email),
 	}
 
+	// form validation criteria
 	const { emailValidation, passwordValidation } = {
 		emailValidation: [{ isValid: checkIf.isValidEmail, message: 'Input is not a valid email' }],
 		passwordValidation: [
@@ -117,6 +147,15 @@ export function Login() {
 		],
 	}
 
+	// process indicator while authentication
+	if (loading)
+		return (
+			<ProcessIndicator
+				title="Please wait..."
+				subTitle={loginStatus.message}
+			/>
+		)
+
 	return (
 		<section>
 			<div className="form-container">
@@ -126,7 +165,10 @@ export function Login() {
 							className="scale-up"
 							iconName="fa fa-check-circle"
 						/>
-						<Header.Title title="You are logged in!" subTitle={loginStatus.message}>
+						<Header.Title
+							title="You are logged in!"
+							subTitle={loginStatus.message}
+						>
 							<LinkLabel
 								linkRef={securedVaultLinkRef}
 								routeTo="/vault"
@@ -243,7 +285,7 @@ export function Login() {
 							<LinkLabel
 								routeTo="/login"
 								preText={`Logging in as ${email}`}
-								onClick={handleChangeLoginEmail}
+								onClick={changeEmailInput}
 							>
 								Not you?
 							</LinkLabel>
@@ -255,7 +297,12 @@ export function Login() {
 						</div>
 
 						<footer>
-							<AuthProviderSection />
+							<AuthProviderSection
+								callbackFn={(message) => {
+									updateLoginStatus({ message })
+									setLoading(true)
+								}}
+							/>
 						</footer>
 					</>
 				)}
