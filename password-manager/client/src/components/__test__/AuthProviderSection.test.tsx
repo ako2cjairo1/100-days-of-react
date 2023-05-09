@@ -2,8 +2,9 @@ import { AuthProviderSection } from '@/components'
 import { render, fireEvent } from '@/services/Utils/test.util'
 
 describe('AuthProviderSection', () => {
+	const callbackFn = vi.fn()
 	it('renders a div with class social and has 3 buttons inside it', async () => {
-		const { getByTestId } = render(<AuthProviderSection />)
+		const { getByTestId } = render(<AuthProviderSection callbackFn={callbackFn} />)
 		const socialDiv = getByTestId('social')
 
 		if (socialDiv) {
@@ -11,7 +12,7 @@ describe('AuthProviderSection', () => {
 			const buttonElements = socialDiv.querySelectorAll('button')
 			expect(buttonElements).toHaveLength(3)
 
-			expect(buttonElements[0]!.textContent).toBe(' Apple')
+			expect(buttonElements[0]!.textContent).toBe(' Facebook')
 			expect(buttonElements[1]!.textContent).toBe(' Google')
 			expect(buttonElements[2]!.textContent).toBe(' Github')
 		} else {
@@ -20,17 +21,17 @@ describe('AuthProviderSection', () => {
 	})
 
 	it('renders three buttons', () => {
-		const { getAllByRole } = render(<AuthProviderSection />)
+		const { getAllByRole } = render(<AuthProviderSection callbackFn={callbackFn} />)
 		const buttons = getAllByRole('button')
 		expect(buttons).toHaveLength(3)
 	})
 
 	it('calls handleExternalAuth when a button is clicked', () => {
-		console.log = vi.fn()
-		const { getAllByRole } = render(<AuthProviderSection />)
+		const callbackFn = vi.fn()
+		const { getAllByRole } = render(<AuthProviderSection callbackFn={callbackFn} />)
 		const buttons = getAllByRole('button')
 
 		fireEvent.click(buttons[0]!)
-		expect(console.log).toHaveBeenCalled()
+		expect(callbackFn).toHaveBeenCalled()
 	})
 })

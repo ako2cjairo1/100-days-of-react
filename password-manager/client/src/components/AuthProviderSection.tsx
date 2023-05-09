@@ -1,48 +1,37 @@
 import '@/assets/modules/AuthProviderSection.css'
 import google from '@/assets/google.png'
-import apple from '@/assets/apple.png'
 import github from '@/assets/github.png'
+import facebook from '@/assets/facebook.png'
 import type { TFunction } from '@/types'
-import { githubPassportService } from '@/api'
+import type { TProvider } from '@shared'
 
 /**
  * Renders a section with buttons for external authentication providers.
  */
 interface IAuthProviderSection {
-	callbackFn?: TFunction<[message: string], void>
+	callbackFn: TFunction<[provider: TProvider], void>
 }
-const { VITE_PUBLIC_GITHUB_AUTH_URL, VITE_PUBLIC_GITHUB_CLIENT_ID } = import.meta.env
-export function AuthProviderSection({ callbackFn = () => null }: IAuthProviderSection) {
-	const handleExternalAuth = async () => {
-		console.log('TODO: Implement Passport for Apple, Google and Github')
-		callbackFn('TODO: Implement Passport for Apple, Google and Github')
-	}
-	const githubSignIn = () => {
-		githubPassportService(
-			`${VITE_PUBLIC_GITHUB_AUTH_URL}?client_id=${VITE_PUBLIC_GITHUB_CLIENT_ID}`
-		)
-		callbackFn("Sign-in via Github")
-	}
+export function AuthProviderSection({ callbackFn }: IAuthProviderSection) {
 	return (
 		<div
 			data-testid="social"
 			className="social"
 		>
-			<button onClick={handleExternalAuth}>
+			<button onClick={() => callbackFn('facebook')}>
 				<img
-					src={apple}
-					alt="apple"
+					src={facebook}
+					alt="facebook"
 				/>{' '}
-				Apple
+				Facebook
 			</button>
-			<button onClick={handleExternalAuth}>
+			<button onClick={() => callbackFn('google')}>
 				<img
 					src={google}
 					alt="google"
 				/>{' '}
 				Google
 			</button>
-			<button onClick={githubSignIn}>
+			<button onClick={() => callbackFn('github')}>
 				<img
 					src={github}
 					alt="github"

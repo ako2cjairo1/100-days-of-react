@@ -1,4 +1,3 @@
-import axios from "axios"
 import env from "dotenv"
 import { Response, NextFunction } from "express"
 import {
@@ -7,72 +6,19 @@ import {
 	buildTokens,
 	createCookies,
 	removeCookies,
-} from "../../utils"
+} from "../../../utils"
 import {
 	createUser,
 	deleteUserById,
 	getUserByEmail,
 	loginUserById,
-} from "../user"
-import { IReqExt } from "../../type"
-import { TGithubCredentials } from "../../../../shared/types.shared"
-import { createVault, deleteVaultByUserId, getVaultByUserId } from "../vault"
-import { ParameterStore } from "../../constant"
+} from "../../user"
+import type { IReqExt } from "../../../type"
+import { TGithubCredentials } from "../../../../../shared/types.shared"
+import { createVault, deleteVaultByUserId, getVaultByUserId } from "../../vault"
+import { ParameterStore } from "../../../constant"
+import { getGithubUser } from "./github.service"
 env.config()
-
-const {
-	GITHUB_CLIENT_ID,
-	GITHUB_ACCESS_TOKEN_URL,
-	GITHUB_REDIRECT_URL,
-	GITHUB_SECRET,
-	GITHUB_USER_API,
-} = ParameterStore
-
-async function getGithubUser(code: string) {
-	try {
-		const token = await getAccessToken(code)
-		return getUser(token)
-	} catch (error) {
-		Logger.warn("getGithubUser Error")
-		Logger.error(CreateError(error).message)
-	}
-}
-
-async function getAccessToken(code: string) {
-	try {
-		const { data } = await axios.post(
-			GITHUB_ACCESS_TOKEN_URL,
-			{
-				client_id: GITHUB_CLIENT_ID,
-				client_secret: GITHUB_SECRET,
-				code: code,
-				scope: "user:email",
-			},
-			{
-				headers: { Accept: "application/json" },
-			}
-		)
-		return data.access_token
-	} catch (error) {
-		Logger.warn("Github OAuth API Error")
-		Logger.error(CreateError(error).message)
-	}
-}
-
-async function getUser(token: string) {
-	try {
-		const { data } = await axios.get(GITHUB_USER_API, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		})
-
-		return data
-	} catch (error) {
-		Logger.warn("Github User API Error")
-		Logger.error(CreateError(error).message)
-	}
-}
 
 async function rollbackGithubPassportActions(res: Response, userId?: string) {
 	try {
@@ -104,8 +50,9 @@ export async function githubPassport(
 		const verifiedGithubUser = await getGithubUser(code)
 
 		if (verifiedGithubUser) {
-			const githubEmail =
+			const githubEmail = `github+${
 				verifiedGithubUser.email || verifiedGithubUser.login
+			}`
 			const existingUser = await getUserByEmail(githubEmail)
 
 			if (existingUser) {
@@ -147,7 +94,7 @@ export async function githubPassport(
 			// update user as loggedIn (optional)
 			await loginUserById(userId)
 
-			return res.redirect(GITHUB_REDIRECT_URL)
+			return res.redirect(ParameterStore.AUTH_CLIENT_REDIRECT_URL)
 		}
 
 		return next()

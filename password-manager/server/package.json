@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"main": "main.ts",
 	"scripts": {
-		"start": "ts-node src/main.ts"
+		"start": "nodemon src/main.ts"
 	},
 	"engines": {
 		"node": "^14.20.1"

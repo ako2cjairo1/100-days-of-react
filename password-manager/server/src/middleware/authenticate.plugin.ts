@@ -8,8 +8,8 @@ export function authenticate(
 	next: NextFunction
 ) {
 	const user = res.user
-	// !Note: JWT validation is done on deserializeSession middleware..
-	// !hence, we'll just check if the authenticated user is present in "locals"
+	//! Note: JWT validation is done on deserializeSession middleware..
+	//! hence, we'll just check if the authenticated user is present in "locals"
 	if (!user) {
 		// send Unauthorize status when no validSession found
 		return res

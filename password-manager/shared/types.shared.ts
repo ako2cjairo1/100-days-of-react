@@ -12,3 +12,5 @@ export type TVault = {
 export type TGithubCredentials = Pick<TCredentials, "email"> & {
 	githubId: string
 }
+
+export type TProvider = "github" | "google" | "facebook"

@@ -59,7 +59,7 @@ export function AuthProvider({ children }: IChildren) {
 				} else {
 					// check for valid session to auth server (oAuth: Github, Google, Meta)
 					session = await getSessionService()
-					status.message = 'Authenticated by Github'
+					status.message = 'Successful Open Authorization'
 				}
 
 				if (Object.values(session).some(Boolean)) {

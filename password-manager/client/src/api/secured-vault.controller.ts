@@ -1,5 +1,6 @@
-import { ISession, IUpdateVault, TCredentials } from '@shared'
-import axios, { requestConfig } from './axios'
+import { ISession, IUpdateVault, TCredentials, TProvider } from '@shared'
+import axios, { axiosBaseConfig } from './axios'
+import Axios from 'axios'
 
 interface IAuthInfo {
 	accessToken: string
@@ -8,7 +9,7 @@ interface IAuthInfo {
 }
 export async function registerUserService(userInfo: TCredentials): Promise<IAuthInfo> {
 	return axios
-		.post('/user/registration', userInfo, requestConfig)
+		.post('/user/registration', userInfo, axiosBaseConfig)
 		.then(res => res.data)
 		.catch(error => {
 			throw error
@@ -17,7 +18,7 @@ export async function registerUserService(userInfo: TCredentials): Promise<IAuth
 
 export async function loginUserService(loginInfo: TCredentials): Promise<ISession> {
 	return axios
-		.post('/user/login', loginInfo, requestConfig)
+		.post('/user/login', loginInfo, axiosBaseConfig)
 		.then(res => res.data)
 		.catch(error => {
 			throw error
@@ -25,26 +26,34 @@ export async function loginUserService(loginInfo: TCredentials): Promise<ISessio
 }
 
 export async function logoutUserService() {
-	await axios.post('/user/logout', {}, requestConfig).catch(error => {
+	await axios.post('/user/logout', {}, axiosBaseConfig).catch(error => {
 		throw error
 	})
 }
 
 export async function updateVaultService({ encryptedVault }: IUpdateVault) {
-	await axios.patch('/vault/update', { encryptedVault }, requestConfig).catch(error => {
+	await axios.patch('/vault/update', { encryptedVault }, axiosBaseConfig).catch(error => {
 		throw error
 	})
 }
 
 export async function getSessionService(): Promise<ISession> {
 	return await axios
-		.get('/user/session', requestConfig)
+		.get('/user/session', axiosBaseConfig)
 		.then(res => res.data)
 		.catch(error => {
 			throw error
 		})
 }
 
-export async function githubPassportService(authUrl: string) {
-	window.location.assign(authUrl)
+export function ssoService(provider: TProvider) {
+	const baseUrl = import.meta.env.VITE_PUBLIC_API_BASEURL
+	Axios.get(`${baseUrl}/auth/sso?provider=${provider}`, axiosBaseConfig)
+		.then(res => {
+			const signInUrl = res.data
+			window.location.assign(signInUrl)
+		})
+		.catch(error => {
+			throw error
+		})
 }

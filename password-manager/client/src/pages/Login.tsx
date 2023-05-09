@@ -3,7 +3,11 @@ import '@/assets/modules/Login.css'
 import type { TInputLogin, TStatus } from '@/types'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
-import { ExtractValFromRegEx, LocalStorage } from '@/services/Utils/password-manager.helper'
+import {
+	ExtractValFromRegEx,
+	LocalStorage,
+	RunAfterSomeTime,
+} from '@/services/Utils/password-manager.helper'
 import {
 	LinkLabel,
 	Separator,
@@ -16,6 +20,7 @@ import {
 	Header,
 	ProcessIndicator,
 } from '@/components'
+import { ssoService } from '@/api'
 
 // constants
 const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
@@ -88,8 +93,8 @@ export function Login() {
 
 	// side-effect to reset notification message when user is actively typing
 	useEffect(() => {
-		if (!loading && !isLoggedIn) updateLoginStatus({ message: '' })
-	}, [inputStates, isLoggedIn, loading, updateLoginStatus])
+		if (inputStates) updateLoginStatus({ message: '' })
+	}, [inputStates, updateLoginStatus])
 
 	// 2 step submit: email and password.
 	// User has option to go back and update their inputted email if necessary
@@ -147,7 +152,7 @@ export function Login() {
 		],
 	}
 
-	// process indicator while authentication
+	// process indicator while oAuth
 	if (loading)
 		return (
 			<ProcessIndicator
@@ -298,9 +303,24 @@ export function Login() {
 
 						<footer>
 							<AuthProviderSection
-								callbackFn={(message) => {
-									updateLoginStatus({ message })
+								callbackFn={provider => {
+									console.log('TODO: Implement Passport for Facebook')
 									setLoading(true)
+									updateLoginStatus({ message: `Sign-in via ${provider}` })
+
+									RunAfterSomeTime(() => {
+										if (!loading) {
+											setLoading(false)
+											location.reload()
+											updateLoginStatus({
+												success: false,
+												message: 'Auth Provider is not responding...',
+											})
+										}
+									}, 5)
+
+									// call sso, expect callback from provider on side-effects (Login render)
+									ssoService(provider)
 								}}
 							/>
 						</footer>

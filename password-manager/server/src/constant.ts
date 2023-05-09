@@ -17,12 +17,23 @@ const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || ""
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || ""
 const SECRET_KEY = ACCESS_TOKEN_SECRET
 
-const GITHUB_ACCESS_TOKEN_URL = process.env.GITHUB_ACCESS_TOKEN_URL || ""
+const GITHUB_REDIRECT_AUTH_URL = process.env.GITHUB_REDIRECT_AUTH_URL || ""
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || ""
 const GITHUB_SECRET = process.env.GITHUB_SECRET || ""
-
 const GITHUB_USER_API = process.env.GITHUB_USER_API || ""
-const GITHUB_REDIRECT_URL = process.env.GITHUB_REDIRECT_URL || ""
+
+const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL || ""
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || ""
+const GOOGLE_SIGN_IN_URL = process.env.GOOGLE_SIGN_IN_URL || ""
+
+const GOOGLE_SECRET = process.env.GOOGLE_SECRET || ""
+const GOOGLE_USER_API = process.env.GOOGLE_USER_API || ""
+const GOOGLE_REDIRECT_AUTH_URL = process.env.GOOGLE_REDIRECT_AUTH_URL || ""
+
+// redirect to client url after successful oAuth
+const clientURLEnvironment = CLIENT_URL.split(",")
+const AUTH_CLIENT_REDIRECT_URL =
+	(isProd ? clientURLEnvironment[1] : clientURLEnvironment[0]) || ""
 
 export const ParameterStore = {
 	SERVER_PORT,
@@ -33,11 +44,17 @@ export const ParameterStore = {
 	SECRET_KEY,
 	ACCESS_TOKEN_SECRET,
 	REFRESH_TOKEN_SECRET,
-	GITHUB_ACCESS_TOKEN_URL,
+	GITHUB_REDIRECT_AUTH_URL,
 	GITHUB_CLIENT_ID,
 	GITHUB_SECRET,
 	GITHUB_USER_API,
-	GITHUB_REDIRECT_URL,
+	GOOGLE_CLIENT_ID,
+	GOOGLE_SECRET,
+	GOOGLE_SIGN_IN_URL,
+	GOOGLE_REDIRECT_AUTH_URL,
+	GOOGLE_ACCESS_TOKEN_URL,
+	GOOGLE_USER_API,
+	AUTH_CLIENT_REDIRECT_URL,
 }
 
 export const TokenType = {

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
 import type { TStatus, TInputRegistration } from '@/types'
 import { REGISTER_STATE } from '@/services/constants/Registration.constant'
@@ -21,9 +21,10 @@ import {
 	PasswordStrength,
 	AnimatedIcon,
 	Header,
+	ProcessIndicator,
 } from '@/components'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
-import { registerUserService } from '@/api'
+import { registerUserService, ssoService } from '@/api'
 
 // constants
 const { CREDENTIALS, STATUS, EMAIL_REGEX, PASSWORD_REGEX } = REGISTER_STATE
@@ -36,12 +37,13 @@ export function Registration() {
 	const { inputStates, onChange, onFocus, onBlur, isFocus, isSubmitted } = inputAttribute
 	const { password, email, confirm, isTermsAgreed } = inputStates
 
-	const { objState: registrationStatus, mutate: mutateRegistrationStatus } =
+	const { objState: registrationStatus, mutate: updateRegistrationStatus } =
 		useStateObj<TStatus>(STATUS)
 
 	const emailRef = useRef<HTMLInputElement>(null)
 	const loginRef = useRef<HTMLAnchorElement>(null)
 	const { mutateAuth } = useAuthContext()
+	const [loading, setLoading] = useState(false)
 
 	useEffect(() => {
 		if (!registrationStatus.success) emailRef.current?.focus()
@@ -49,8 +51,8 @@ export function Registration() {
 	}, [registrationStatus.success])
 
 	useEffect(() => {
-		mutateRegistrationStatus({ message: '' })
-	}, [inputStates, mutateRegistrationStatus])
+		updateRegistrationStatus({ message: '' })
+	}, [inputStates, updateRegistrationStatus])
 
 	const passwordRequirement = {
 		minLength: minLength.test(password),
@@ -106,7 +108,7 @@ export function Registration() {
 		event.preventDefault()
 
 		if (!isSubmitted) {
-			mutateRegistrationStatus({ message: '' })
+			updateRegistrationStatus({ message: '' })
 			inputAction.isSubmit(true)
 
 			RunAfterSomeTime(async () => {
@@ -122,9 +124,9 @@ export function Registration() {
 						mutateAuth({ email })
 						// clear form input states and status
 						inputAction.resetInput()
-						mutateRegistrationStatus({ success: true, message: '' })
+						updateRegistrationStatus({ success: true, message: '' })
 					} else {
-						mutateRegistrationStatus({
+						updateRegistrationStatus({
 							success: false,
 							message: 'Registration Failed!',
 						})
@@ -133,11 +135,20 @@ export function Registration() {
 					inputAction.isSubmit(false)
 				} catch (error) {
 					inputAction.isSubmit(false)
-					return mutateRegistrationStatus({ success: false, message: CreateError(error).message })
+					return updateRegistrationStatus({ success: false, message: CreateError(error).message })
 				}
 			}, 3)
 		}
 	}
+
+	// process indicator while oAuth
+	if (loading)
+		return (
+			<ProcessIndicator
+				title="Please wait..."
+				subTitle={registrationStatus.message}
+			/>
+		)
 
 	return (
 		<section>
@@ -324,7 +335,27 @@ export function Registration() {
 						</div>
 
 						<footer>
-							<AuthProviderSection />
+							<AuthProviderSection
+								callbackFn={provider => {
+									console.log('TODO: Implement Passport for Facebook')
+									setLoading(true)
+									updateRegistrationStatus({ message: `Register and Sign-in via ${provider}` })
+
+									RunAfterSomeTime(() => {
+										if (!loading) {
+											setLoading(false)
+											location.reload()
+											updateRegistrationStatus({
+												success: false,
+												message: 'Auth Provider is not responding...',
+											})
+										}
+									}, 5)
+
+									// call sso, expect callback from provider on side-effects (Login render)
+									ssoService(provider)
+								}}
+							/>
 						</footer>
 					</>
 				)}

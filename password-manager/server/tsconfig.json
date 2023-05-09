@@ -18,8 +18,8 @@
 		"baseUrl": ".",
 		"paths": {
 			"*": ["src/"],
-			"@shared": ["../shared"],
-			"@server-utils": ["./src/utils"]
+			"@shared": ["../shared"]
+			// "@server-utils": ["./src/utils"]
 		}
 	},
 	"include": ["./src/**/*.ts"],
