@@ -9,6 +9,9 @@ const {
 	GOOGLE_REDIRECT_AUTH_URL,
 	GOOGLE_CLIENT_ID,
 	GOOGLE_SIGN_IN_URL,
+	FACEBOOK_CLIENT_ID,
+	FACEBOOK_REDIRECT_AUTH_URL,
+	FACEBOOK_SIGN_IN_URL,
 } = ParameterStore
 
 export async function getSignInUrl(
@@ -17,6 +20,7 @@ export async function getSignInUrl(
 	next: NextFunction
 ) {
 	try {
+		let options
 		const provider = req.query["provider"]?.toString() as TProvider
 		if (!provider) {
 			return res.status(400).json({ message: "provider name is missing" })
@@ -31,9 +35,9 @@ export async function getSignInUrl(
 					)
 
 			case "google":
-				const options = {
-					redirect_uri: GOOGLE_REDIRECT_AUTH_URL || "",
-					client_id: GOOGLE_CLIENT_ID || "",
+				options = {
+					client_id: GOOGLE_CLIENT_ID,
+					redirect_uri: GOOGLE_REDIRECT_AUTH_URL,
 					access_type: "online",
 					response_type: "code",
 					prompt: "consent",
@@ -47,6 +51,23 @@ export async function getSignInUrl(
 					.status(200)
 					.send(
 						`${GOOGLE_SIGN_IN_URL}?${new URLSearchParams(
+							options
+						).toString()}`
+					)
+			case "facebook":
+				options = {
+					client_id: FACEBOOK_CLIENT_ID,
+					redirect_uri: FACEBOOK_REDIRECT_AUTH_URL,
+					auth_type: "rerequest",
+					response_type: "code",
+					display: "popup",
+					scope: ["public_profile", "email"].join(" "),
+				}
+
+				return res
+					.status(200)
+					.send(
+						`${FACEBOOK_SIGN_IN_URL}?${new URLSearchParams(
 							options
 						).toString()}`
 					)

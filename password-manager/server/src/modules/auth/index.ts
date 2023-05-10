@@ -1,3 +1,4 @@
-export * from "./github/github.auth"
-export * from "./google/google.auth"
+export * from "./github"
+export * from "./google"
+export * from "./facebook"
 export * from "./sso-gateway"
