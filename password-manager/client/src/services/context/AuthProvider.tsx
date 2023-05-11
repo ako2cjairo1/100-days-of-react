@@ -3,7 +3,7 @@ import type { TAuthContext, TAuthProvider, IChildren, TStatus } from '@/types'
 import { AUTH_CONTEXT } from '@/services/constants'
 import { TCredentials } from '../../../../shared/types.shared'
 import { CreateError, SessionStorage, generateVaultKey, hashPassword } from '../Utils'
-import { getSessionService, loginUserService } from '@/api'
+import { getSessionService, loginUserService } from '@/services/api'
 import { ISession } from '../../../../shared/interfaces.shared'
 
 export const AuthContext = createContext<TAuthContext<TAuthProvider> | null>(null)

@@ -95,7 +95,7 @@ export async function googlePassport(
 			return res.redirect(ParameterStore.AUTH_CLIENT_REDIRECT_URL)
 		}
 
-		return next()
+		return res.status(401).json({ message: "Not Verified" })
 	} catch (err) {
 		// something went wrong, rollback registration
 		rollbackGooglePassportActions(res, userId)

@@ -1,8 +1,8 @@
 import { Response, NextFunction } from "express"
 import { authenticateUser, loginUserById } from "../user.service"
 import { getVaultByUserId } from "../../vault"
-import { CreateError, buildTokens, createCookies } from "../../../utils"
-import { IReqExt } from "../../../type"
+import { CreateError, Logger, buildTokens, createCookies } from "../../../utils"
+import { IReqExt, IUserModel } from "../../../type"
 import { TCredentials } from "@shared"
 
 export async function loginHandler(
@@ -10,6 +10,7 @@ export async function loginHandler(
 	res: Response,
 	next: NextFunction
 ) {
+	let loginUser: Partial<IUserModel> = { email: req.body.email }
 	try {
 		// find user and verify the hashed password
 		const authUser = await authenticateUser({ ...req.body })
@@ -23,6 +24,7 @@ export async function loginHandler(
 		if (authUser) {
 			const { _id, email, version, password } = authUser
 			const userId = _id.toString()
+			loginUser = { ...authUser, userId }
 			// get user vault from db using userId
 			const vault = await getVaultByUserId(userId)
 
@@ -62,5 +64,11 @@ export async function loginHandler(
 		error.status = 401
 		// send formatted error to error handler plugin
 		next(error)
+	} finally {
+		Logger.info({
+			action: "LOGIN",
+			userId: loginUser.userId,
+			email: loginUser.email,
+		})
 	}
 }

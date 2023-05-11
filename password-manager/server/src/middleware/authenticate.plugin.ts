@@ -1,5 +1,4 @@
 import { NextFunction, Request } from "express"
-import { Logger } from "../utils"
 import { IResExt, TVerifiedToken } from "../type"
 
 export function authenticate(
@@ -12,10 +11,7 @@ export function authenticate(
 	//! hence, we'll just check if the authenticated user is present in "locals"
 	if (!user) {
 		// send Unauthorize status when no validSession found
-		return res
-			.status(401)
-			.json({ message: "You're not signed-in or session timed out" })
+		return res.status(401).json({ message: "You're not signed-in" })
 	}
-	Logger.warn(user)
 	next()
 }

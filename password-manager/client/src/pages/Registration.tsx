@@ -24,7 +24,7 @@ import {
 	ProcessIndicator,
 } from '@/components'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
-import { registerUserService, ssoService } from '@/api'
+import { registerUserService, ssoService } from '@/services/api'
 
 // constants
 const { CREDENTIALS, STATUS, EMAIL_REGEX, PASSWORD_REGEX } = REGISTER_STATE
@@ -337,17 +337,15 @@ export function Registration() {
 						<footer>
 							<AuthProviderSection
 								callbackFn={provider => {
-									console.log('TODO: Implement Passport for Facebook')
 									setLoading(true)
 									updateRegistrationStatus({ message: `Register and Sign-in via ${provider}` })
 
 									RunAfterSomeTime(() => {
 										if (!loading) {
 											setLoading(false)
-											location.reload()
 											updateRegistrationStatus({
 												success: false,
-												message: 'Auth Provider is not responding...',
+												message: "SSO Provider didn't respond, please try again",
 											})
 										}
 									}, 5)

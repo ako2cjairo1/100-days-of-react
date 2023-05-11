@@ -12,4 +12,4 @@ export const userRouter = express
 	.post("/registration", registerHandler)
 	.post("/login", loginHandler)
 	.post("/logout", authenticate, logoutHandler)
-	.get("/session", authenticate, sessionHandler)
+	.post("/session", authenticate, sessionHandler)

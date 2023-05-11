@@ -18,7 +18,7 @@ export async function registerHandler(
 
 		userId = _id.toString()
 		// create Vault using user._id
-		const { data, salt } = await createVault({ userId })
+		const { data: encryptedVault, salt } = await createVault({ userId })
 		// data: initial value of empty array of objects..
 		// salt: is created on pre-save to database (use to generate vaultKey for client)
 
@@ -31,7 +31,7 @@ export async function registerHandler(
 			}
 		)
 		// registration successful: send accessToken, vault and salt (to generate vault key)
-		return res.status(201).json({ accessToken, vault: data, salt })
+		return res.status(201).json({ accessToken, encryptedVault, salt })
 	} catch (err) {
 		if (userId) {
 			// something went wrong, rollback registration

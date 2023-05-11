@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
 import type { TInputLogin, TStatus } from '@/types'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
@@ -20,7 +20,7 @@ import {
 	Header,
 	ProcessIndicator,
 } from '@/components'
-import { ssoService } from '@/api'
+import { ssoService } from '@/services/api'
 
 // constants
 const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
@@ -49,12 +49,11 @@ export function Login() {
 	const authRef = useRef(true)
 	const [loading, setLoading] = useState(false)
 
-	// side-effect to persist authentication
-	useEffect(() => {
+	const authenticateSession = useCallback(() => {
 		if (authRef.current && !isLoggedIn) {
 			// show authentication progress window
 			setLoading(true)
-			updateLoginStatus({ status: true, message: 'Signing in via Github' })
+			updateLoginStatus({ status: false, message: '' })
 			// authenticate current session by verifying to auth server
 			authenticate().then(({ success, message }) => {
 				// hide authentication progress window
@@ -65,6 +64,11 @@ export function Login() {
 			authRef.current = false
 		}
 	}, [authenticate, isLoggedIn, updateLoginStatus])
+
+	// side-effect to persist authentication
+	useEffect(() => {
+		authenticateSession()
+	}, [authenticateSession])
 
 	// side-effect to remember user's email..
 	useEffect(() => {
@@ -98,7 +102,7 @@ export function Login() {
 
 	// 2 step submit: email and password.
 	// User has option to go back and update their inputted email if necessary
-	const handleSubmit = async (formEvent: React.FormEvent) => {
+	const handleSubmit = (formEvent: React.FormEvent) => {
 		formEvent.preventDefault()
 
 		updateLoginStatus({ message: '' })
@@ -115,15 +119,17 @@ export function Login() {
 			// indicate start progress status of submit button
 			isSubmit(true)
 			// authenticate credential via auth server
-			const { success, message } = await authenticate({ email, password })
-			if (success) {
-				// clear input form states and status
-				resetInput()
-			}
-			// show success or failed authentication
-			updateLoginStatus({ success, message })
-			// end progress status of submit button
-			isSubmit(false)
+			authenticate({ email, password }).then(({ success, message }) => {
+				if (success) {
+					// clear input form states and status
+					resetInput()
+				}
+				// show success or failed authentication
+				updateLoginStatus({ success, message })
+				// end progress status of submit button
+				isSubmit(false)
+			})
+
 		}
 	}
 
@@ -304,17 +310,15 @@ export function Login() {
 						<footer>
 							<AuthProviderSection
 								callbackFn={provider => {
-									console.log('TODO: Implement Passport for Facebook')
 									setLoading(true)
 									updateLoginStatus({ message: `Sign-in via ${provider}` })
 
 									RunAfterSomeTime(() => {
 										if (!loading) {
 											setLoading(false)
-											location.reload()
 											updateLoginStatus({
 												success: false,
-												message: 'Auth Provider is not responding...',
+												message: "SSO Provider didn't respond, please try again",
 											})
 										}
 									}, 5)

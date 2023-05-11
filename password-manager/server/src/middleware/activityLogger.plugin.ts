@@ -7,14 +7,15 @@ export function activityLogger(
 	next: NextFunction
 ) {
 	const { method, originalUrl } = req
+	const protectedUrl = originalUrl.replace(/(?<==)[^&]+/g, "***")
 	const startTime = new Date().getTime()
 
-	Logger.info(`${method}: ${originalUrl}`)
+	Logger.info(`${method}: ${protectedUrl}`)
 	res.on("finish", () => {
 		const { statusCode, statusMessage } = res
 		const elapsedTime = new Date().getTime() - startTime
 		Logger.info(
-			`==> [${statusCode}] ${statusMessage} ${originalUrl} [${elapsedTime}ms]`
+			`==> [${statusCode}|${statusMessage}] (took ${elapsedTime}ms) ${protectedUrl}`
 		)
 	})
 	next()

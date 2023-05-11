@@ -39,7 +39,6 @@ export function parseToken(req: Request): TToken {
 
 	// parse cookies for cookies
 	if (cookies) {
-		Logger.warn("Parsing Cookies for Tokens")
 		parsedTokens = {
 			accessToken: cookies[AccessToken],
 			refreshToken: cookies[RefreshToken],
@@ -49,7 +48,6 @@ export function parseToken(req: Request): TToken {
 	// parse queryString
 	const queryString = query[AccessToken]?.toString()
 	if (queryString) {
-		Logger.warn("Parsing Query String Tokens")
 		// override accessToken from cookies if client used queryString
 		parsedTokens = {
 			...parsedTokens,
@@ -60,7 +58,6 @@ export function parseToken(req: Request): TToken {
 	// parse Authorization header
 	const authorization = req.headers["authorization"]?.split(" ")[1]
 	if (authorization) {
-		Logger.warn("Parsing Bearer Tokens")
 		// override accessToken from cookies and query string
 		parsedTokens = {
 			...parsedTokens,

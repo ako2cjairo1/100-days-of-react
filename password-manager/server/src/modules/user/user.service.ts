@@ -33,6 +33,7 @@ export async function logoutUserById(userId?: IUserModel["userId"]) {
 	return await UserModel.findOneAndUpdate(
 		{ _id: userId },
 		{
+			// replace old version to invalidate refreshToken issued
 			version: generateSalt(16),
 			isLoggedIn: false,
 		}

@@ -12,14 +12,13 @@ export function errorHandler(
 
 	// unknown error, create custom error
 	let error = CreateError(err)
+	const { status, message } = error
 
 	//* for client: override error properties accordingly */
 	// override error message for status 401
-	if (error.status === 400) error.message = "Bad Request!"
+	if (status === 400) error.message = `Bad Request! ${message}`
 	// override error message for status 401
-	if (error.status === 401) error.message = "Unauthorized!"
-
-	const { status, message } = error
+	if (status === 401) error.message = `Unauthorized! ${message}`
 
 	// server log the error with readable message
 	if (status >= 400 && status <= 499) Logger.warn(message, error)

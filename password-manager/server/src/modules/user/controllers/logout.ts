@@ -1,5 +1,5 @@
 import { Request, NextFunction } from "express"
-import { CreateError, removeCookies } from "../../../utils"
+import { CreateError, Logger, removeCookies } from "../../../utils"
 import { logoutUserById } from "../user.service"
 import { IResExt, IUserModel } from "../../../type"
 
@@ -8,12 +8,18 @@ export async function logoutHandler(
 	res: IResExt<IUserModel>,
 	next: NextFunction
 ) {
+	const user = res.user
 	try {
-		// TODO: invalidate tokens used
-		// remove tokens from session cookies
+		// clear the cookies to invalidate session
 		removeCookies(res)
+		// check if user session is authenticated
+		if (!user) {
+			return res
+				.status(400)
+				.json({ message: "Logout action could not be completed." })
+		}
 		// update login status and increase token "version" (for refreshToken)
-		await logoutUserById(res.user?.userId)
+		await logoutUserById(user.userId)
 
 		return res.sendStatus(204).end()
 	} catch (err) {
@@ -23,5 +29,11 @@ export async function logoutHandler(
 		error.message = "Error logging out"
 		// send formatted error to error handler plugin
 		return next(error)
+	} finally {
+		Logger.info({
+			action: "LOGOUT",
+			userId: user?.userId,
+			email: user?.email,
+		})
 	}
 }

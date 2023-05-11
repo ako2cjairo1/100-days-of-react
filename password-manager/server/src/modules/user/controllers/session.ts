@@ -1,5 +1,5 @@
 import { IResExt, IUserModel } from "../../../type"
-import { CreateError, parseToken } from "../../../utils"
+import { CreateError, Logger, parseToken } from "../../../utils"
 import { NextFunction, Request } from "express"
 import { getUserById } from "../user.service"
 import { getVaultByUserId } from "../../vault"
@@ -9,22 +9,26 @@ export async function sessionHandler(
 	res: IResExt<IUserModel>,
 	next: NextFunction
 ) {
+	const user = res.user
 	try {
 		// check if user session is authenticated
-		if (!res.user) {
-			return res
-				.status(401)
-				.json({ message: "You're not signed-in or session timed out" })
+		if (!user) {
+			return res.status(401).json({ message: "You're not signed-in" })
 		}
 
-		const user = await getUserById(res.user.userId)
-		if (!user) {
+		const userFromDB = await getUserById(user.userId)
+		if (!userFromDB) {
 			return res.status(400).json({ message: "User not found" })
 		}
 
 		// parse cookies, query string and Bearer token
 		const { accessToken } = parseToken(req)
-		const { _id, email, password } = user
+		const { _id, email, password, isLoggedIn } = userFromDB
+
+		// assumes sso authenticated and logged-in
+		if (!isLoggedIn) {
+			return res.status(401).json({ message: "No valid session" })
+		}
 
 		// get user vault from db using userId
 		const vault = await getVaultByUserId(_id.toString())
@@ -51,5 +55,11 @@ export async function sessionHandler(
 		error.status = 400
 		// send formatted error to error handler plugin
 		next(error)
+	} finally {
+		Logger.info({
+			action: "SSO LOGIN",
+			userId: user?.userId,
+			email: user?.email,
+		})
 	}
 }

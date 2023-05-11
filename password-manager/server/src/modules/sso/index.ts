@@ -1,4 +1,4 @@
 export * from "./github"
 export * from "./google"
 export * from "./facebook"
-export * from "./sso-gateway"
+export * from "./sso.route"

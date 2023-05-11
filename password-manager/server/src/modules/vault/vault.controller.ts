@@ -1,6 +1,6 @@
 import { NextFunction, Request } from "express"
-import { CreateError } from "../../utils"
-import { getVaultByUserId, updateVaultByUserId } from "./vault.service"
+import { CreateError, Logger } from "../../utils"
+import { updateVaultByUserId } from "./vault.service"
 import { IReqExt, IResExt, IUserModel } from "../../type"
 import { IUpdateVault } from "@shared"
 
@@ -9,16 +9,17 @@ export async function updateVaultHandler(
 	res: IResExt<IUserModel>,
 	next: NextFunction
 ) {
+	const user = res.user
 	try {
 		// check if user session is authenticated
-		if (!res.user) {
+		if (!user) {
 			return res
 				.status(400)
 				.json({ message: "Update could not be completed." })
 		}
 
 		await updateVaultByUserId({
-			userId: res.user.userId,
+			userId: user.userId,
 			data: req.body.encryptedVault,
 		})
 
@@ -30,5 +31,11 @@ export async function updateVaultHandler(
 		error.message = "Error updating Vault :("
 		// send formatted error to error handler plugin
 		next(error)
+	} finally {
+		Logger.info({
+			action: "VAULT UPDATE",
+			userId: user?.userId,
+			email: user?.email,
+		})
 	}
 }

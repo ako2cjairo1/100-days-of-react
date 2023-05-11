@@ -15,7 +15,7 @@ import { CreateError, Log, SessionStorage } from '@/services/Utils/password-mana
 import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
 import { RequestType, KEYCHAIN_CONST, FormContent, AUTH_CONTEXT } from '@/services/constants'
 import { decryptVault, encryptVault } from '@/services/Utils/crypto'
-import { logoutUserService, updateVaultService } from '@/api'
+import { logoutUserService, updateVaultService } from '@/services/api'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
