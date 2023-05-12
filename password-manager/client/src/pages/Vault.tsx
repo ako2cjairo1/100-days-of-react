@@ -65,10 +65,8 @@ export function Vault() {
 	}, [updateVaultStatus, vaultKey])
 
 	useEffect(() => {
-		console.table({ isLoggedIn, authRef })
 		// currently logged-in? hydrate current User's Vault
 		if (isLoggedIn) {
-			console.log("Just Hydrate >>>>>")
 			hydrateAndGetVault()
 			return
 		}

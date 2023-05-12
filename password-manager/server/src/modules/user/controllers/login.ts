@@ -12,7 +12,7 @@ export async function loginHandler(
 ) {
 	const unknownUser = req.body
 	// for logging purposes, to identify the User logging in
-	let loginUser: Partial<IUserModel> = { email: unknownUser.password }
+	let loginUser: Partial<IUserModel> = { email: unknownUser.email }
 	try {
 		// find user and verify the hashed password
 		const authenticatedUser = await authenticateUser({ ...unknownUser })
