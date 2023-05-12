@@ -225,7 +225,6 @@ type TLSKey =
 	| 'PM_remember_email'
 	| 'PM_searchkey'
 	| 'PM_encrypted_vault'
-	| 'PM_VK'
 	| (string & { keys?: string })
 /**
  * LocalStorage object provides an interface for interacting with the browser's local storage.

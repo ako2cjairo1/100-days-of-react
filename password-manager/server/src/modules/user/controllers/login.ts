@@ -10,57 +10,56 @@ export async function loginHandler(
 	res: Response,
 	next: NextFunction
 ) {
-	let loginUser: Partial<IUserModel> = { email: req.body.email }
+	const unknownUser = req.body
+	// for logging purposes, to identify the User logging in
+	let loginUser: Partial<IUserModel> = { email: unknownUser.password }
 	try {
 		// find user and verify the hashed password
-		const authUser = await authenticateUser({ ...req.body })
+		const authenticatedUser = await authenticateUser({ ...unknownUser })
 
-		if (!authUser) {
+		if (!authenticatedUser) {
 			return res
 				.status(401)
 				.json({ message: "Invalid email or password." })
 		}
 
-		if (authUser) {
-			const { _id, email, version, password } = authUser
-			const userId = _id.toString()
-			loginUser = { ...authUser, userId }
-			// get user vault from db using userId
-			const vault = await getVaultByUserId(userId)
+		const { _id, email, version, password } = authenticatedUser
+		const userId = _id.toString()
+		loginUser = { userId, email }
 
-			if (!vault) {
-				return res
-					.status(405) // method not allowed
-					.json({ message: "We can't find your Vault" })
-			}
-			// generate pair of tokens using authenticated user(_Id, email, version, etc.)
-			const { accessToken, refreshToken } = buildTokens({
-				userId,
-				email,
-				version,
-			})
-			// store signed tokens into cookies
-			createCookies(res, { accessToken, refreshToken })
-			// update user as loggedIn (optional)
-			await loginUserById(userId)
+		// fetch User's encrypted Vault from DB
+		const vault = await getVaultByUserId(userId)
 
-			const { data, salt } = vault
-			// login success: send accessToken, vault data and salt (to generate vault key)
-			return res.status(200).json({
-				accessToken,
-				email,
-				hashedPassword: password,
-				salt,
-				encryptedVault: data,
-			})
+		if (!vault) {
+			return res
+				.status(405) // method not allowed
+				.json({ message: "We can't find your Vault" })
 		}
+		// generate pair of tokens using authenticated user(_Id, email, version, etc.)
+		const { accessToken, refreshToken } = buildTokens({
+			userId,
+			email,
+			version,
+		})
+		// store signed tokens into cookies
+		createCookies(res, { accessToken, refreshToken })
+		// update user as loggedIn (optional)
+		await loginUserById(userId)
 
-		throw Error("Login failed!")
+		const { data, salt } = vault
+		// login success: send accessToken, vault data and salt (to generate vault key)
+		return res.status(200).json({
+			accessToken,
+			email,
+			hashedPassword: password,
+			salt,
+			encryptedVault: data,
+		})
 	} catch (err) {
 		// parse unknown err
 		let error = CreateError(err)
 		// default error message
-		error.message = "Access Denied!"
+		error.message = "Login Denied!"
 		error.status = 401
 		// send formatted error to error handler plugin
 		next(error)

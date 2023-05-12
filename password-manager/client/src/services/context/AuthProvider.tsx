@@ -20,16 +20,9 @@ export function AuthProvider({ children }: IChildren) {
 	const createUserSession = useCallback(
 		({ accessToken, email, hashedPassword, salt, encryptedVault }: ISession) => {
 			// generate vaultKey using combination of email, hashedPassword and "salt" from API
-			const vaultKey = generateVaultKey({
-				email,
-				hashedPassword,
-				salt,
-			})
-			// store Vault and vaultKey in session storage
-			SessionStorage.write([
-				['PM_VK', vaultKey],
-				['PM_encrypted_vault', encryptedVault],
-			])
+			const vaultKey = generateVaultKey({ email, hashedPassword, salt })
+			// store encrypted Vault in session storage
+			SessionStorage.write([['PM_encrypted_vault', encryptedVault]])
 			// !This maybe replaced with cookies
 			mutateAuth({ email, vault: encryptedVault, vaultKey, accessToken, isLoggedIn: true })
 		},
@@ -42,9 +35,6 @@ export function AuthProvider({ children }: IChildren) {
 				success: false,
 				message: 'Unauthorize',
 			}
-
-			// clear-out current Auth context
-			mutateAuth(AUTH_CONTEXT.authInfo)
 
 			try {
 				// authenticate user using email and hashed password from API
@@ -59,7 +49,7 @@ export function AuthProvider({ children }: IChildren) {
 				} else {
 					// check for valid session to auth server (oAuth: Github, Google, Meta)
 					session = await getSessionService()
-					status.message = 'Successful Open Authorization'
+					status.message = 'Authentication Successful!'
 				}
 
 				if (Object.values(session).some(Boolean)) {

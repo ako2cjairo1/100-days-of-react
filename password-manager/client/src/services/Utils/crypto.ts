@@ -1,3 +1,4 @@
+import { TKeychain } from '@/types'
 import { SHA256, PBKDF2, AES, enc } from 'crypto-js'
 
 export function hashPassword(password: string) {
@@ -16,15 +17,16 @@ export function generateVaultKey({ email, hashedPassword, salt }: IGenerateVault
 	}).toString()
 }
 
-interface IEncryptVault {
-	vault: string
+interface IEncryptVault<T = string> {
+	vault: T
 	vaultKey: string
 }
-export function encryptVault({ vault, vaultKey }: IEncryptVault) {
-	return AES.encrypt(vault, vaultKey).toString()
+export function encryptVault<T = TKeychain>({ vault, vaultKey }: IEncryptVault<T>) {
+	const serializeVault = JSON.stringify(vault)
+	return AES.encrypt(serializeVault, vaultKey).toString()
 }
 
-export function decryptVault({ vault, vaultKey }: IEncryptVault) {
+export function decryptVault({ vault, vaultKey }: IEncryptVault<string>) {
 	try {
 		const decrypted = AES.decrypt(vault, vaultKey).toString(enc.Utf8)
 		return JSON.parse(decrypted)

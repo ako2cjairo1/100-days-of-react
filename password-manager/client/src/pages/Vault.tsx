@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import '@/assets/modules/Vault.css'
 import {
 	VaultContainer,
@@ -9,14 +10,13 @@ import {
 	AnimatedIcon,
 	Header,
 	SearchBar,
+	ProcessIndicator,
 } from '@/components'
 import { useAuthContext, useStateObj } from '@/hooks'
-import { CreateError, Log, SessionStorage } from '@/services/Utils/password-manager.helper'
 import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
+import { CreateError, Log, SessionStorage, decryptVault, encryptVault } from '@/services/Utils'
 import { RequestType, KEYCHAIN_CONST, FormContent, AUTH_CONTEXT } from '@/services/constants'
-import { decryptVault, encryptVault } from '@/services/Utils/crypto'
 import { logoutUserService, updateVaultService } from '@/services/api'
-import { useLocation, useNavigate } from 'react-router-dom'
 
 const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
 const { add, modify, view } = RequestType
@@ -33,30 +33,27 @@ export function Vault() {
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
 	const {
-		authInfo: { isLoggedIn },
+		authInfo: { isLoggedIn, vaultKey },
 		mutateAuth,
 		authenticate,
 	} = useAuthContext()
 	const vaultCountRef = useRef(0)
-	const navigate = useNavigate()
-	const location = useLocation()
 	const authRef = useRef(true)
+	const [loading, setLoading] = useState(false)
+
 
 	const hydrateAndGetVault = useCallback(() => {
-		let currentVault = []
+		let decryptedVault = []
 		try {
-			const encryptedVault = SessionStorage.read('PM_encrypted_vault')
-			if (encryptedVault) {
-				// use vaultKey to decrypt Vault (combination of email, hashed password and salt from API)
-				currentVault = decryptVault({
-					vault: encryptedVault,
-					vaultKey: SessionStorage.read('PM_VK'),
-				})
+			const vault = SessionStorage.read('PM_encrypted_vault')
+			if (vault) {
+				// vaultKey to decrypt Vault (combination of email, hashed password and salt from Auth Server)
+				decryptedVault = decryptVault({ vault, vaultKey })
 			}
-			// hydrate Vault state
-			setVault(currentVault)
+			// update Vault state
+			setVault(decryptedVault)
 			// remember how many items on current Vault
-			vaultCountRef.current = currentVault.length
+			vaultCountRef.current = decryptedVault.length
 		} catch (error) {
 			updateVaultStatus({
 				success: false,
@@ -64,31 +61,34 @@ export function Vault() {
 			})
 		}
 
-		return currentVault
-	}, [updateVaultStatus])
+		return decryptedVault
+	}, [updateVaultStatus, vaultKey])
 
 	useEffect(() => {
-		// currently logged-in? update current vault
+		console.table({ isLoggedIn, authRef })
+		// currently logged-in? hydrate current User's Vault
 		if (isLoggedIn) {
+			console.log("Just Hydrate >>>>>")
 			hydrateAndGetVault()
 			return
 		}
 
 		// otherwise, get authentication from auth server
 		if (authRef.current) {
+			// show authentication progress window
+			setLoading(true)
+			updateVaultStatus({ status: false, message: '' })
 			authenticate().then(({ success }) => {
-				if (!success) navigate('/login')
+				setLoading(false)
+				if (!success) Navigate({ to: '/login', replace: true })
 			})
 			authRef.current = false
 		}
-	}, [authenticate, hydrateAndGetVault, isLoggedIn, navigate])
+	}, [authenticate, hydrateAndGetVault, isLoggedIn, updateVaultStatus])
 
 	// encrypt current Vault, store on session storage and finally, update database
 	const syncDatabaseUpdate = async (vault: TKeychain[]) => {
-		const encryptedVault = encryptVault({
-			vault: JSON.stringify(vault),
-			vaultKey: SessionStorage.read('PM_VK'),
-		})
+		const encryptedVault = encryptVault({ vault, vaultKey })
 		// send encrypted update to database
 		await updateVaultService({ encryptedVault })
 		// store local copy of encryptedVault in session storage
@@ -138,9 +138,7 @@ export function Vault() {
 			}
 		} catch (error) {
 			const err = CreateError(error)
-			if (err.code === 401 || err.code === 403)
-				navigate('/login', { state: { from: location }, replace: true })
-
+			if (err.code === 401 || err.code === 403) Navigate({ to: '/login', replace: true })
 			return {
 				success: false,
 				message: err.message,
@@ -225,6 +223,15 @@ export function Vault() {
 			SessionStorage.clear()
 		}
 	}
+
+	// process indicator while oAuth
+	if (loading)
+		return (
+			<ProcessIndicator
+				title="Please wait..."
+				subTitle={vaultStatus.message}
+			/>
+		)
 
 	return (
 		<div className="vault-container">

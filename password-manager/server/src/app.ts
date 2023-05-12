@@ -2,30 +2,40 @@ import express from "express"
 import cookieParser from "cookie-parser"
 import { apiRoute } from "./apiRoute"
 import {
+	securities,
 	activityLogger,
+	deserializeSession,
 	errorHandler,
 	invalidRouteHandler,
-	securities,
-	deserializeSession,
 } from "./middleware"
 import { authRoute } from "./authRoute"
 
 export default express()
-	/* middleware: cors, helmet, and rate limiter */
-	.use(securities)
+	/**
+	 * --------------- BASE MIDDLEWARE -----------------
+	 */
 	.use(express.json())
-	// handle urlencoded form data
+	// Middleware that allows Express to parse through both JSON and x-www-form-urlencoded request bodies
 	.use(express.urlencoded({ extended: false }))
 	.use(cookieParser())
-	/* Register plugins here */
+	/**
+	 * -------------- CUSTOM MIDDLEWARE ----------------
+	 */
+	// middleware: cors, helmet, and rate limiter
+	.use(securities)
+	// custom server activity logger (info, warn, error)
 	.use(activityLogger)
-	// middleware controller to parse tokens (cookies, authorization and query string)
+	// to parse tokens (cookies, authorization and query string)
 	.use(deserializeSession)
-
-	/* root route of API endpoint */
+	/**
+	 * -------------------- ROUTES ---------------------
+	 */
+	// Root router when you visit http://localhost:3000/api/v1, you will see "Login Page"
+	// endpoints: /heartbeat, /user and /vault
 	.use("/api/v1", apiRoute)
-	/* root route for oauth */
+	// Root router when you visit (http://localhost:3000/auth)
+	// endpoints: /sso, passports: /google, /github and /facebook
 	.use("/auth", authRoute)
 
-	/* custom Error Handler */
+	// Middleware Error Handler: needs to be the last to handle api errors
 	.use(errorHandler, invalidRouteHandler)
