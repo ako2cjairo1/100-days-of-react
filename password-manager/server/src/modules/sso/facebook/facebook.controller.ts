@@ -1,36 +1,15 @@
 import { Request, Response, NextFunction } from "express"
 import type { IReqExt } from "../../../type"
-import {
-	CreateError,
-	Logger,
-	buildTokens,
-	createCookies,
-	removeCookies,
-} from "../../../utils"
+import { CreateError, buildTokens, createCookies } from "../../../utils"
 import { ParameterStore } from "../../../constant"
 import {
-	createUser,
-	deleteUserById,
+	createUserAndVault,
 	getUserByEmail,
 	loginUserById,
+	rollbackRegistrationActions,
 } from "../../user"
-import { createVault, deleteVaultByUserId, getVaultByUserId } from "../../vault"
+import { getVaultByUserId } from "../../vault"
 import { getFacebookUser } from "./facebook.service"
-
-async function rollbackFacebookPassportActions(res: Response, userId?: string) {
-	try {
-		removeCookies(res)
-		if (userId) {
-			/* DB transactions to delete User and their Vault */
-			await deleteUserById(userId)
-			await deleteVaultByUserId(userId)
-		}
-	} catch (err) {
-		const error = CreateError(err)
-		error.name = "Rollback Facebook Passport Error"
-		Logger.warn(error)
-	}
-}
 
 export async function facebookPassport(
 	req: IReqExt<Request>,
@@ -57,28 +36,25 @@ export async function facebookPassport(
 				userId = existingUser._id.toString()
 				email = existingUser.email
 				version = existingUser.version || ""
+
+				// get Vault of User from db
+				const vault = await getVaultByUserId(userId)
+				if (!vault) {
+					return res
+						.status(405) // method not allowed
+						.json({ message: "We can't find your Vault" })
+				}
 			} else {
-				/** register facebook user and generate user._id */
-				const newUser = await createUser({
+				/** register facebook User and create their Vault */
+				const { user: newUser } = await createUserAndVault({
 					email: facebookEmail,
 					// format of password for OAuth Users (id + email)
 					password: `${verifiedFacebookUser.id}:${facebookEmail}`,
 				})
 
-				userId = newUser._id.toString()
+				userId = newUser.userId
 				email = newUser.email
 				version = newUser.version || ""
-
-				await createVault({ userId })
-			}
-
-			// get Vault of User from db
-			const vault = await getVaultByUserId(userId)
-			if (!vault) {
-				rollbackFacebookPassportActions
-				return res
-					.status(405) // method not allowed
-					.json({ message: "We can't find your Vault" })
 			}
 
 			// generate pair of tokens using authenticated Facebook User(_Id, email, version, etc.)
@@ -98,7 +74,7 @@ export async function facebookPassport(
 		return next()
 	} catch (err) {
 		// something went wrong, rollback registration
-		rollbackFacebookPassportActions(res, userId)
+		rollbackRegistrationActions(res, userId)
 		// parse unknown err
 		let error = CreateError(err)
 		// default error message

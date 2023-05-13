@@ -1,8 +1,9 @@
-import { IResExt, IUserModel } from "../../../type"
-import { CreateError, Logger, parseToken } from "../../../utils"
 import { NextFunction, Request } from "express"
+import type { IResExt } from "../../../type"
+import type { IUserModel } from "@shared"
 import { getUserById } from "../user.service"
 import { getVaultByUserId } from "../../vault"
+import { CreateError, Logger, parseToken } from "../../../utils"
 
 export async function sessionHandler(
 	req: Request,

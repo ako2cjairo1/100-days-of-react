@@ -345,7 +345,7 @@ export function Registration() {
 											setLoading(false)
 											updateRegistrationStatus({
 												success: false,
-												message: "SSO Provider didn't respond, please try again",
+												message: `${provider} didn't respond, please try again`,
 											})
 										}
 									}, 5)

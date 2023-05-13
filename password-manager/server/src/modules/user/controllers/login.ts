@@ -2,8 +2,8 @@ import { Response, NextFunction } from "express"
 import { authenticateUser, loginUserById } from "../user.service"
 import { getVaultByUserId } from "../../vault"
 import { CreateError, Logger, buildTokens, createCookies } from "../../../utils"
-import { IReqExt, IUserModel } from "../../../type"
-import { TCredentials } from "@shared"
+import type { IReqExt } from "../../../type"
+import type { TCredentials, IUserModel } from "@shared"
 
 export async function loginHandler(
 	req: IReqExt<TCredentials>,

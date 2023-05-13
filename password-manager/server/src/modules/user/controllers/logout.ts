@@ -1,7 +1,8 @@
 import { Request, NextFunction } from "express"
 import { CreateError, Logger, removeCookies } from "../../../utils"
 import { logoutUserById } from "../user.service"
-import { IResExt, IUserModel } from "../../../type"
+import type { IResExt } from "../../../type"
+import type { IUserModel } from "@shared"
 
 export async function logoutHandler(
 	_req: Request,

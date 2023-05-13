@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import '@/assets/modules/Vault.css'
 import {
 	VaultContainer,
@@ -40,7 +40,7 @@ export function Vault() {
 	const vaultCountRef = useRef(0)
 	const authRef = useRef(true)
 	const [loading, setLoading] = useState(false)
-
+	const navigate = useNavigate()
 
 	const hydrateAndGetVault = useCallback(() => {
 		let decryptedVault = []
@@ -78,11 +78,11 @@ export function Vault() {
 			updateVaultStatus({ status: false, message: '' })
 			authenticate().then(({ success }) => {
 				setLoading(false)
-				if (!success) Navigate({ to: '/login', replace: true })
+				if (!success) navigate("/login", { replace: true })
 			})
 			authRef.current = false
 		}
-	}, [authenticate, hydrateAndGetVault, isLoggedIn, updateVaultStatus])
+	}, [authenticate, hydrateAndGetVault, isLoggedIn, navigate, updateVaultStatus])
 
 	// encrypt current Vault, store on session storage and finally, update database
 	const syncDatabaseUpdate = async (vault: TKeychain[]) => {
@@ -136,7 +136,7 @@ export function Vault() {
 			}
 		} catch (error) {
 			const err = CreateError(error)
-			if (err.code === 401 || err.code === 403) Navigate({ to: '/login', replace: true })
+			if (err.code === 401 || err.code === 403) navigate("/login", { replace: true })
 			return {
 				success: false,
 				message: err.message,

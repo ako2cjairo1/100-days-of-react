@@ -1,9 +1,9 @@
-import { ISession, IUpdateVault, TCredentials, TProvider } from '@shared'
+import { ISession, IUpdateVault, IUserModel, TCredentials, TProvider } from '@shared'
 import { AxiosInstance, VITE_PUBLIC_API_BASEURL } from '../Utils/axios'
 
 export async function registerUserService(
 	userInfo: TCredentials
-): Promise<Pick<ISession, 'accessToken' | 'encryptedVault' | 'salt'>> {
+): Promise<Pick<IUserModel, 'userId' | 'email' | 'version'>> {
 	return AxiosInstance.post('/user/registration', userInfo)
 		.then(res => res.data)
 		.catch(error => {
@@ -40,14 +40,6 @@ export async function getSessionService(): Promise<ISession> {
 }
 
 export async function ssoService(provider: TProvider) {
-	AxiosInstance.get(`/auth/sso?provider=${provider}`, {
-		baseURL: VITE_PUBLIC_API_BASEURL,
-	})
-		.then(res => {
-			// open sso login url
-			window.location.assign(res.data)
-		})
-		.catch(error => {
-			throw error
-		})
+	// open sso login url
+	window.open(`${VITE_PUBLIC_API_BASEURL}/auth/sso?provider=${provider}`, '_self')
 }

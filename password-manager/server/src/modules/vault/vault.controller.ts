@@ -1,8 +1,8 @@
-import { NextFunction, Request } from "express"
+import { NextFunction } from "express"
+import type { IReqExt, IResExt } from "../../type"
+import type { IUpdateVault, IUserModel } from "@shared"
 import { CreateError, Logger } from "../../utils"
 import { updateVaultByUserId } from "./vault.service"
-import { IReqExt, IResExt, IUserModel } from "../../type"
-import { IUpdateVault } from "@shared"
 
 export async function updateVaultHandler(
 	req: IReqExt<IUpdateVault>,

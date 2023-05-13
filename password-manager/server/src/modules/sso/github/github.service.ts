@@ -2,12 +2,8 @@ import axios from "axios"
 import { ParameterStore } from "../../../constant"
 import { CreateError, Logger } from "../../../utils"
 
-const {
-	GITHUB_CLIENT_ID,
-	GITHUB_REDIRECT_AUTH_URL,
-	GITHUB_SECRET,
-	GITHUB_USER_API,
-} = ParameterStore
+const { GITHUB_CLIENT_ID, GITHUB_SIGN_IN_URL, GITHUB_SECRET, GITHUB_USER_API } =
+	ParameterStore
 
 export async function getGithubUser(code: string) {
 	try {
@@ -22,7 +18,7 @@ export async function getGithubUser(code: string) {
 async function getAccessToken(code: string) {
 	try {
 		const { data } = await axios.post(
-			`${GITHUB_REDIRECT_AUTH_URL}/access_token`,
+			`${GITHUB_SIGN_IN_URL}/access_token`,
 			{
 				client_id: GITHUB_CLIENT_ID,
 				client_secret: GITHUB_SECRET,

@@ -1,7 +1,6 @@
-import type { IUserModel } from "../../type"
 import { UserModel } from "./user.model"
 import { generateSalt, isHashVerified } from "../../utils"
-import { TCredentials } from "@shared"
+import type { IUserModel, TCredentials } from "@shared"
 
 // create user
 export async function createUser(user: TCredentials) {

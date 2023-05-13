@@ -5,13 +5,14 @@ import { NextFunction, Request, Response } from "express"
 
 const {
 	GITHUB_CLIENT_ID,
+	GITHUB_SIGN_IN_URL,
 	GITHUB_REDIRECT_AUTH_URL,
-	GOOGLE_REDIRECT_AUTH_URL,
 	GOOGLE_CLIENT_ID,
 	GOOGLE_SIGN_IN_URL,
+	GOOGLE_REDIRECT_AUTH_URL,
 	FACEBOOK_CLIENT_ID,
-	FACEBOOK_REDIRECT_AUTH_URL,
 	FACEBOOK_SIGN_IN_URL,
+	FACEBOOK_REDIRECT_AUTH_URL,
 } = ParameterStore
 
 const googleOptions = {
@@ -33,9 +34,16 @@ const facebookOptions = {
 	display: "popup",
 	scope: ["public_profile", "email"].join(" "),
 }
+const githubOptions = {
+	client_id: GITHUB_CLIENT_ID,
+	redirect_uri: GITHUB_REDIRECT_AUTH_URL,
+	scope: ["user", "email"].join(" "),
+}
 
 const providerAuthURL = {
-	github: `${GITHUB_REDIRECT_AUTH_URL}/authorize?client_id=${GITHUB_CLIENT_ID}`,
+	github: `${GITHUB_SIGN_IN_URL}/authorize?${new URLSearchParams(
+		githubOptions
+	).toString()}`,
 	google: `${GOOGLE_SIGN_IN_URL}?${new URLSearchParams(
 		googleOptions
 	).toString()}`,
@@ -44,7 +52,7 @@ const providerAuthURL = {
 	).toString()}`,
 }
 
-export async function getSSOProviderURL(
+export async function ssoAuthenticate(
 	req: Request,
 	res: Response,
 	next: NextFunction
@@ -56,7 +64,7 @@ export async function getSSOProviderURL(
 			return res.status(400).json({ message: "provider name is missing" })
 		}
 
-		res.status(200).send(authURL)
+		return res.redirect(authURL)
 	} catch (err) {
 		Logger.error(err)
 		// parse unknown err

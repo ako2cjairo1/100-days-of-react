@@ -1,39 +1,18 @@
 import env from "dotenv"
 import { Response, NextFunction } from "express"
+import { CreateError, buildTokens, createCookies } from "../../../utils"
 import {
-	CreateError,
-	Logger,
-	buildTokens,
-	createCookies,
-	removeCookies,
-} from "../../../utils"
-import {
-	createUser,
-	deleteUserById,
+	createUserAndVault,
 	getUserByEmail,
 	loginUserById,
+	rollbackRegistrationActions,
 } from "../../user"
+import { getVaultByUserId } from "../../vault"
 import type { IReqExt } from "../../../type"
-import { TGithubCredentials } from "../../../../../shared/types.shared"
-import { createVault, deleteVaultByUserId, getVaultByUserId } from "../../vault"
+import type { TGithubCredentials } from "@shared"
 import { ParameterStore } from "../../../constant"
 import { getGithubUser } from "./github.service"
 env.config()
-
-async function rollbackGithubPassportActions(res: Response, userId?: string) {
-	try {
-		removeCookies(res)
-		if (userId) {
-			/* DB transactions to delete User and their Vault */
-			await deleteUserById(userId)
-			await deleteVaultByUserId(userId)
-		}
-	} catch (err) {
-		const error = CreateError(err)
-		error.name = "Rollback Github Passport Error"
-		Logger.warn(error)
-	}
-}
 
 export async function githubPassport(
 	req: IReqExt<TGithubCredentials>,
@@ -60,27 +39,25 @@ export async function githubPassport(
 				userId = existingUser._id.toString()
 				email = existingUser.email
 				version = existingUser.version || ""
+
+				// get Vault of User from db
+				const vault = await getVaultByUserId(userId)
+				if (!vault) {
+					return res
+						.status(405) // method not allowed
+						.json({ message: "We can't find your Vault" })
+				}
 			} else {
 				/** register github user and generate user._id */
-				const newUser = await createUser({
+				const { user: newUser } = await createUserAndVault({
 					email: githubEmail,
 					// format of password for OAuth Users (id + email)
 					password: `${verifiedGithubUser.id}:${githubEmail}`,
 				})
 
-				userId = newUser._id.toString()
+				userId = newUser.userId
 				email = newUser.email
 				version = newUser.version || ""
-
-				await createVault({ userId })
-			}
-
-			// get Vault of User from db
-			const vault = await getVaultByUserId(userId)
-			if (!vault) {
-				return res
-					.status(405) // method not allowed
-					.json({ message: "We can't find your Vault" })
 			}
 
 			// generate pair of tokens using authenticated Github User(_Id, email, version, etc.)
@@ -97,10 +74,10 @@ export async function githubPassport(
 			return res.redirect(ParameterStore.AUTH_CLIENT_REDIRECT_URL)
 		}
 
-		return next()
+		return res.status(401).json({ message: "Not Verified" })
 	} catch (err) {
 		// something went wrong, rollback registration
-		rollbackGithubPassportActions(res, userId)
+		rollbackRegistrationActions(res, userId)
 		// parse unknown err
 		let error = CreateError(err)
 		// default error message
