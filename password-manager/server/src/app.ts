@@ -21,7 +21,7 @@ export default express()
 	/**
 	 * -------------- CUSTOM MIDDLEWARE ----------------
 	 */
-	// middleware: cors, helmet, and rate limiter
+	// middleware: cors, helmet, and default rate limiter
 	.use(securities)
 	// custom server activity logger (info, warn, error)
 	.use(activityLogger)
@@ -34,7 +34,7 @@ export default express()
 	// endpoints: /heartbeat, /user and /vault
 	.use("/api/v1", apiRoute)
 	// Root router when you visit (http://localhost:3000/auth)
-	// endpoints: /sso, passports: /google, /github and /facebook
+	// endpoints: /sso, /callback:(google,github and facebook)
 	.use("/auth", authRoute)
 
 	// Middleware Error Handler: needs to be the last to handle api errors

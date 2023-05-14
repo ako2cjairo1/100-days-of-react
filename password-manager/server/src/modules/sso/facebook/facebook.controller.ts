@@ -21,6 +21,10 @@ export async function facebookPassport(
 	let version = ""
 
 	try {
+		// something went wrong? do not continue and proceed to error handler
+		if (req.query.error) {
+			return next(req.query.error)
+		}
 		// expected "code" from Facebook OAuth as callback url
 		const code = req.query.code || res.locals.code || ""
 		const verifiedFacebookUser = await getFacebookUser(code)
@@ -71,7 +75,7 @@ export async function facebookPassport(
 			return res.redirect(ParameterStore.AUTH_CLIENT_REDIRECT_URL)
 		}
 
-		return next()
+		return res.status(401).json({ message: "Not Verified" })
 	} catch (err) {
 		// something went wrong, rollback registration
 		rollbackRegistrationActions(res, userId)

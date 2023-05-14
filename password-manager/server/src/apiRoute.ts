@@ -1,6 +1,6 @@
 import express from "express"
 import { userRouter, vaultRoute } from "./modules"
-import { UserEndpointLimiter, authenticate } from "./middleware"
+import { authenticate } from "./middleware"
 
 export const apiRoute = express
 	.Router()
@@ -8,6 +8,6 @@ export const apiRoute = express
 		res.status(200).json({ message: "I'm alive" })
 	)
 	// User base uri
-	.use("/user", UserEndpointLimiter, userRouter)
+	.use("/user", userRouter)
 	// Vault base uri
 	.use("/vault", authenticate, vaultRoute)

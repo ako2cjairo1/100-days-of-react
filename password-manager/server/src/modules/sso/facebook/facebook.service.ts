@@ -28,7 +28,6 @@ async function getAccessToken(code: string) {
 				client_id: FACEBOOK_CLIENT_ID,
 				client_secret: FACEBOOK_SECRET,
 				redirect_uri: FACEBOOK_REDIRECT_AUTH_URL,
-				// grant_type: "client_credentials",
 			},
 			{
 				headers: { Accept: "application/json" },

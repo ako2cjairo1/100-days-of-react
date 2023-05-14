@@ -133,7 +133,7 @@ export function Login() {
 		}
 	}
 
-	const changeEmailInput = () => {
+	const backToEmailInput = () => {
 		// clear password (if any)
 		resetInput('password')
 		// go back and change inputted email
@@ -296,7 +296,7 @@ export function Login() {
 							<LinkLabel
 								routeTo="/login"
 								preText={`Logging in as ${email}`}
-								onClick={changeEmailInput}
+								onClick={backToEmailInput}
 							>
 								Not you?
 							</LinkLabel>
@@ -320,6 +320,7 @@ export function Login() {
 												success: false,
 												message: `${provider} didn't respond, please try again`,
 											})
+											window.location.reload()
 										}
 									}, 5)
 

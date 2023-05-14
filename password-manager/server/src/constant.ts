@@ -1,5 +1,6 @@
 import env from "dotenv"
 import { CookieOptions } from "express"
+import { Options } from "express-rate-limit"
 env.config()
 
 const isProd = process.env.NODE_ENV === "production"
@@ -97,7 +98,7 @@ export const DefaultCookieOptions: CookieOptions = {
 	maxAge: 5 * 60 * 1000, // 5min default cookie expiration
 }
 
-export const RateLimitConfig = {
+export const BaseRateLimitConfig: Partial<Options> = {
 	windowMs: 5 * 60 * 1000, // 5 minutes
 	max: 100, // Limit each IP to 100 requests per `window` (per 5 minutes)
 	message:
@@ -106,8 +107,10 @@ export const RateLimitConfig = {
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 }
 
-export const UserLimitConfig = {
-	...RateLimitConfig,
-	max: 100, // Limit each IP to 100 requests per `window`
+export const LoginLimitConfig: Partial<Options> = {
+	...BaseRateLimitConfig,
+
+	max: 10, // Limit each IP to 100 requests per `window`
+	skipSuccessfulRequests: true,
 	message: "Too many login attempts, please try again after sometime.",
 }

@@ -347,6 +347,7 @@ export function Registration() {
 												success: false,
 												message: `${provider} didn't respond, please try again`,
 											})
+											window.location.reload()
 										}
 									}, 5)
 

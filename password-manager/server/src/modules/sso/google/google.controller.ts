@@ -21,6 +21,10 @@ export async function googlePassport(
 	let version = ""
 
 	try {
+		// something went wrong? do not continue and proceed to error handler
+		if (req.query.error) {
+			return next(req.query.error)
+		}
 		// expected "code" from Google OAuth as callback url
 		const code = req.query.code || res.locals.code || ""
 		const verifiedGoogleUser = await getGoogleUser(code)

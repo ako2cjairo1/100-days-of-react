@@ -24,6 +24,10 @@ export async function githubPassport(
 	let version = ""
 
 	try {
+		// something went wrong? do not continue and proceed to error handler
+		if (req.query.error) {
+			return next(req.query.error)
+		}
 		// expected "code" from Github OAuth as callback url
 		const code = req.query.code || res.locals.code || ""
 		const verifiedGithubUser = await getGithubUser(code)

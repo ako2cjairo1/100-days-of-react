@@ -1,7 +1,11 @@
 import cors from "cors"
 import Helmet from "helmet"
 import limiter from "express-rate-limit"
-import { UserLimitConfig, ParameterStore, RateLimitConfig } from "../constant"
+import {
+	LoginLimitConfig,
+	ParameterStore,
+	BaseRateLimitConfig,
+} from "../constant"
 
 const allowedOrigins = ParameterStore.CLIENT_URL.split(",")
 
@@ -24,7 +28,7 @@ const Cors = cors({
 })
 
 // custom rate limiter for login
-export const UserEndpointLimiter = limiter(UserLimitConfig)
+export const LoginLimiter = limiter(LoginLimitConfig)
 
 // add more security plugins here
-export const securities = [Cors, Helmet(), limiter(RateLimitConfig)]
+export const securities = [Cors, Helmet(), limiter(BaseRateLimitConfig)]

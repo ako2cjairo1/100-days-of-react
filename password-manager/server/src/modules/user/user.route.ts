@@ -1,5 +1,5 @@
 import express from "express"
-import { authenticate } from "../../middleware"
+import { LoginLimiter, authenticate } from "../../middleware"
 import {
 	loginHandler,
 	logoutHandler,
@@ -10,6 +10,6 @@ import {
 export const userRouter = express
 	.Router()
 	.post("/registration", registerHandler)
-	.post("/login", loginHandler)
+	.post("/login", LoginLimiter, loginHandler)
 	.post("/logout", authenticate, logoutHandler)
 	.post("/session", authenticate, sessionHandler)
