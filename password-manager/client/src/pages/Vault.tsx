@@ -78,7 +78,7 @@ export function Vault() {
 			updateVaultStatus({ status: false, message: '' })
 			authenticate().then(({ success }) => {
 				setLoading(false)
-				if (!success) navigate("/login", { replace: true })
+				if (!success) navigate('/login', { replace: true })
 			})
 			authRef.current = false
 		}
@@ -136,7 +136,7 @@ export function Vault() {
 			}
 		} catch (error) {
 			const err = CreateError(error)
-			if (err.code === 401 || err.code === 403) navigate("/login", { replace: true })
+			if (err.code === 401 || err.code === 403) navigate('/login', { replace: true })
 			return {
 				success: false,
 				message: err.message,

@@ -22,7 +22,6 @@
 	height: 15px;
 	position: relative;
 	margin-right: initial;
-	overflow: visible;
 	transition: var(--transition);
 }
 

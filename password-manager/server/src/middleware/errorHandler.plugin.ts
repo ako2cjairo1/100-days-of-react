@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import { CreateError, Logger } from "../utils"
+import { ParameterStore } from "../constant"
 
 export function errorHandler(
 	err: unknown,
@@ -25,10 +26,14 @@ export function errorHandler(
 	if (status >= 500) Logger.error(message, error)
 
 	// set the status and send the error object as response
-	res.status(status).json({
-		status,
-		message,
-	})
+	return res.redirect(
+		`${ParameterStore.AUTH_CLIENT_REDIRECT_URL}/error?${new URLSearchParams(
+			{
+				status: status.toString(),
+				error: message,
+			}
+		).toString()}`
+	)
 }
 
 export function invalidRouteHandler(

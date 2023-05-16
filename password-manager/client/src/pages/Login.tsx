@@ -3,11 +3,7 @@ import '@/assets/modules/Login.css'
 import type { TInputLogin, TStatus } from '@/types'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
-import {
-	ExtractValFromRegEx,
-	LocalStorage,
-	RunAfterSomeTime,
-} from '@/services/Utils/password-manager.helper'
+import { ExtractValFromRegEx, LocalStorage, RunAfterSomeTime } from '@/services/Utils'
 import {
 	LinkLabel,
 	Separator,
@@ -118,7 +114,7 @@ export function Login() {
 		if (!isSubmitted) {
 			// indicate start progress status of submit button
 			isSubmit(true)
-			// authenticate credential via auth server
+			// authenticate email and password credential via auth server
 			authenticate({ email, password }).then(({ success, message }) => {
 				if (success) {
 					// clear input form states and status
@@ -129,7 +125,6 @@ export function Login() {
 				// end progress status of submit button
 				isSubmit(false)
 			})
-
 		}
 	}
 
@@ -304,7 +299,7 @@ export function Login() {
 
 						<div>
 							<Separator>OR</Separator>
-							<p className="center small">Continue with...</p>
+							<p className="center small">you can sign in with...</p>
 						</div>
 
 						<footer>

@@ -1,7 +1,7 @@
 import express from "express"
 import {
 	facebookPassport,
-	ssoAuthenticate,
+	ssoAuthorization,
 	githubPassport,
 	googlePassport,
 } from "./modules/sso"
@@ -9,7 +9,7 @@ import {
 export const authRoute = express
 	.Router()
 	// sso sign-in gateway for all providers
-	.get("/sso", ssoAuthenticate)
+	.get("/sso", ssoAuthorization)
 	// callback routes, should be registered to sso provider(s)
 	.get("/callback/github", githubPassport)
 	.get("/callback/google", googlePassport)

@@ -94,7 +94,6 @@
 	position: relative;
 	padding: 5px;
 	border-radius: 30%;
-	overflow: visible;
 	transition: var(--transition);
 }
 

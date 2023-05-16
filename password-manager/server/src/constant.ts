@@ -114,3 +114,29 @@ export const LoginLimitConfig: Partial<Options> = {
 	skipSuccessfulRequests: true,
 	message: "Too many login attempts, please try again after sometime.",
 }
+
+/** SSO configurations */
+export const GoogleOptions = {
+	client_id: GOOGLE_CLIENT_ID,
+	redirect_uri: GOOGLE_REDIRECT_AUTH_URL,
+	access_type: "offline",
+	response_type: "code",
+	prompt: "consent",
+	scope: [
+		"https://www.googleapis.com/auth/userinfo.profile",
+		"https://www.googleapis.com/auth/userinfo.email",
+	].join(" "),
+}
+export const FacebookOptions = {
+	client_id: FACEBOOK_CLIENT_ID,
+	redirect_uri: FACEBOOK_REDIRECT_AUTH_URL,
+	auth_type: "rerequest",
+	response_type: "code",
+	display: "popup",
+	scope: ["public_profile", "email"].join(" "),
+}
+export const GithubOptions = {
+	client_id: GITHUB_CLIENT_ID,
+	redirect_uri: GITHUB_REDIRECT_AUTH_URL,
+	scope: ["user", "email"].join(" "),
+}

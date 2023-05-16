@@ -51,7 +51,6 @@ describe('Keychain components', () => {
 			        <img
 			          alt="L"
 			          class="header"
-			          loading="lazy"
 			          src="logo1"
 			        />
 			      </a>
@@ -95,7 +94,6 @@ describe('Keychain components', () => {
 			        <img
 			          alt="L"
 			          class="header"
-			          loading="lazy"
 			          src="logo2"
 			        />
 			      </a>

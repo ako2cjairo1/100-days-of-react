@@ -15,7 +15,7 @@ export function activityLogger(
 		const { statusCode, statusMessage } = res
 		const elapsedTime = new Date().getTime() - startTime
 		Logger.info(
-			`==> [${statusCode}|${statusMessage}] (took ${elapsedTime}ms) ${protectedUrl}`
+			`--> [${statusCode}|${statusMessage}] (took ${elapsedTime}ms) ${protectedUrl}`
 		)
 	})
 	next()

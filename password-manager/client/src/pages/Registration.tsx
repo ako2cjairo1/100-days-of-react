@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
 import type { TStatus, TInputRegistration } from '@/types'
-import { REGISTER_STATE } from '@/services/constants/Registration.constant'
+import { REGISTER_STATE } from '@/services/constants'
 import {
 	RunAfterSomeTime,
 	ExtractValFromRegEx,
@@ -204,10 +204,10 @@ export function Registration() {
 										isFocus.email
 											? ''
 											: checkIf.isValidEmail
-												? 'valid'
-												: email.length > 0
-													? 'invalid'
-													: ''
+											? 'valid'
+											: email.length > 0
+											? 'invalid'
+											: ''
 									}
 								/>
 								<ValidationMessage
@@ -241,10 +241,10 @@ export function Registration() {
 										isFocus.password
 											? ''
 											: checkIf.isValidPassword
-												? 'valid'
-												: password.length > 0
-													? 'invalid'
-													: ''
+											? 'valid'
+											: password.length > 0
+											? 'invalid'
+											: ''
 									}
 								/>
 								<ValidationMessage
@@ -275,10 +275,10 @@ export function Registration() {
 										isFocus.confirm
 											? ''
 											: checkIf.validConfirmation
-												? 'valid'
-												: password.length > 0
-													? 'invalid'
-													: ''
+											? 'valid'
+											: password.length > 0
+											? 'invalid'
+											: ''
 									}
 								/>
 
@@ -331,7 +331,7 @@ export function Registration() {
 
 						<div>
 							<Separator>OR</Separator>
-							<p className="center small">Continue with...</p>
+							<p className="center small">you can sign in with...</p>
 						</div>
 
 						<footer>

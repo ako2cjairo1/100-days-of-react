@@ -1,5 +1,5 @@
 import { ChangeEvent, FocusEvent, useCallback, useEffect, useState } from 'react'
-import { ConvertPropsToBool, Log } from '@/services/Utils/password-manager.helper'
+import { ConvertPropsToBool } from '@/services/Utils'
 import { useStateObj } from '@/hooks'
 
 /**
@@ -68,7 +68,7 @@ export function useInput<TInput>(initState: TInput) {
 			isSubmitted,
 			onChange,
 			onBlur: (event: TInputEvent) => mutateIsFocus({ [event.target.id]: false }),
-			onFocus: (event: TInputEvent) => Log(`"${event.target.id}" focused`),
+			onFocus: () => null, //Log(`"${event.target.id}" focused`),
 		},
 	}
 }

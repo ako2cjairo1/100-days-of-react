@@ -16,7 +16,6 @@ export function Logo({ logo, website }: Pick<IKeychainCard, 'logo' | 'website'>)
 			<img
 				className="header"
 				src={logo}
-				loading="lazy"
 				alt={domainLogo}
 			/>
 		)

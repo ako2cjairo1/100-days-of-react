@@ -1,8 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
 import { Login, Registration, Vault } from '@/pages'
-import { RotatingBackdrop } from './components'
+import { ErrorHandler, RotatingBackdrop } from './components'
 
-const App = () => {
+function App() {
 	return (
 		<main className="App">
 			<RotatingBackdrop />
@@ -22,6 +22,10 @@ const App = () => {
 				<Route
 					path="/vault"
 					element={<Vault />}
+				/>
+				<Route
+					path="/error"
+					element={<ErrorHandler />}
 				/>
 			</Routes>
 		</main>
