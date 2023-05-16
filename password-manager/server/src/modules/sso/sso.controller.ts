@@ -1,12 +1,12 @@
+import { NextFunction, Request, Response } from "express"
 import type { TProvider } from "@shared"
+import { CreateError, Logger } from "../../utils"
 import {
 	FacebookOptions,
 	GithubOptions,
 	GoogleOptions,
 	ParameterStore,
 } from "../../constant"
-import { CreateError, Logger } from "../../utils"
-import { NextFunction, Request, Response } from "express"
 
 const { GITHUB_SIGN_IN_URL, GOOGLE_SIGN_IN_URL, FACEBOOK_SIGN_IN_URL } =
 	ParameterStore
@@ -23,7 +23,7 @@ const providerAuthURL = {
 	).toString()}`,
 }
 
-export async function ssoAuthorization(
+export async function ssoAuthorizationHandler(
 	req: Request,
 	res: Response,
 	next: NextFunction

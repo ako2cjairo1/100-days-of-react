@@ -1,6 +1,6 @@
 import express from "express"
 import cookieParser from "cookie-parser"
-import { apiRoute } from "./apiRoute"
+import { apiRoute, ssoRoute } from "./modules"
 import {
 	securities,
 	activityLogger,
@@ -8,7 +8,6 @@ import {
 	errorHandler,
 	invalidRouteHandler,
 } from "./middleware"
-import { authRoute } from "./authRoute"
 
 export default express()
 	/**
@@ -35,7 +34,7 @@ export default express()
 	.use("/api/v1", apiRoute)
 	// Root router when you visit (http://localhost:3000/auth)
 	// endpoints: /sso, /callback:(google,github and facebook)
-	.use("/auth", authRoute)
+	.use("/auth", ssoRoute)
 
 	// Middleware Error Handler: needs to be the last to handle api errors
 	.use(errorHandler, invalidRouteHandler)

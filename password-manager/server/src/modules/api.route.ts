@@ -1,6 +1,6 @@
 import express from "express"
-import { userRouter, vaultRoute } from "./modules"
-import { authenticate } from "./middleware"
+import { userRouter, vaultRoute } from "../modules"
+import { authenticate } from "../middleware"
 
 export const apiRoute = express
 	.Router()
