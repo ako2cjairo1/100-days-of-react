@@ -31,6 +31,7 @@ export function ErrorHandler(error: unknown) {
 					<AnimatedIcon
 						iconName="fa fa-face-rolling-eyes"
 						animation="fa-shake"
+						animateOnLoad
 					/>
 				</Header.Logo>
 				<Header.Title

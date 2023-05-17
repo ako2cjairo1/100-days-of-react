@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import type { IReqExt } from "../../../type"
-import { CreateError, buildTokens, createCookies } from "../../../utils"
+import { CreateError, Logger, buildTokens, createCookies } from "../../../utils"
 import { ParameterStore } from "../../../constant"
 import {
 	getUserByEmail,
@@ -9,7 +9,7 @@ import {
 	rollbackRegistrationActions,
 } from "../../user"
 import { getVaultByUserId } from "../../vault"
-import { getGoogleUser } from "./google.service"
+import { getAccessToken, getUser } from "../../sso"
 
 export async function googlePassport(
 	req: IReqExt<Request>,
@@ -22,8 +22,8 @@ export async function googlePassport(
 
 	try {
 		// something went wrong? do not continue and proceed to error handler
-		if (req.query.error) {
-			return next(req.query.error)
+		if (req.query["error"]) {
+			return next(new Error(req.query["error"].toString()))
 		}
 		// expected "code" from Google OAuth as callback url
 		const code = req.query.code || res.locals.code || ""
@@ -75,7 +75,7 @@ export async function googlePassport(
 			return res.redirect(ParameterStore.AUTH_CLIENT_REDIRECT_URL)
 		}
 
-		return res.status(401).json({ message: "Not Verified" })
+		return next(new Error("Not Authorized"))
 	} catch (err) {
 		// something went wrong, rollback registration
 		rollbackRegistrationActions(res, userId)
@@ -86,5 +86,15 @@ export async function googlePassport(
 		error.status = 400
 		// send formatted error to error handler plugin
 		next(error)
+	}
+}
+
+async function getGoogleUser(code: string) {
+	try {
+		const { id_token, access_token } = await getAccessToken(code)
+		return getUser(id_token, access_token)
+	} catch (error) {
+		Logger.warn("getGoogleUser Error")
+		Logger.error(CreateError(error).message)
 	}
 }

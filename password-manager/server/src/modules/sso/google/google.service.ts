@@ -1,6 +1,6 @@
+import axios from "axios"
 import { CreateError, Logger } from "../../../utils"
 import { ParameterStore } from "../../../constant"
-import axios from "axios"
 
 const {
 	GOOGLE_CLIENT_ID,
@@ -10,16 +10,7 @@ const {
 	GOOGLE_USER_API,
 } = ParameterStore
 
-export async function getGoogleUser(code: string) {
-	try {
-		const { id_token, access_token } = await getAccessToken(code)
-		return getUser(id_token, access_token)
-	} catch (error) {
-		Logger.warn("getGoogleUser Error")
-		Logger.error(CreateError(error).message)
-	}
-}
-async function getAccessToken(code: string) {
+export async function getAccessToken(code: string) {
 	try {
 		const { data } = await axios.post(
 			GOOGLE_ACCESS_TOKEN_URL,
@@ -40,7 +31,8 @@ async function getAccessToken(code: string) {
 		Logger.warn(CreateError(error).message)
 	}
 }
-async function getUser(id_token: string, access_token: string) {
+
+export async function getUser(id_token: string, access_token: string) {
 	try {
 		const googleUser = await axios.get(
 			`${GOOGLE_USER_API}?alt=json&access_token=${access_token}`,

@@ -37,9 +37,26 @@ export function errorHandler(
 }
 
 export function invalidRouteHandler(
-	_request: Request,
-	response: Response,
+	req: Request,
+	res: Response,
 	_next: NextFunction
 ) {
-	response.status(404).json({ message: "Requested resource not found." })
+	// log for admin audit
+	if (req.query["error"]) {
+		Logger.error({
+			error: req.query["error"],
+			description: req.query["error_description"],
+			uri: req.query["error_uri"],
+		})
+	}
+
+	// set the status and send the error object as response
+	return res.redirect(
+		`${ParameterStore.AUTH_CLIENT_REDIRECT_URL}/error?${new URLSearchParams(
+			{
+				status: "404",
+				error: "Requested resource not found.",
+			}
+		).toString()}`
+	)
 }
