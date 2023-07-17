@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express"
 import type { TProvider } from "@shared"
-import { CreateError, Logger } from "../../utils"
 import {
+	CreateError,
+	Logger,
 	FacebookOptions,
 	GithubOptions,
 	GoogleOptions,
 	ParameterStore,
-} from "../../constant"
+} from "../../utils"
 
 const { GITHUB_SIGN_IN_URL, GOOGLE_SIGN_IN_URL, FACEBOOK_SIGN_IN_URL } =
 	ParameterStore

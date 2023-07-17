@@ -1,6 +1,5 @@
 import axios from "axios"
-import { CreateError, Logger } from "../../../utils"
-import { ParameterStore } from "../../../constant"
+import { CreateError, Logger, ParameterStore } from "../../../utils"
 
 const {
 	GOOGLE_CLIENT_ID,

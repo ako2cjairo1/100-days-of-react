@@ -1,6 +1,5 @@
 import axios from "axios"
-import { ParameterStore } from "../../../constant"
-import { CreateError, Logger } from "../../../utils"
+import { CreateError, Logger, ParameterStore } from "../../../utils"
 
 const { GITHUB_CLIENT_ID, GITHUB_SIGN_IN_URL, GITHUB_SECRET, GITHUB_USER_API } =
 	ParameterStore

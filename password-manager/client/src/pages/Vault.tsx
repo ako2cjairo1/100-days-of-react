@@ -135,11 +135,11 @@ export function Vault() {
 				message: 'Success',
 			}
 		} catch (error) {
-			const err = CreateError(error)
-			if (err.code === 401 || err.code === 403) navigate('/login', { replace: true })
+			const { code, message } = CreateError(error)
+			if (code === 401 || code === 403) navigate({ pathname: '/error', search: `error=${message}` })
 			return {
 				success: false,
-				message: err.message,
+				message: message,
 			}
 		}
 	}

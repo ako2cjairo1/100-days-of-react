@@ -8,18 +8,15 @@ import {
 	ParameterStore,
 	TokenMaxAge,
 	TokenType,
-} from "../constant"
+	CreateError,
+	Logger,
+} from "../utils"
 import type {
 	TSignOptions,
 	TToken,
 	TTokenPayload,
 	TVerifiedToken,
 } from "../type"
-import { CreateError, Logger } from "../utils"
-
-const { AccessToken, RefreshToken } = Cookies
-const { Access, Refresh } = TokenMaxAge
-const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = ParameterStore
 
 export function generateSalt(size: number = 64) {
 	return crypto.randomBytes(size).toString("hex")
@@ -40,13 +37,13 @@ export function parseToken(req: Request): TToken {
 	// parse cookies for cookies
 	if (cookies) {
 		parsedTokens = {
-			accessToken: cookies[AccessToken],
-			refreshToken: cookies[RefreshToken],
+			accessToken: cookies[Cookies.AccessToken],
+			refreshToken: cookies[Cookies.RefreshToken],
 		}
 	}
 
 	// parse queryString
-	const queryString = query[AccessToken]?.toString()
+	const queryString = query[Cookies.AccessToken]?.toString()
 	if (queryString) {
 		// override accessToken from cookies if client used queryString
 		parsedTokens = {
@@ -89,8 +86,8 @@ export function verifyToken(
 	try {
 		const secret =
 			type === TokenType.Access
-				? ACCESS_TOKEN_SECRET
-				: REFRESH_TOKEN_SECRET
+				? ParameterStore.ACCESS_TOKEN_SECRET
+				: ParameterStore.REFRESH_TOKEN_SECRET
 		const token = jwt.verify(payload, secret) as TVerifiedToken
 		// send the verified accessToken if there are no errors
 		return {
@@ -114,16 +111,16 @@ export function buildTokens({ userId, email, version }: TTokenPayload) {
 		accessToken: signToken(
 			{ userId, email },
 			{
-				expiresIn: Access,
-				secretOrPrivateKey: ACCESS_TOKEN_SECRET,
+				expiresIn: TokenMaxAge.Access,
+				secretOrPrivateKey: ParameterStore.ACCESS_TOKEN_SECRET,
 			}
 		),
 		refreshToken: version
 			? signToken(
 					{ userId, email, version },
 					{
-						expiresIn: Refresh,
-						secretOrPrivateKey: REFRESH_TOKEN_SECRET,
+						expiresIn: TokenMaxAge.Refresh,
+						secretOrPrivateKey: ParameterStore.REFRESH_TOKEN_SECRET,
 					}
 			  )
 			: "",
@@ -135,14 +132,14 @@ export function createCookies(
 	{ accessToken, refreshToken }: TToken
 ) {
 	try {
-		res.cookie(AccessToken, accessToken, {
+		res.cookie(Cookies.AccessToken, accessToken, {
 			...DefaultCookieOptions,
-			maxAge: Access * 1000,
+			maxAge: TokenMaxAge.Access * 1000,
 		})
 		if (refreshToken)
-			res.cookie(RefreshToken, refreshToken, {
+			res.cookie(Cookies.RefreshToken, refreshToken, {
 				...DefaultCookieOptions,
-				maxAge: Refresh * 1000,
+				maxAge: TokenMaxAge.Refresh * 1000,
 			})
 	} catch (error) {
 		let err = CreateError(error)
@@ -153,8 +150,14 @@ export function createCookies(
 
 export function removeCookies(res: Response) {
 	try {
-		res.clearCookie(AccessToken, { ...DefaultCookieOptions, maxAge: 0 })
-		res.clearCookie(RefreshToken, { ...DefaultCookieOptions, maxAge: 0 })
+		res.clearCookie(Cookies.AccessToken, {
+			...DefaultCookieOptions,
+			maxAge: 0,
+		})
+		res.clearCookie(Cookies.RefreshToken, {
+			...DefaultCookieOptions,
+			maxAge: 0,
+		})
 	} catch (error) {
 		let err = CreateError(error)
 		err.name = "Remove Cookies Error"

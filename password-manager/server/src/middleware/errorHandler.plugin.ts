@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express"
-import { CreateError, Logger } from "../utils"
-import { ParameterStore } from "../constant"
+import { CreateError, Logger, ParameterStore } from "../utils"
 
 export function errorHandler(
 	err: unknown,

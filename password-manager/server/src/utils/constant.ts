@@ -82,12 +82,12 @@ export const Cookies = {
 	AccessToken: "PM_AT",
 	RefreshToken: "PM_RT",
 	User: "user",
-} as const
+}
 
 export const TokenMaxAge = {
 	Access: 60, // 1 min
 	Refresh: 5 * 60, // 5 mins
-} as const
+}
 
 export const DefaultCookieOptions: CookieOptions = {
 	domain: COOKIE_DOMAIN,

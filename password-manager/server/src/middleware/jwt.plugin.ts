@@ -1,5 +1,5 @@
 import { expressjwt as jwt } from "express-jwt"
-import { ParameterStore } from "../constant"
+import { ParameterStore } from "../utils"
 
 export const jwtPlugin = jwt({
 	algorithms: ["HS512"],

@@ -9,8 +9,6 @@ export const AuthContext = createContext<TAuthContext<TAuthProvider> | null>(nul
 
 /**
  * AuthProvider component provides authentication context to its children components.
- * @param {ReactNode} children - The child components that will have access to the authentication context.
- * @returns {JSX.Element} The AuthContext provider with the given children components.
  */
 export function AuthProvider({ children }: IChildren) {
 	const [authInfo, setAuth] = useState<TAuthProvider>(AUTH_CONTEXT.authInfo)

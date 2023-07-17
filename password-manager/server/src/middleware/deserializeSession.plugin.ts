@@ -7,8 +7,8 @@ import {
 	createCookies,
 	verifyToken,
 	Logger,
+	TokenType,
 } from "../utils"
-import { TokenType } from "../constant"
 import { fetchUserById } from "../modules/user/controllers"
 import { IResExt, TVerifiedToken } from "../type"
 

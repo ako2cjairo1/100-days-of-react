@@ -1,11 +1,7 @@
 import cors from "cors"
 import Helmet from "helmet"
 import limiter from "express-rate-limit"
-import {
-	LoginLimitConfig,
-	ParameterStore,
-	BaseRateLimitConfig,
-} from "../constant"
+import { LoginLimitConfig, ParameterStore, BaseRateLimitConfig } from "../utils"
 
 const allowedOrigins = ParameterStore.CLIENT_URL.split(",")
 

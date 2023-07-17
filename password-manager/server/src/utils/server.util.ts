@@ -2,7 +2,7 @@ import http from "http"
 import { Express } from "express"
 import { Logger } from "."
 import { disconnectFromMongoDB } from "../database"
-import { ParameterStore } from "../constant"
+import { ParameterStore } from "../utils"
 
 export function PMServer(app: Express) {
 	const server = http.createServer(app)
