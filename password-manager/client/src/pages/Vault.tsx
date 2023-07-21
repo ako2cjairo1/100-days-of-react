@@ -145,6 +145,13 @@ export function Vault() {
 	}
 
 	const openKeychain = (keychainId?: string, action?: TRequestType) => {
+		if (!isLoggedIn) {
+			navigate('/login', { replace: true })
+		} else {
+			authenticate().then(({ success }) =>
+				!success ? navigate('/login', { replace: true }) : null
+			)
+		}
 		const info = vault.find(info => info.keychainId === keychainId)
 		// throw an error message if keychainId is not found
 		if (!info) {

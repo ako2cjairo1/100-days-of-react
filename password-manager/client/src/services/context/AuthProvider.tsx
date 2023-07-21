@@ -56,6 +56,8 @@ export function AuthProvider({ children }: IChildren) {
 					return status
 				}
 			} catch (error) {
+				// reset auth context
+				mutateAuth(AUTH_CONTEXT.authInfo)
 				return {
 					success: false,
 					message: CreateError(error).message,
@@ -63,6 +65,8 @@ export function AuthProvider({ children }: IChildren) {
 			}
 
 			// else, Unauthorize
+			// reset auth context
+			mutateAuth(AUTH_CONTEXT.authInfo)
 			return status
 		},
 		[createUserSession]

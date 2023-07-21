@@ -1,7 +1,8 @@
 import '@/assets/modules/PasswordStrength.css'
 import type { TEvaluatedPassword } from '@/types'
-import { PasswordStatus } from '@/services/constants'
+import { PasswordStatus, REGISTER_STATE } from '@/services/constants'
 import { useEffect, useState } from 'react'
+import { MergeRegExObj } from '@/services/Utils'
 
 const { weak, mediocre, secure, strong, unbreakable, none } = PasswordStatus
 /**
@@ -17,7 +18,7 @@ const { weak, mediocre, secure, strong, unbreakable, none } = PasswordStatus
 export function evaluatePassword({ password, regex }: IPasswordStrength): TEvaluatedPassword {
 	if (!password) return { status: weak, score: 0 }
 	if (!regex) {
-		regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/
+		regex = MergeRegExObj(REGISTER_STATE.PASSWORD_REGEX)
 	}
 
 	const length = password.length
@@ -36,12 +37,12 @@ export function evaluatePassword({ password, regex }: IPasswordStrength): TEvalu
 			score === 1
 				? weak
 				: score === 2
-				? mediocre
-				: score === 3
-				? secure
-				: score === 4
-				? strong
-				: unbreakable,
+					? mediocre
+					: score === 3
+						? secure
+						: score === 4
+							? strong
+							: unbreakable,
 	}
 }
 
@@ -71,9 +72,8 @@ export function PasswordStrength({ password, regex }: Partial<IPasswordStrength>
 		<div className="password-strength">
 			{password && (
 				<p
-					className={`x-small smooth ${
-						password ? `show ${toggleAnimation ? 'scale-up' : 'scale-down'}` : 'hidden'
-					}`}
+					className={`x-small smooth ${password ? `show ${toggleAnimation ? 'scale-up' : 'scale-down'}` : 'hidden'
+						}`}
 				>
 					{status}
 				</p>
