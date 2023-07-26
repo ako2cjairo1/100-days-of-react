@@ -9,12 +9,12 @@ import { useEffect, useState } from 'react'
  * returns {boolean} Returns a boolean value that indicates whether the toggle has been fulfilled or not.
  */
 
-export function useDebounceToggle(toggle: boolean, delay?: number) {
+export function useDebounceToggle(toggle: boolean, delay = 3) {
 	const [toggleValue, setToggleValue] = useState(toggle)
 
 	useEffect(() => {
 		// flip the toggle
-		RunAfterSomeTime(() => setToggleValue(!toggle), delay || 3)
+		RunAfterSomeTime(() => setToggleValue(!toggle), delay)
 	}, [toggle, delay])
 
 	return toggleValue

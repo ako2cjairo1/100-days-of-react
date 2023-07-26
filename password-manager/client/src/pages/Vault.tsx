@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '@/assets/modules/Vault.css'
 import {
@@ -11,6 +11,7 @@ import {
 	Header,
 	SearchBar,
 	ProcessIndicator,
+	Separator,
 } from '@/components'
 import { useAuthContext, useStateObj } from '@/hooks'
 import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
@@ -64,7 +65,7 @@ export function Vault() {
 		return decryptedVault
 	}, [updateVaultStatus, vaultKey])
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		// currently logged-in? hydrate current User's Vault
 		if (isLoggedIn) {
 			hydrateAndGetVault()
@@ -242,16 +243,28 @@ export function Vault() {
 		<div className="vault-container">
 			<Menubar>
 				<Menubar.Item
+					name="Add Keychain"
+					iconName="fa fa-plus"
+					onClick={() => keychainModal.open()}
+				/>
+				<Menubar.Item
+					name="Import"
+					iconName="fa fa-file-import"
+					onClick={() => keychainModal.open()}
+				/>
+				{vault.some(Boolean) && (
+					<Menubar.Item
+						name="Export"
+						iconName="fa fa-file-export"
+						onClick={() => keychainModal.open()}
+					/>
+				)}
+				<Separator />
+				<Menubar.Item
 					name="Logout"
 					iconName="fa fa-sign-out"
 					navigateTo="/login"
 					onClick={handleLogout}
-				/>
-
-				<Menubar.Item
-					name="add item"
-					iconName="fa fa-plus"
-					onClick={() => keychainModal.open()}
 				/>
 			</Menubar>
 
@@ -298,7 +311,6 @@ export function Vault() {
 				)}
 			</section>
 
-			{/* TODO: create custom hook for modal */}
 			<Modal
 				isOpen={isOpenModalForm}
 				onClose={keychainModal.close}

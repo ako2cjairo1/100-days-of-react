@@ -1,14 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { AuthSlice } from './features'
+import { createLogger } from 'redux-logger'
+import authReducer from './features/authenticationSlice'
 
 // wrap reducers with middleware (thunk, etc.)
 export const store = configureStore({
 	reducer: {
-		auth: AuthSlice.reducer,
+		auth: authReducer,
 	},
-	middleware: getDefaultMiddleware => getDefaultMiddleware(),
+	middleware: getDefaultMiddleware => getDefaultMiddleware().concat(createLogger()),
 	devTools: true,
 })
 
-export type TAppDispatch = typeof store.dispatch
 export type TRootState = ReturnType<typeof store.getState>
+export type TAppDispatch = typeof store.dispatch
