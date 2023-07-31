@@ -12,3 +12,11 @@
 	padding: 7px;
 	border-radius: 20px;
 }
+.username {
+	top: 40px !important;
+	right: 0 !important;
+}
+.password {
+	top: 125px;
+	right: 0;
+}

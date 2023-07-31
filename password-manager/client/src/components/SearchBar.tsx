@@ -38,10 +38,11 @@ export function SearchBar({ children, searchCallback }: ISearchBar) {
 		[searchCallback]
 	)
 
+	const executeSearchRef = useRef(executeSearch)
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const searchValue = event.target.value
 		setSearch(searchValue)
-		executeSearch(searchValue)
+		executeSearchRef.current(searchValue)
 	}
 
 	const handleClear = () => {
@@ -55,10 +56,10 @@ export function SearchBar({ children, searchCallback }: ISearchBar) {
 		if (cachedSearchKeyRef.current) {
 			const cachedSearchKey = LocalStorage.read('PM_searchkey')
 			setSearch(cachedSearchKey)
-			executeSearch(cachedSearchKey)
+			executeSearchRef.current(cachedSearchKey)
 			cachedSearchKeyRef.current = false
 		}
-	}, [executeSearch])
+	}, [])
 
 	return (
 		<div className="fdc">

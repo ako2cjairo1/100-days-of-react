@@ -68,18 +68,14 @@ export function Keychain({
 							readOnly
 							onClick={handleAction.copyUserName}
 						/>
-						<div
-							className="action-container"
-							style={{ top: '40px', right: '0' }}
-						>
+						<div className="action-container username">
 							<AnimatedIcon
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
-								iconName={`fa ${
-									!checkIf.canCopyUsername && checkIf.debounceCopyUserName
+								iconName={`fa ${!checkIf.canCopyUsername && checkIf.debounceCopyUserName
 										? 'fa-check active scale-up'
 										: 'fa-clone'
-								}`}
+									}`}
 								onClick={handleAction.copyUserName}
 							/>
 						</div>
@@ -98,10 +94,7 @@ export function Keychain({
 							readOnly
 							onClick={handleAction.copyPassword}
 						/>
-						<div
-							className="action-container"
-							style={{ top: '125px', right: '0' }}
-						>
+						<div className="action-container password">
 							<AnimatedIcon
 								title={revealPassword ? 'hide' : 'reveal'}
 								className={`action-button small active`}
@@ -111,11 +104,10 @@ export function Keychain({
 							<AnimatedIcon
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyPassword && 'active scale-down'}`}
-								iconName={`fa ${
-									!checkIf.canCopyPassword && checkIf.debounceCopyPassword
+								iconName={`fa ${!checkIf.canCopyPassword && checkIf.debounceCopyPassword
 										? 'fa-check active scale-up'
 										: 'fa-clone'
-								}`}
+									}`}
 								onClick={handleAction.copyPassword}
 							/>
 						</div>

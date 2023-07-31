@@ -33,108 +33,90 @@ interface INewKeychainForm {
 }
 export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKeychainForm) {
 	// form controlled inputs
-	const { inputAttribute, inputAction } = useInput<TKeychain>(KEYCHAIN)
-	// destructure
-	const { inputStates, onChange, onFocus, onBlur, isSubmitted, isFocus } = inputAttribute
-	const { website, username, password } = inputStates
+	const { mutate: updateInput, resetInput, isSubmit, input, onChange, onFocus, onBlur, isSubmitted, isFocus } =
+		useInput<TKeychain>(KEYCHAIN)
+	const updateInputRef = useRef(updateInput)
 
 	const websiteInputRef = useRef<HTMLInputElement>(null)
-	const initInputActionRef = useRef(true)
 	const [revealPassword, setRevealPassword] = useState(false)
 	const { objState: keychainStatus, mutate: updateKeychainStatus } = useStateObj<TStatus>(STATUS)
+	const updateKeychainStatusRef = useRef(updateKeychainStatus)
 
 	const usernameClipboard = useTimedCopyToClipboard({})
 	const passwordClipboard = useTimedCopyToClipboard({})
 
-	// conditional rendering
+	// conditional rendering properties
 	const checkIf = {
 		isEditing: !IsEmpty(keychainInfo?.keychainId),
 		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
-		isValidWebsite: WEBSITE_REGEX.test(website),
-		canCopyUsername: !usernameClipboard.isCopied && !IsEmpty(username),
-		canCopyPassword: !passwordClipboard.isCopied && !IsEmpty(password),
+		isValidWebsite: WEBSITE_REGEX.test(input.website),
+		canCopyUsername: !usernameClipboard.isCopied && !IsEmpty(input.username),
+		canCopyPassword: !passwordClipboard.isCopied && !IsEmpty(input.password),
 		canGeneratePassword: !isSubmitted && !keychainStatus.success,
 		debounceUsernameClipboard:
 			useDebounceToggle(usernameClipboard.isCopied, 2) &&
 			usernameClipboard.isCopied &&
-			!IsEmpty(username),
+			!IsEmpty(input.username),
 		debouncePasswordClipboard:
 			useDebounceToggle(passwordClipboard.isCopied, 2) &&
 			passwordClipboard.isCopied &&
-			!IsEmpty(password),
+			!IsEmpty(input.password),
 		canDisableSubmit() {
 			return (
 				isSubmitted ||
 				keychainStatus.success ||
 				!checkIf.isValidWebsite ||
-				IsEmpty(username) ||
-				IsEmpty(password)
+				IsEmpty(input.username) ||
+				IsEmpty(input.password)
 			)
 		},
 	}
 
+	// on initial render, determine if we need to generate new UUI and password
 	useEffect(() => {
-		// on initial render, determine if we need to generate new UUI and password
-		if (initInputActionRef.current) {
-			inputAction.mutate({
-				...keychainInfo,
-				keychainId: checkIf.isEditing ? keychainInfo?.keychainId : GenerateUUID(),
-				password: checkIf.isEditing ? keychainInfo?.password : GeneratePassword(),
-			})
-			initInputActionRef.current = false
-		}
-	}, [checkIf.isEditing, inputAction, keychainInfo])
+		updateInputRef.current({
+			...keychainInfo,
+			keychainId: checkIf.isEditing ? keychainInfo?.keychainId : GenerateUUID(),
+			password: checkIf.isEditing ? keychainInfo?.password : GeneratePassword(),
+		})
+	}, [checkIf.isEditing, keychainInfo])
 
+	// side-effect to focus the cursor to input Website
 	useEffect(() => {
-		// focus the cursor to input Website
 		if (!keychainStatus.success) websiteInputRef.current?.focus()
 	}, [keychainStatus.success])
 
+	// side-effect to clear the status message when user updated keychain form
 	useEffect(() => {
-		// clear the status message when user is updating the form
-		updateKeychainStatus({ message: '' })
-	}, [inputStates, updateKeychainStatus])
+		updateKeychainStatusRef.current({ message: '' })
+	}, [input])
 
 	const handleAction = {
+		copyPassword: () => checkIf.canCopyPassword && passwordClipboard.copy(input.password),
+		copyUserName: () => checkIf.canCopyUsername && usernameClipboard.copy(input.username),
+		revealPassword: () => !IsEmpty(input.password) && setRevealPassword(prev => !prev),
 		generatePassword: () => {
 			if (!isSubmitted) {
 				passwordClipboard.clear()
 				setRevealPassword(true)
-				inputAction.mutate({ password: GeneratePassword() })
-			}
-		},
-		copyPassword: () => {
-			if (checkIf.canCopyPassword) {
-				usernameClipboard.clear()
-				passwordClipboard.copy(password)
-			}
-		},
-		copyUserName: () => {
-			if (checkIf.canCopyUsername) {
-				passwordClipboard.clear()
-				usernameClipboard.copy(username)
-			}
-		},
-		revealPassword: () => {
-			if (password) {
-				setRevealPassword(prev => !prev)
+				updateInput({ password: GeneratePassword() })
 			}
 		},
 		deletePassword: async () => {
 			if (checkIf.canGeneratePassword) {
 				// post request to remove keychain info
-				const { success, message } = await updateCallback({ ...inputStates }, remove)
+				const { success, message } = await updateCallback({ ...input }, remove)
 				if (!success) throw new Error(message)
 
 				// show success status before closing the modal
-				updateKeychainStatus({ success: true, message: 'Password Deleted!' })
+				updateKeychainStatusRef.current({ success: true, message: 'Password Deleted!' })
 
 				// after sometime, reset status and close modal
 				RunAfterSomeTime(() => {
-					updateKeychainStatus(STATUS)
+					updateKeychainStatusRef.current(STATUS)
 					showForm(false)
 					// invoke resetInput
-					inputAction.resetInput()
+					resetInput()
 				}, 3)
 			}
 		},
@@ -143,13 +125,13 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 			if (!isSubmitted) {
 				// set to submit and reset status
-				inputAction.isSubmit(true)
-				updateKeychainStatus(STATUS)
+				isSubmit(true)
+				updateKeychainStatusRef.current(STATUS)
 
 				try {
 					// post request to update/add keychain info
 					const { success, message } = await updateCallback(
-						{ ...inputStates },
+						{ ...input },
 						checkIf.isEditing ? modify : add
 					)
 					if (!success) throw new Error(message)
@@ -158,19 +140,19 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						? 'The changes have been saved'
 						: 'Password have been added!'
 					// show success status before closing the modal
-					updateKeychainStatus({ success: true, message: successMessage })
+					updateKeychainStatusRef.current({ success: true, message: successMessage })
 
 					// after sometime, reset status and close modal
 					RunAfterSomeTime(() => {
-						updateKeychainStatus(STATUS)
+						updateKeychainStatusRef.current(STATUS)
 						showForm(false)
 						// invoke resetInput
-						inputAction.resetInput()
+						resetInput()
 					}, 3)
 				} catch (error) {
-					updateKeychainStatus({ success: false, message: CreateError(error).message })
+					updateKeychainStatusRef.current({ success: false, message: CreateError(error).message })
 				} finally {
-					inputAction.isSubmit(false)
+					isSubmit(false)
 				}
 			}
 		},
@@ -229,7 +211,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							inputMode="url"
 							placeholder="ex: outlook.com"
 							linkRef={websiteInputRef}
-							value={website}
+							value={input.website}
 							disabled={isSubmitted}
 							required
 							className={`${isSubmitted
@@ -248,22 +230,26 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						props={{
 							label: 'User Name',
 							labelFor: 'username',
-							isFulfilled: !IsEmpty(username),
+							isFulfilled: !IsEmpty(input.username),
 						}}
 					/>
 					<FormGroup.Input
 						id="username"
 						type="text"
 						placeholder="ex: sample@email.com"
-						value={username}
+						value={input.username}
 						disabled={isSubmitted}
 						required
-						className={`${isSubmitted ? 'disabled' : !IsEmpty(username) ? '' : !isFocus.username && 'invalid'
+						className={`${isSubmitted
+							? 'disabled'
+							: !IsEmpty(input.username)
+								? ''
+								: !isFocus.username && 'invalid'
 							}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 					<div className="action-container">
-						{username.length > 0 && (
+						{input.username.length > 0 && (
 							<AnimatedIcon
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
@@ -280,29 +266,33 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						props={{
 							label: 'Password',
 							labelFor: 'password',
-							isFulfilled: !IsEmpty(password),
+							isFulfilled: !IsEmpty(input.password),
 						}}
 					>
-						<PasswordStrength password={password} />
+						<PasswordStrength password={input.password} />
 					</FormGroup.Label>
 					<FormGroup.Input
 						id="password"
 						style={{ paddingRight: '106px' }}
 						type={revealPassword ? 'text' : 'password'}
-						value={password}
+						value={input.password}
 						disabled={isSubmitted}
 						required
-						className={`${isSubmitted ? 'disabled' : !IsEmpty(password) ? '' : !isFocus.password && 'invalid'
+						className={`${isSubmitted
+							? 'disabled'
+							: !IsEmpty(input.password)
+								? ''
+								: !isFocus.password && 'invalid'
 							}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 
 					<div className="action-container">
-						{password.length > 0 && (
+						{input.password.length > 0 && (
 							<>
 								<AnimatedIcon
 									title={revealPassword ? 'hide' : 'reveal'}
-									className={`action-button small ${password.length > 0 && 'active'}`}
+									className={`action-button small ${input.password.length > 0 && 'active'}`}
 									iconName={`fa fa-eye${revealPassword ? '-slash scale-up' : ' scale-down'}`}
 									onClick={handleAction.revealPassword}
 								/>
@@ -355,7 +345,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						onClick={() => {
 							setRevealPassword(false)
 							showForm(false)
-							updateKeychainStatus({ success: false, message: '' })
+							updateKeychainStatusRef.current({ success: false, message: '' })
 						}}
 					>
 						Cancel

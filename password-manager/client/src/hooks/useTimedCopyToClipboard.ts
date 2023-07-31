@@ -46,6 +46,7 @@ export function useTimedCopyToClipboard({
 
 	const copy = (value?: string) => {
 		if (!isCopied) {
+			clear()
 			// copy the actual value to clipboard
 			CopyToClipboard(value ? value : text)
 			// update clipboard status

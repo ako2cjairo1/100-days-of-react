@@ -1,22 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
-import type { TInputLogin, TStatus } from '@/types'
-import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
-import { useInput, useAuthContext, useStateObj } from '@/hooks'
-import { ExtractValFromRegEx, LocalStorage, RunAfterSomeTime } from '@/services/Utils'
 import {
-	LinkLabel,
-	Separator,
+	AnimatedIcon,
 	AuthProviderSection,
+	FormGroup,
+	Header,
+	LinkLabel,
+	ProcessIndicator,
+	Separator,
 	SubmitButton,
 	Toggle,
-	FormGroup,
 	ValidationMessage,
-	AnimatedIcon,
-	Header,
-	ProcessIndicator,
 } from '@/components'
+import { useAuthContext, useInput, useStateObj } from '@/hooks'
+import { ExtractValFromRegEx, LocalStorage, RunAfterSomeTime } from '@/services/Utils'
 import { ssoService } from '@/services/api'
+import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
+import type { TInputLogin, TStatus } from '@/types'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 // constants
 const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
@@ -24,65 +24,56 @@ const { minLength } = PASSWORD_REGEX
 
 export function Login() {
 	// custom form input hook
-	const { inputAttribute, inputAction } = useInput<TInputLogin>(LOGIN_STATE.Credential)
-	// destructure useInput hook
-	const { isSubmit, mutate: updateInput, resetInput } = inputAction
-	const { inputStates, isFocus, onChange, onFocus, onBlur, isSubmitted } = inputAttribute
-	const { email, password, isRemember } = inputStates
+	const { mutate: updateInput, isSubmit, resetInput, input, isFocus, onChange, onFocus, onBlur, isSubmitted } =
+		useInput<TInputLogin>(LOGIN_STATE.Credential)
+	const updateInputRef = useRef(updateInput)
 
 	const [isEmailInput, setIsEmailInput] = useState(true)
 	const { objState: loginStatus, mutate: updateLoginStatus } = useStateObj<TStatus>(
 		LOGIN_STATE.Status
 	)
+	const updateLoginStatusRef = useRef(updateLoginStatus)
 	const emailInputRef = useRef<HTMLInputElement>(null)
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
-	const savedEmailRef = useRef(true)
 	const {
 		authenticate,
 		authInfo: { isLoggedIn },
 	} = useAuthContext()
-	const authRef = useRef(true)
 	const [loading, setLoading] = useState(false)
 
-	const authenticateSession = useCallback(() => {
-		if (authRef.current && !isLoggedIn) {
-			// show authentication progress window
-			setLoading(true)
-			updateLoginStatus({ status: false, message: '' })
-			// authenticate current session by verifying to auth server
-			authenticate().then(({ success, message }) => {
-				// hide authentication progress window
-				setLoading(false)
-				// show success or failed authentication
-				updateLoginStatus({ success, message })
-			})
-			authRef.current = false
-		}
-	}, [authenticate, isLoggedIn, updateLoginStatus])
-
 	// side-effect to persist authentication
-	useEffect(() => {
+	useLayoutEffect(() => {
+		const authenticateSession = () => {
+			if (!isLoggedIn) {
+				// show authentication progress window
+				setLoading(true)
+				updateLoginStatusRef.current({ status: false, message: '' })
+				// authenticate current session by verifying to auth server
+				authenticate().then(({ success, message }) => {
+					// hide authentication progress window
+					setLoading(false)
+					// show success or failed authentication
+					updateLoginStatusRef.current({ success, message })
+				})
+			}
+		}
 		authenticateSession()
-	}, [authenticateSession])
+	}, [authenticate, isLoggedIn])
 
 	// side-effect to remember user's email..
 	useEffect(() => {
-		// email ref, to ensure do this only once
-		if (savedEmailRef.current) {
-			const rememberedEmail = LocalStorage.read('PM_remember_email')
-			// load remembered email from local storage
-			updateInput({
-				email: rememberedEmail,
-				isRemember: rememberedEmail ? true : false,
-			})
-			savedEmailRef.current = false
-		}
+		const rememberedEmail = LocalStorage.read('PM_remember_email')
+		// load remembered email from local storage
+		updateInputRef.current({
+			email: rememberedEmail,
+			isRemember: rememberedEmail ? true : false,
+		})
 		emailInputRef.current?.focus()
-	}, [updateInput])
+	}, [])
 
 	// side-effect to determine focused control
-	useEffect(() => {
+	useLayoutEffect(() => {
 		// focus to link button "proceed to secured vault"
 		if (loginStatus.success) return securedVaultLinkRef.current?.focus()
 		// focus to email input control
@@ -92,22 +83,22 @@ export function Login() {
 	}, [isEmailInput, loginStatus.success, isSubmitted])
 
 	// side-effect to reset notification message when user is actively typing
-	useEffect(() => {
-		if (inputStates) updateLoginStatus({ message: '' })
-	}, [inputStates, updateLoginStatus])
+	useLayoutEffect(() => {
+		if (input) updateLoginStatusRef.current({ message: '' })
+	}, [input])
 
 	// 2 step submit: email and password.
 	// User has option to go back and update their inputted email if necessary
 	const handleSubmit = (formEvent: React.FormEvent) => {
 		formEvent.preventDefault()
 
-		updateLoginStatus({ message: '' })
+		updateLoginStatusRef.current({ message: '' })
 		if (isEmailInput) {
 			// move to password input
 			setIsEmailInput(false)
 			// option to save email, delete in LS otherwise
-			return isRemember
-				? LocalStorage.write('PM_remember_email', email)
+			return input.isRemember
+				? LocalStorage.write('PM_remember_email', input.email)
 				: LocalStorage.remove('PM_remember_email')
 		}
 
@@ -115,16 +106,18 @@ export function Login() {
 			// indicate start progress status of submit button
 			isSubmit(true)
 			// authenticate email and password credential via auth server
-			authenticate({ email, password }).then(({ success, message }) => {
-				if (success) {
-					// clear input form states and status
-					resetInput()
+			authenticate({ email: input.email, password: input.password }).then(
+				({ success, message }) => {
+					if (success) {
+						// clear input form states and status
+						resetInput()
+					}
+					// show success or failed authentication
+					updateLoginStatusRef.current({ success, message })
+					// end progress status of submit button
+					isSubmit(false)
 				}
-				// show success or failed authentication
-				updateLoginStatus({ success, message })
-				// end progress status of submit button
-				isSubmit(false)
-			})
+			)
 		}
 	}
 
@@ -136,8 +129,8 @@ export function Login() {
 	}
 
 	const checkIf = {
-		minLengthPassed: minLength.test(password),
-		isValidEmail: EMAIL_REGEX.test(email),
+		minLengthPassed: minLength.test(input.password),
+		isValidEmail: EMAIL_REGEX.test(input.email),
 	}
 
 	// form validation criteria
@@ -173,7 +166,7 @@ export function Login() {
 						/>
 						<Header.Title
 							title="You are logged in!"
-							subTitle={loginStatus.message}
+						// subTitle={loginStatus.message}
 						>
 							<LinkLabel
 								linkRef={securedVaultLinkRef}
@@ -212,14 +205,14 @@ export function Login() {
 										autoComplete="email"
 										placeholder="Email"
 										required
-										value={email}
+										value={input.email}
 										linkRef={emailInputRef}
 										disabled={isSubmitted}
 										className={!checkIf.isValidEmail ? (!isFocus.email ? 'invalid' : '') : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
-										isVisible={email.length > 0 && !checkIf.isValidEmail}
+										isVisible={input.email.length > 0 && !checkIf.isValidEmail}
 										validations={emailValidation}
 									/>
 								</div>
@@ -237,14 +230,14 @@ export function Login() {
 										type="password"
 										placeholder="Password"
 										required
-										value={password}
+										value={input.password}
 										linkRef={passwordInputRef}
 										disabled={isSubmitted}
 										className={!checkIf.minLengthPassed ? (!isFocus.password ? 'invalid' : '') : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
-										isVisible={password.length > 0 && !checkIf.minLengthPassed}
+										isVisible={input.password.length > 0 && !checkIf.minLengthPassed}
 										validations={passwordValidation}
 									/>
 								</div>
@@ -253,11 +246,13 @@ export function Login() {
 							{isEmailInput && (
 								<Toggle
 									id="isRemember"
-									checked={isRemember}
+									checked={input.isRemember}
 									{...{ onChange, onFocus, onBlur }}
 								>
-									<Toggle.Description checked={isRemember}>Remember email?</Toggle.Description>
-									<Toggle.Description checked={!isRemember}>
+									<Toggle.Description checked={input.isRemember}>
+										Remember email?
+									</Toggle.Description>
+									<Toggle.Description checked={!input.isRemember}>
 										Ok, we`ll remember your email.
 									</Toggle.Description>
 								</Toggle>
@@ -290,7 +285,7 @@ export function Login() {
 						) : (
 							<LinkLabel
 								routeTo="/login"
-								preText={`Logging in as ${email}`}
+								preText={`Logging in as ${input.email}`}
 								onClick={backToEmailInput}
 							>
 								Not you?
@@ -306,12 +301,12 @@ export function Login() {
 							<AuthProviderSection
 								callbackFn={provider => {
 									setLoading(true)
-									updateLoginStatus({ message: `Sign-in via ${provider}` })
+									updateLoginStatusRef.current({ message: `Sign-in via ${provider}` })
 
 									RunAfterSomeTime(() => {
 										if (!loading) {
 											setLoading(false)
-											updateLoginStatus({
+											updateLoginStatusRef.current({
 												success: false,
 												message: `${provider} didn't respond, please try again`,
 											})

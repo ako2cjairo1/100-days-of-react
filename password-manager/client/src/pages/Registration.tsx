@@ -32,13 +32,12 @@ const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
 
 export function Registration() {
 	// form controlled inputs
-	const { inputAttribute, inputAction } = useInput<TInputRegistration>(CREDENTIALS)
-	// destructure
-	const { inputStates, onChange, onFocus, onBlur, isFocus, isSubmitted } = inputAttribute
-	const { password, email, confirm, isTermsAgreed } = inputStates
+	const { isSubmit, resetInput, input, onChange, onFocus, onBlur, isFocus, isSubmitted } =
+		useInput<TInputRegistration>(CREDENTIALS)
 
 	const { objState: registrationStatus, mutate: updateRegistrationStatus } =
 		useStateObj<TStatus>(STATUS)
+	const updateRegistrationStatusRef = useRef(updateRegistrationStatus)
 
 	const emailRef = useRef<HTMLInputElement>(null)
 	const loginRef = useRef<HTMLAnchorElement>(null)
@@ -51,27 +50,27 @@ export function Registration() {
 	}, [registrationStatus.success])
 
 	useEffect(() => {
-		updateRegistrationStatus({ message: '' })
-	}, [inputStates, updateRegistrationStatus])
+		updateRegistrationStatusRef.current({ message: '' })
+	}, [input])
 
 	const passwordRequirement = {
-		minLength: minLength.test(password),
-		alphabet: alphabet.test(password),
-		number: number.test(password),
-		symbol: symbol.test(password),
+		minLength: minLength.test(input.password),
+		alphabet: alphabet.test(input.password),
+		number: number.test(input.password),
+		symbol: symbol.test(input.password),
 	}
 
 	const checkIf = {
-		isValidEmail: EMAIL_REGEX.test(email),
+		isValidEmail: EMAIL_REGEX.test(input.email),
 		isValidPassword: Object.values(passwordRequirement).every(Boolean),
-		validConfirmation: !IsEmpty(password) && password === confirm,
+		validConfirmation: !IsEmpty(input.password) && input.password === input.confirm,
 		canSubmitForm() {
 			return (
-				!isTermsAgreed ||
+				!input.isTermsAgreed ||
 				isSubmitted ||
 				!checkIf.isValidEmail ||
 				!checkIf.isValidPassword ||
-				password !== confirm
+				input.password !== input.confirm
 			)
 		},
 	}
@@ -109,21 +108,21 @@ export function Registration() {
 
 		if (!isSubmitted) {
 			updateRegistrationStatus({ message: '' })
-			inputAction.isSubmit(true)
+			isSubmit(true)
 
 			RunAfterSomeTime(async () => {
 				try {
 					if (checkIf.isValidPassword) {
 						// register and get accessToken, encrypted vault and salt from API
 						await registerUserService({
-							email,
+							email: input.email,
 							// hash password before sending to API
-							password: hashPassword(password),
+							password: hashPassword(input.password),
 						})
 						// !This maybe replaced with cookies
-						mutateAuth({ email })
+						mutateAuth({ email: input.email })
 						// clear form input states and status
-						inputAction.resetInput()
+						resetInput()
 						updateRegistrationStatus({ success: true, message: '' })
 					} else {
 						updateRegistrationStatus({
@@ -132,9 +131,9 @@ export function Registration() {
 						})
 					}
 
-					inputAction.isSubmit(false)
+					isSubmit(false)
 				} catch (error) {
-					inputAction.isSubmit(false)
+					isSubmit(false)
 					return updateRegistrationStatus({ success: false, message: CreateError(error).message })
 				}
 			}, 3)
@@ -150,214 +149,215 @@ export function Registration() {
 			/>
 		)
 
+	if (registrationStatus.success)
+		return (
+			<div className="form-container">
+				<Header>
+					<AnimatedIcon
+						className="scale-up"
+						iconName="fa fa-check-circle"
+					/>
+					<Header.Title title="Registration completed!">
+						<LinkLabel
+							linkRef={loginRef}
+							routeTo="/login"
+							preText="Proceed to"
+						>
+							login?
+						</LinkLabel>
+					</Header.Title>
+				</Header>
+			</div>
+		)
+
 	return (
 		<section>
 			<div className="form-container">
-				{registrationStatus.success ? (
-					<Header>
-						<AnimatedIcon
-							className="scale-up"
-							iconName="fa fa-check-circle"
+				<Header>
+					<Header.Title
+						title="Create Account"
+						subTitle="Create a free account with your email."
+					/>
+					<Header.Status status={registrationStatus} />
+				</Header>
+
+				<FormGroup onSubmit={handleSubmit}>
+					<div className="input-row">
+						<FormGroup.Label
+							props={{
+								label: 'Email Address',
+								labelFor: 'email',
+								isFulfilled: checkIf.isValidEmail,
+							}}
 						/>
-						<Header.Title title="Registration completed!">
-							<LinkLabel
-								linkRef={loginRef}
-								routeTo="/login"
-								preText="Proceed to"
-							>
-								login?
-							</LinkLabel>
-						</Header.Title>
-					</Header>
-				) : (
-					<>
-						<Header>
-							<Header.Title
-								title="Create Account"
-								subTitle="Create a free account with your email."
-							/>
-							<Header.Status status={registrationStatus} />
-						</Header>
-
-						<FormGroup onSubmit={handleSubmit}>
-							<div className="input-row">
-								<FormGroup.Label
-									props={{
-										label: 'Email Address',
-										labelFor: 'email',
-										isFulfilled: checkIf.isValidEmail,
-									}}
-								/>
-								<FormGroup.Input
-									id="email"
-									type="email"
-									inputMode="email"
-									autoComplete="email"
-									autoCapitalize="none"
-									placeholder="sample@email.com"
-									value={email}
-									linkRef={emailRef}
-									disabled={isSubmitted}
-									required
-									{...{ onChange, onFocus, onBlur }}
-									className={
-										isFocus.email
-											? ''
-											: checkIf.isValidEmail
-											? 'valid'
-											: email.length > 0
+						<FormGroup.Input
+							id="email"
+							type="email"
+							inputMode="email"
+							autoComplete="email"
+							autoCapitalize="none"
+							placeholder="sample@email.com"
+							value={input.email}
+							linkRef={emailRef}
+							disabled={isSubmitted}
+							required
+							{...{ onChange, onFocus, onBlur }}
+							className={
+								isFocus.email
+									? ''
+									: checkIf.isValidEmail
+										? 'valid'
+										: input.email.length > 0
 											? 'invalid'
 											: ''
-									}
-								/>
-								<ValidationMessage
-									isVisible={!isFocus.email && !checkIf.isValidEmail && email.length > 0}
-									validations={emailReq}
-								/>
-							</div>
+							}
+						/>
+						<ValidationMessage
+							isVisible={!isFocus.email && !checkIf.isValidEmail && input.email.length > 0}
+							validations={emailReq}
+						/>
+					</div>
 
-							<div className="input-row">
-								<FormGroup.Label
-									props={{
-										label: 'Master Password',
-										labelFor: 'password',
-										isFulfilled: checkIf.isValidPassword,
-									}}
-								>
-									<PasswordStrength
-										password={password}
-										regex={MergeRegExObj(PASSWORD_REGEX)}
-									/>
-								</FormGroup.Label>
-								<FormGroup.Input
-									id="password"
-									type="password"
-									placeholder="Enter Master Password"
-									value={password}
-									disabled={isSubmitted}
-									required
-									{...{ onChange, onFocus, onBlur }}
-									className={
-										isFocus.password
-											? ''
-											: checkIf.isValidPassword
-											? 'valid'
-											: password.length > 0
-											? 'invalid'
-											: ''
-									}
-								/>
-								<ValidationMessage
-									title="Your master password must contain:"
-									isVisible={!isFocus.password && !checkIf.isValidPassword && password.length > 0}
-									validations={passwordReq}
-								/>
-							</div>
-
-							<div className="input-row vr">
-								<FormGroup.Label
-									props={{
-										label: 'Confirm Master Password',
-										labelFor: 'confirm',
-										isFulfilled: checkIf.validConfirmation,
-									}}
-								/>
-
-								<FormGroup.Input
-									id="confirm"
-									type="password"
-									placeholder="Confirm Your Master Password"
-									value={confirm}
-									disabled={isSubmitted}
-									required
-									{...{ onChange, onFocus, onBlur }}
-									className={
-										isFocus.confirm
-											? ''
-											: checkIf.validConfirmation
-											? 'valid'
-											: password.length > 0
-											? 'invalid'
-											: ''
-									}
-								/>
-
-								<ValidationMessage
-									isVisible={!isFocus.confirm && !checkIf.validConfirmation && confirm.length > 0}
-									validations={confirmReq}
-								/>
-							</div>
-
-							<Toggle
-								id="isTermsAgreed"
-								checked={isTermsAgreed}
-								{...{ onChange, onFocus, onBlur }}
-							>
-								<div className="offset-toggle">
-									<LinkLabel
-										preText="By selecting this option you agree to the following:"
-										className="tal"
-										routeTo="/terms"
-									>
-										<br />
-										Terms of Service, Privacy Policy
-									</LinkLabel>
-								</div>
-							</Toggle>
-
-							<div className="center">
-								<SubmitButton
-									props={{
-										variant: 'primary',
-										iconName: 'fa fa-user-plus',
-										textStatus: 'Processing...',
-										submitted: isSubmitted,
-										disabled: checkIf.canSubmitForm(),
-									}}
-									className="accent-bg"
-									onClick={() => console.log('Submit button triggered!')}
-								>
-									Create account
-								</SubmitButton>
-							</div>
-						</FormGroup>
-
-						<LinkLabel
-							routeTo="/login"
-							preText="Already have an account?"
+					<div className="input-row">
+						<FormGroup.Label
+							props={{
+								label: 'Master Password',
+								labelFor: 'password',
+								isFulfilled: checkIf.isValidPassword,
+							}}
 						>
-							Log in
-						</LinkLabel>
-
-						<div>
-							<Separator>OR</Separator>
-							<p className="center small">you can sign in with...</p>
-						</div>
-
-						<footer>
-							<AuthProviderSection
-								callbackFn={provider => {
-									setLoading(true)
-									updateRegistrationStatus({ message: `Register and Sign-in via ${provider}` })
-
-									RunAfterSomeTime(() => {
-										if (!loading) {
-											setLoading(false)
-											updateRegistrationStatus({
-												success: false,
-												message: `${provider} didn't respond, please try again`,
-											})
-											window.location.reload()
-										}
-									}, 5)
-
-									// call sso, expect callback from provider on side-effects (Login render)
-									ssoService(provider)
-								}}
+							<PasswordStrength
+								password={input.password}
+								regex={MergeRegExObj(PASSWORD_REGEX)}
 							/>
-						</footer>
-					</>
-				)}
+						</FormGroup.Label>
+						<FormGroup.Input
+							id="password"
+							type="password"
+							placeholder="Enter Master Password"
+							value={input.password}
+							disabled={isSubmitted}
+							required
+							{...{ onChange, onFocus, onBlur }}
+							className={
+								isFocus.password
+									? ''
+									: checkIf.isValidPassword
+										? 'valid'
+										: input.password.length > 0
+											? 'invalid'
+											: ''
+							}
+						/>
+						<ValidationMessage
+							title="Your master password must contain:"
+							isVisible={!isFocus.password && !checkIf.isValidPassword && input.password.length > 0}
+							validations={passwordReq}
+						/>
+					</div>
+
+					<div className="input-row vr">
+						<FormGroup.Label
+							props={{
+								label: 'Confirm Master Password',
+								labelFor: 'confirm',
+								isFulfilled: checkIf.validConfirmation,
+							}}
+						/>
+
+						<FormGroup.Input
+							id="confirm"
+							type="password"
+							placeholder="Confirm Your Master Password"
+							value={input.confirm}
+							disabled={isSubmitted}
+							required
+							{...{ onChange, onFocus, onBlur }}
+							className={
+								isFocus.confirm
+									? ''
+									: checkIf.validConfirmation
+										? 'valid'
+										: input.password.length > 0
+											? 'invalid'
+											: ''
+							}
+						/>
+
+						<ValidationMessage
+							isVisible={!isFocus.confirm && !checkIf.validConfirmation && confirm.length > 0}
+							validations={confirmReq}
+						/>
+					</div>
+
+					<Toggle
+						id="isTermsAgreed"
+						checked={input.isTermsAgreed}
+						{...{ onChange, onFocus, onBlur }}
+					>
+						<div className="offset-toggle">
+							<LinkLabel
+								preText="By selecting this option you agree to the following:"
+								className="tal"
+								routeTo="/terms"
+							>
+								<br />
+								Terms of Service, Privacy Policy
+							</LinkLabel>
+						</div>
+					</Toggle>
+
+					<div className="center">
+						<SubmitButton
+							props={{
+								variant: 'primary',
+								iconName: 'fa fa-user-plus',
+								textStatus: 'Processing...',
+								submitted: isSubmitted,
+								disabled: checkIf.canSubmitForm(),
+							}}
+							className="accent-bg"
+							onClick={() => console.log('Submit button triggered!')}
+						>
+							Create account
+						</SubmitButton>
+					</div>
+				</FormGroup>
+
+				<LinkLabel
+					routeTo="/login"
+					preText="Already have an account?"
+				>
+					Log in
+				</LinkLabel>
+
+				<div>
+					<Separator>OR</Separator>
+					<p className="center small">you can sign in with...</p>
+				</div>
+
+				<footer>
+					<AuthProviderSection
+						callbackFn={provider => {
+							setLoading(true)
+							updateRegistrationStatus({ message: `Register and Sign-in via ${provider}` })
+
+							RunAfterSomeTime(() => {
+								if (!loading) {
+									setLoading(false)
+									updateRegistrationStatus({
+										success: false,
+										message: `${provider} didn't respond, please try again`,
+									})
+									window.location.reload()
+								}
+							}, 5)
+
+							// call sso, expect callback from provider on side-effects (Login render)
+							ssoService(provider)
+						}}
+					/>
+				</footer>
 			</div>
 		</section>
 	)

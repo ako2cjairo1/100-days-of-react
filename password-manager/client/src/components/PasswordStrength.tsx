@@ -37,12 +37,12 @@ export function evaluatePassword({ password, regex }: IPasswordStrength): TEvalu
 			score === 1
 				? weak
 				: score === 2
-					? mediocre
-					: score === 3
-						? secure
-						: score === 4
-							? strong
-							: unbreakable,
+				? mediocre
+				: score === 3
+				? secure
+				: score === 4
+				? strong
+				: unbreakable,
 	}
 }
 
@@ -72,8 +72,9 @@ export function PasswordStrength({ password, regex }: Partial<IPasswordStrength>
 		<div className="password-strength">
 			{password && (
 				<p
-					className={`x-small smooth ${password ? `show ${toggleAnimation ? 'scale-up' : 'scale-down'}` : 'hidden'
-						}`}
+					className={`x-small smooth ${
+						password ? `show ${toggleAnimation ? 'scale-up' : 'scale-down'}` : 'hidden'
+					}`}
 				>
 					{status}
 				</p>
