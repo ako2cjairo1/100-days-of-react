@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import '@/assets/modules/Login.css'
-import type { TStatus, TInputRegistration } from '@/types'
+import type { TStatus, TInputRegistration, TValidation } from '@/types'
 import { REGISTER_STATE } from '@/services/constants'
 import {
 	RunAfterSomeTime,
@@ -58,6 +58,7 @@ export function Registration() {
 		alphabet: alphabet.test(input.password),
 		number: number.test(input.password),
 		symbol: symbol.test(input.password),
+		illegalSymbol: !input.password.includes(','),
 	}
 
 	const checkIf = {
@@ -94,7 +95,11 @@ export function Registration() {
 				isValid: passwordRequirement.symbol,
 				message: `a special character: ${ExtractValFromRegEx(symbol.source)}`,
 			},
-		],
+			{
+				isValid: passwordRequirement.illegalSymbol,
+				message: 'does not contain illegal symbol: comma (,)',
+			},
+		] satisfies TValidation[],
 		confirmReq: [
 			{
 				isValid: checkIf.validConfirmation,
@@ -206,10 +211,10 @@ export function Registration() {
 								isFocus.email
 									? ''
 									: checkIf.isValidEmail
-										? 'valid'
-										: input.email.length > 0
-											? 'invalid'
-											: ''
+									? 'valid'
+									: !IsEmpty(input.email)
+									? 'invalid'
+									: ''
 							}
 						/>
 						<ValidationMessage
@@ -243,15 +248,15 @@ export function Registration() {
 								isFocus.password
 									? ''
 									: checkIf.isValidPassword
-										? 'valid'
-										: input.password.length > 0
-											? 'invalid'
-											: ''
+									? 'valid'
+									: !IsEmpty(input.password)
+									? 'invalid'
+									: ''
 							}
 						/>
 						<ValidationMessage
 							title="Your master password must contain:"
-							isVisible={!isFocus.password && !checkIf.isValidPassword && input.password.length > 0}
+							isVisible={!isFocus.password && !checkIf.isValidPassword && !IsEmpty(input.password)}
 							validations={passwordReq}
 						/>
 					</div>
@@ -277,15 +282,15 @@ export function Registration() {
 								isFocus.confirm
 									? ''
 									: checkIf.validConfirmation
-										? 'valid'
-										: input.password.length > 0
-											? 'invalid'
-											: ''
+									? 'valid'
+									: !IsEmpty(input.password)
+									? 'invalid'
+									: ''
 							}
 						/>
 
 						<ValidationMessage
-							isVisible={!isFocus.confirm && !checkIf.validConfirmation && confirm.length > 0}
+							isVisible={!isFocus.confirm && !checkIf.validConfirmation && !IsEmpty(input.confirm)}
 							validations={confirmReq}
 						/>
 					</div>
@@ -317,7 +322,6 @@ export function Registration() {
 								disabled: checkIf.canSubmitForm(),
 							}}
 							className="accent-bg"
-							onClick={() => console.log('Submit button triggered!')}
 						>
 							Create account
 						</SubmitButton>

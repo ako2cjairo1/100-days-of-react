@@ -18,8 +18,9 @@ export function Keychain({
 	actionCallback,
 }: IKeychain) {
 	const [revealPassword, setRevealPassword] = useState(false)
-	const userNameClipboard = useTimedCopyToClipboard({})
+	const userNameClipboard = useTimedCopyToClipboard({ message: 'Username is copied to clipboard!' })
 	const passwordClipboard = useTimedCopyToClipboard({
+		message: 'Password is copied to clipboard!',
 		copyCallbackFn: () => setRevealPassword(false),
 	})
 
@@ -72,10 +73,11 @@ export function Keychain({
 							<AnimatedIcon
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
-								iconName={`fa ${!checkIf.canCopyUsername && checkIf.debounceCopyUserName
+								iconName={`fa ${
+									!checkIf.canCopyUsername && checkIf.debounceCopyUserName
 										? 'fa-check active scale-up'
 										: 'fa-clone'
-									}`}
+								}`}
 								onClick={handleAction.copyUserName}
 							/>
 						</div>
@@ -104,10 +106,11 @@ export function Keychain({
 							<AnimatedIcon
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyPassword && 'active scale-down'}`}
-								iconName={`fa ${!checkIf.canCopyPassword && checkIf.debounceCopyPassword
+								iconName={`fa ${
+									!checkIf.canCopyPassword && checkIf.debounceCopyPassword
 										? 'fa-check active scale-up'
 										: 'fa-clone'
-									}`}
+								}`}
 								onClick={handleAction.copyPassword}
 							/>
 						</div>

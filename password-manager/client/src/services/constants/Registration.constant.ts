@@ -25,7 +25,7 @@ export const REGISTER_STATE = {
 		minLength: /^(?=.{8})/,
 		alphabet: /(?=.*[A-Z])(?=.*[a-z])/,
 		number: /(?=.*[0-9])/,
-		symbol: /(?=.*[-!@.#$,%^_&*])/,
+		symbol: /(?=.*[-!@.#$%^_&*])/,
 	},
 } satisfies Record<'CREDENTIALS', TInputRegistration> &
 	Record<'STATUS', TStatus> &

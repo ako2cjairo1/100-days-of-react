@@ -15,7 +15,14 @@ import {
 } from '@/components'
 import { useAuthContext, useStateObj } from '@/hooks'
 import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
-import { CreateError, Log, SessionStorage, decryptVault, encryptVault } from '@/services/Utils'
+import {
+	CreateError,
+	ExportToCSV,
+	Log,
+	SessionStorage,
+	decryptVault,
+	encryptVault,
+} from '@/services/Utils'
 import { RequestType, KEYCHAIN_CONST, FormContent, AUTH_CONTEXT } from '@/services/constants'
 import { logoutUserService, updateVaultService } from '@/services/api'
 
@@ -250,13 +257,13 @@ export function Vault() {
 				<Menubar.Item
 					name="Import"
 					iconName="fa fa-file-import"
-					onClick={() => keychainModal.open()}
+					onClick={() => null}
 				/>
 				{vault.some(Boolean) && (
 					<Menubar.Item
 						name="Export"
 						iconName="fa fa-file-export"
-						onClick={() => keychainModal.open()}
+						onClick={() => ExportToCSV(vault)}
 					/>
 				)}
 				<Separator />

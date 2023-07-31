@@ -1,6 +1,6 @@
-import type { TConvertToStringUnion, TFunction } from '@/types'
+import type { TConvertToStringUnion, TExportKeychain, TFunction } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
-import { REGISTER_STATE } from '@/services/constants'
+import { KEYCHAIN_CONST, REGISTER_STATE } from '@/services/constants'
 import { AxiosError } from 'axios'
 
 export function Log<T>(Obj: T, ...optional: unknown[]) {
@@ -380,6 +380,7 @@ export function TimeAgo(date: Date): string {
 			day: 'numeric',
 			year: 'numeric',
 			hour: 'numeric',
+			minute: 'numeric',
 		})
 	}
 }
@@ -391,4 +392,52 @@ export function IsEmpty<T>(value: T) {
 		(typeof value === 'string' && value.length <= 0) ||
 		(Array.isArray(value) && value.length <= 0)
 	)
+}
+
+export function ExportToCSV(
+	vault: TExportKeychain[],
+	fileTitle = 'Passwords',
+	headers = KEYCHAIN_CONST.HEADERS
+) {
+	const exportVault = [...vault]
+	// include headers to csv export
+	if (headers) {
+		exportVault.unshift(headers)
+	}
+
+	const convertToCSV = () => {
+		let csvItem = ''
+		try {
+			const tempVault = typeof exportVault !== 'object' ? JSON.parse(exportVault) : exportVault
+
+			for (let idx = 0; idx < tempVault.length; idx++) {
+				let line = ''
+				for (const prop in headers) {
+					if (line !== '') line += ','
+					line += tempVault[idx][prop]
+				}
+				csvItem += `${line}\r\n`
+			}
+		} catch (error) {
+			Log(CreateError(error).message)
+		}
+
+		return csvItem
+	}
+
+	const link = document.createElement('a')
+
+	if (link.download !== undefined) {
+		const blob = new Blob([convertToCSV()], { type: 'text/csv;charset=utf-8;' })
+		const url = URL.createObjectURL(blob)
+		// Browsers that support HTML5 download attribute
+		link.setAttribute('href', url)
+		link.setAttribute('download', `${fileTitle}.csv`)
+		link.style.visibility = 'hidden'
+
+		document.body.appendChild(link)
+		// trigger download action
+		link.click()
+		document.body.removeChild(link)
+	}
 }

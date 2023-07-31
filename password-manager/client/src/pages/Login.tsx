@@ -12,7 +12,7 @@ import {
 	ValidationMessage,
 } from '@/components'
 import { useAuthContext, useInput, useStateObj } from '@/hooks'
-import { ExtractValFromRegEx, LocalStorage, RunAfterSomeTime } from '@/services/Utils'
+import { ExtractValFromRegEx, IsEmpty, LocalStorage, RunAfterSomeTime } from '@/services/Utils'
 import { ssoService } from '@/services/api'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
 import type { TInputLogin, TStatus } from '@/types'
@@ -24,8 +24,17 @@ const { minLength } = PASSWORD_REGEX
 
 export function Login() {
 	// custom form input hook
-	const { mutate: updateInput, isSubmit, resetInput, input, isFocus, onChange, onFocus, onBlur, isSubmitted } =
-		useInput<TInputLogin>(LOGIN_STATE.Credential)
+	const {
+		mutate: updateInput,
+		isSubmit,
+		resetInput,
+		input,
+		isFocus,
+		onChange,
+		onFocus,
+		onBlur,
+		isSubmitted,
+	} = useInput<TInputLogin>(LOGIN_STATE.Credential)
 	const updateInputRef = useRef(updateInput)
 
 	const [isEmailInput, setIsEmailInput] = useState(true)
@@ -129,8 +138,8 @@ export function Login() {
 	}
 
 	const checkIf = {
-		minLengthPassed: minLength.test(input.password),
-		isValidEmail: EMAIL_REGEX.test(input.email),
+		minLengthPassed: minLength.test(input.password) && !IsEmpty(input.password),
+		isValidEmail: EMAIL_REGEX.test(input.email) && !IsEmpty(input.email),
 	}
 
 	// form validation criteria
@@ -166,7 +175,7 @@ export function Login() {
 						/>
 						<Header.Title
 							title="You are logged in!"
-						// subTitle={loginStatus.message}
+							// subTitle={loginStatus.message}
 						>
 							<LinkLabel
 								linkRef={securedVaultLinkRef}
@@ -212,7 +221,7 @@ export function Login() {
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
-										isVisible={input.email.length > 0 && !checkIf.isValidEmail}
+										isVisible={!checkIf.isValidEmail}
 										validations={emailValidation}
 									/>
 								</div>
@@ -237,7 +246,7 @@ export function Login() {
 										{...{ onChange, onFocus, onBlur }}
 									/>
 									<ValidationMessage
-										isVisible={input.password.length > 0 && !checkIf.minLengthPassed}
+										isVisible={!checkIf.minLengthPassed}
 										validations={passwordValidation}
 									/>
 								</div>

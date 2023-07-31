@@ -1,7 +1,12 @@
 import { useRef } from 'react'
 import type { TFunction } from '@/types'
 import { useStateObj } from '@/hooks'
-import { CopyToClipboard, Log, RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
+import {
+	CopyToClipboard,
+	IsEmpty,
+	Log,
+	RunAfterSomeTime,
+} from '@/services/Utils/password-manager.helper'
 
 const CLIPBOARD_TIMEOUT = 15
 interface IUseTimedCopyToClipboard {
@@ -45,8 +50,7 @@ export function useTimedCopyToClipboard({
 	}
 
 	const copy = (value?: string) => {
-		if (!isCopied) {
-			clear()
+		if (!isCopied && (!IsEmpty(value) || !IsEmpty(text))) {
 			// copy the actual value to clipboard
 			CopyToClipboard(value ? value : text)
 			// update clipboard status

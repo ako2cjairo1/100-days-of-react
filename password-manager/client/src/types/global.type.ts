@@ -20,6 +20,8 @@ export type TKeychain = {
 	timeAgo?: string
 }
 
+export type TExportKeychain = Pick<TKeychain, 'website' | 'username' | 'password'>
+
 export type TStatus = {
 	success: boolean
 	message: string

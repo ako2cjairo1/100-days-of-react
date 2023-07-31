@@ -9,6 +9,7 @@ import {
 	LinkLabel,
 	Header,
 	Separator,
+	ValidationMessage,
 } from '@/components'
 import { KeychainCard } from '@/components/KeychainCard'
 import { useDebounceToggle, useInput, useStateObj, useTimedCopyToClipboard } from '@/hooks'
@@ -33,8 +34,17 @@ interface INewKeychainForm {
 }
 export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKeychainForm) {
 	// form controlled inputs
-	const { mutate: updateInput, resetInput, isSubmit, input, onChange, onFocus, onBlur, isSubmitted, isFocus } =
-		useInput<TKeychain>(KEYCHAIN)
+	const {
+		mutate: updateInput,
+		resetInput,
+		isSubmit,
+		input,
+		onChange,
+		onFocus,
+		onBlur,
+		isSubmitted,
+		isFocus,
+	} = useInput<TKeychain>(KEYCHAIN)
 	const updateInputRef = useRef(updateInput)
 
 	const websiteInputRef = useRef<HTMLInputElement>(null)
@@ -42,14 +52,15 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 	const { objState: keychainStatus, mutate: updateKeychainStatus } = useStateObj<TStatus>(STATUS)
 	const updateKeychainStatusRef = useRef(updateKeychainStatus)
 
-	const usernameClipboard = useTimedCopyToClipboard({})
-	const passwordClipboard = useTimedCopyToClipboard({})
+	const usernameClipboard = useTimedCopyToClipboard({ message: 'Username is copied to clipboard!' })
+	const passwordClipboard = useTimedCopyToClipboard({ message: 'Password is copied to clipboard!' })
 
 	// conditional rendering properties
 	const checkIf = {
 		isEditing: !IsEmpty(keychainInfo?.keychainId),
 		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
 		isValidWebsite: WEBSITE_REGEX.test(input.website),
+		isValidPassword: !input.password.includes(','),
 		canCopyUsername: !usernameClipboard.isCopied && !IsEmpty(input.username),
 		canCopyPassword: !passwordClipboard.isCopied && !IsEmpty(input.password),
 		canGeneratePassword: !isSubmitted && !keychainStatus.success,
@@ -92,8 +103,14 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 	}, [input])
 
 	const handleAction = {
-		copyPassword: () => checkIf.canCopyPassword && passwordClipboard.copy(input.password),
-		copyUserName: () => checkIf.canCopyUsername && usernameClipboard.copy(input.username),
+		copyPassword: () => {
+			usernameClipboard.clear()
+			passwordClipboard.copy(input.password)
+		},
+		copyUserName: () => {
+			passwordClipboard.clear()
+			usernameClipboard.copy(input.username)
+		},
 		revealPassword: () => !IsEmpty(input.password) && setRevealPassword(prev => !prev),
 		generatePassword: () => {
 			if (!isSubmitted) {
@@ -184,8 +201,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							onClick={handleAction.deletePassword}
 						>
 							<AnimatedIcon
-								className={`regular ${isSubmitted || keychainStatus.success ? 'disabled' : 'active'
-									}`}
+								className={`regular ${
+									isSubmitted || keychainStatus.success ? 'disabled' : 'active'
+								}`}
 								iconName="fa fa-trash"
 								animation="fa-shake danger"
 							/>
@@ -214,12 +232,13 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							value={input.website}
 							disabled={isSubmitted}
 							required
-							className={`${isSubmitted
-								? 'disabled'
-								: checkIf.isValidWebsite
+							className={`${
+								isSubmitted
+									? 'disabled'
+									: checkIf.isValidWebsite
 									? ''
 									: !isFocus.website && 'invalid'
-								}`}
+							}`}
 							{...{ onChange, onFocus, onBlur }}
 						/>
 					</div>
@@ -240,21 +259,23 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						value={input.username}
 						disabled={isSubmitted}
 						required
-						className={`${isSubmitted
-							? 'disabled'
-							: !IsEmpty(input.username)
+						className={`${
+							isSubmitted
+								? 'disabled'
+								: !IsEmpty(input.username)
 								? ''
 								: !isFocus.username && 'invalid'
-							}`}
+						}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 					<div className="action-container">
-						{input.username.length > 0 && (
+						{!IsEmpty(input.username) && (
 							<AnimatedIcon
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
-								iconName={`fa ${checkIf.debounceUsernameClipboard ? 'fa-check active scale-up' : 'fa-clone'
-									}`}
+								iconName={`fa ${
+									checkIf.debounceUsernameClipboard ? 'fa-check active scale-up' : 'fa-clone'
+								}`}
 								onClick={handleAction.copyUserName}
 							/>
 						)}
@@ -278,17 +299,18 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						value={input.password}
 						disabled={isSubmitted}
 						required
-						className={`${isSubmitted
-							? 'disabled'
-							: !IsEmpty(input.password)
+						className={`${
+							isSubmitted
+								? 'disabled'
+								: !IsEmpty(input.password)
 								? ''
 								: !isFocus.password && 'invalid'
-							}`}
+						}`}
 						{...{ onChange, onFocus, onBlur }}
 					/>
 
 					<div className="action-container">
-						{input.password.length > 0 && (
+						{!IsEmpty(input.password) && (
 							<>
 								<AnimatedIcon
 									title={revealPassword ? 'hide' : 'reveal'}
@@ -298,10 +320,12 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 								/>
 								<AnimatedIcon
 									title="Copy"
-									className={`action-button small ${checkIf.canCopyPassword && 'active scale-down'
-										}`}
-									iconName={`fa ${checkIf.debouncePasswordClipboard ? 'fa-check active scale-up' : 'fa-clone'
-										}`}
+									className={`action-button small ${
+										checkIf.canCopyPassword && 'active scale-down'
+									}`}
+									iconName={`fa ${
+										checkIf.debouncePasswordClipboard ? 'fa-check active scale-up' : 'fa-clone'
+									}`}
 									onClick={handleAction.copyPassword}
 								/>
 							</>
@@ -314,6 +338,16 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							onClick={handleAction.generatePassword}
 						/>
 					</div>
+					<ValidationMessage
+						// title="Password must contain illegal character(s):"
+						isVisible={!isFocus.password && !checkIf.isValidPassword && !IsEmpty(input.password)}
+						validations={[
+							{
+								isValid: checkIf.isValidPassword,
+								message: 'Password must contain illegal character(s): ,(comma)',
+							},
+						]}
+					/>
 					<div>
 						{checkIf.isClipboardTriggered && (
 							<InlineNotification

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { IChildren, TFunction } from '@/types'
 import { CloseIcon, Input } from '@/components'
-import { LocalStorage } from '@/services/Utils/password-manager.helper'
+import { IsEmpty, LocalStorage } from '@/services/Utils/password-manager.helper'
 
 const STATUS = {
 	message: '',
@@ -76,12 +76,12 @@ export function SearchBar({ children, searchCallback }: ISearchBar) {
 				className="fdc"
 				style={{ gap: '0' }}
 			>
-				<label className="small center">{search.length > 0 && message}</label>
-				{search.length > 0 && resultCount <= 0 && (
+				<label className="small center">{!IsEmpty(search) && message}</label>
+				{!IsEmpty(search) && resultCount <= 0 && (
 					<label className="x-small center disabled">Check the spelling or try a new search.</label>
 				)}
 			</div>
-			{search.length > 0 && <CloseIcon onClick={handleClear} />}
+			{!IsEmpty(search) && <CloseIcon onClick={handleClear} />}
 			{children}
 		</div>
 	)
