@@ -179,7 +179,7 @@ export function Vault() {
 		}
 	}
 
-	const keychainFormCallback = (keychainId?: string) => {
+	const keychainHandler = (keychainId?: string) => {
 		// hide keychain info and reset clipboard status
 		setFormContent(vault_component)
 		updateVaultStatus(STATUS)
@@ -248,32 +248,35 @@ export function Vault() {
 
 	return (
 		<div className="vault-container">
-			<Menubar>
-				<Menubar.Item
-					name="Add Keychain"
-					iconName="fa fa-plus"
-					onClick={() => keychainModal.open()}
-				/>
-				<Menubar.Item
-					name="Import"
-					iconName="fa fa-file-import"
-					onClick={() => null}
-				/>
-				{vault.some(Boolean) && (
+			<aside>
+				<Menubar>
 					<Menubar.Item
-						name="Export"
-						iconName="fa fa-file-export"
-						onClick={() => ExportToCSV(vault)}
+						name="Add Keychain"
+						iconName="fa fa-plus"
+						onClick={() => keychainModal.open()}
 					/>
-				)}
-				<Separator />
-				<Menubar.Item
-					name="Logout"
-					iconName="fa fa-sign-out"
-					navigateTo="/login"
-					onClick={handleLogout}
-				/>
-			</Menubar>
+					<Menubar.Item
+						name="Import"
+						iconName="fa fa-upload"
+						onClick={() => null}
+					/>
+					{/* show Export button if there are items to export */}
+					{vault.some(Boolean) && (
+						<Menubar.Item
+							name="Export"
+							iconName="fa fa-download"
+							onClick={() => ExportToCSV(vault)}
+						/>
+					)}
+					<Separator />
+					<Menubar.Item
+						name="Logout"
+						iconName="fa fa-lock"
+						navigateTo="/login"
+						onClick={handleLogout}
+					/>
+				</Menubar>
+			</aside>
 
 			<section className="form-container">
 				{vault.some(Boolean) ? (
@@ -307,13 +310,13 @@ export function Vault() {
 
 						<VaultContainer
 							vault={vault}
-							actionCallback={openKeychain}
+							actionHandler={openKeychain}
 						/>
 					</>
 				) : (
 					<Keychain
 						{...keychain}
-						actionCallback={keychainFormCallback}
+						actionHandler={keychainHandler}
 					/>
 				)}
 			</section>

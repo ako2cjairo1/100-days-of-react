@@ -32,19 +32,19 @@ export function KeychainCard({
 	subText = '',
 	onClick,
 }: IKeychainCard) {
-	const websiteDomain = useMemo(() => GetDomainUrl(website), [website])
+	const { domain, url } = useMemo(() => GetDomainUrl(website), [website])
 
 	return (
 		<div className={className}>
-			<AnchorWrapper href={website}>
+			<AnchorWrapper href={url}>
 				<Logo
 					logo={logo}
-					website={websiteDomain}
+					website={domain}
 				/>
 			</AnchorWrapper>
 
 			<div className="keychain-card-details">
-				<AnchorWrapper href={website}>{websiteDomain}</AnchorWrapper>
+				<AnchorWrapper href={url}>{domain}</AnchorWrapper>
 				<p className="small">{subText}</p>
 			</div>
 

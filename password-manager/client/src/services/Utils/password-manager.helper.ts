@@ -311,18 +311,21 @@ export async function GetLogoUrlAsync(siteUrl: string) {
 	return logoElement ? (logoElement as HTMLLinkElement).href : ''
 }
 
-export function GetDomainUrl(siteUrl: string) {
-	const domain = siteUrl
-
+export function GetDomainUrl(siteUrl: string): { domain: string; url: string } {
 	try {
+		if (!siteUrl.includes('//')) siteUrl = `http://${siteUrl}`
 		const url = new URL(siteUrl)
 		const hostname = url.hostname
-		return hostname.split('.').slice(-2).join('.')
+		console.table({ url, hostname })
+		return { domain: hostname.split('.').slice(-2).join('.'), url: siteUrl }
 	} catch (error) {
 		Log(CreateError(error).message)
 	}
 
-	return domain
+	return {
+		domain: siteUrl,
+		url: siteUrl,
+	}
 }
 
 /**

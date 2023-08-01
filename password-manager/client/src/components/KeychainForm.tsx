@@ -17,6 +17,7 @@ import {
 	CreateError,
 	GeneratePassword,
 	GenerateUUID,
+	GetDomainUrl,
 	IsEmpty,
 	RunAfterSomeTime,
 	TimeAgo,
@@ -77,6 +78,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 				isSubmitted ||
 				keychainStatus.success ||
 				!checkIf.isValidWebsite ||
+				!checkIf.isValidPassword ||
 				IsEmpty(input.username) ||
 				IsEmpty(input.password)
 			)
@@ -134,7 +136,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					showForm(false)
 					// invoke resetInput
 					resetInput()
-				}, 3)
+				}, 2)
 			}
 		},
 		submitForm: async (e: FormEvent) => {
@@ -148,7 +150,8 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 				try {
 					// post request to update/add keychain info
 					const { success, message } = await updateCallback(
-						{ ...input },
+						// format to correct website url
+						{ ...input, website: GetDomainUrl(input.website).url },
 						checkIf.isEditing ? modify : add
 					)
 					if (!success) throw new Error(message)
@@ -165,7 +168,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						showForm(false)
 						// invoke resetInput
 						resetInput()
-					}, 3)
+					}, 2)
 				} catch (error) {
 					updateKeychainStatusRef.current({ success: false, message: CreateError(error).message })
 				} finally {
@@ -209,7 +212,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							/>
 						</LinkLabel>
 					</KeychainCard>
-					<Separator />
+					<Separator></Separator>
 				</>
 			)}
 
@@ -339,12 +342,11 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						/>
 					</div>
 					<ValidationMessage
-						// title="Password must contain illegal character(s):"
 						isVisible={!isFocus.password && !checkIf.isValidPassword && !IsEmpty(input.password)}
 						validations={[
 							{
 								isValid: checkIf.isValidPassword,
-								message: 'Password must contain illegal character(s): ,(comma)',
+								message: 'Password must not contain illegal character(s): ,(comma)',
 							},
 						]}
 					/>

@@ -8,10 +8,10 @@ import type { IChildren } from '@/types'
  */
 export function Separator({ children }: IChildren) {
 	return (
-		<div className="separator small">
-			<div className="line"></div>
-			{children}
-			{children ? <div className="line"></div> : null}
+		<div className="separator">
+			<span></span>
+			{children ? children : <i className="fa fa-hyphen" />}
+			<span></span>
 		</div>
 	)
 }

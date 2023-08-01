@@ -6,7 +6,7 @@ import { KeychainCard } from '@/components/KeychainCard'
 import { TimeAgo } from '@/services/Utils/password-manager.helper'
 
 export interface IKeychain extends Partial<TKeychain> {
-	actionCallback: TFunction<[keychainId?: string]>
+	actionHandler: TFunction<[keychainId?: string]>
 }
 export function Keychain({
 	keychainId,
@@ -15,7 +15,7 @@ export function Keychain({
 	username = '',
 	password = '',
 	timeAgo = '',
-	actionCallback,
+	actionHandler,
 }: IKeychain) {
 	const [revealPassword, setRevealPassword] = useState(false)
 	const userNameClipboard = useTimedCopyToClipboard({ message: 'Username is copied to clipboard!' })
@@ -33,9 +33,9 @@ export function Keychain({
 			userNameClipboard.clear()
 			passwordClipboard.copy(password)
 		},
-		showVault: () => actionCallback(),
+		showVault: () => actionHandler(),
 		// send the unique KeychainId to update in Modal
-		modifyKeychain: () => actionCallback(keychainId),
+		modifyKeychain: () => actionHandler(keychainId),
 	}
 
 	const checkIf = {

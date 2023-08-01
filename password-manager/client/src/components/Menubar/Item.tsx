@@ -23,18 +23,20 @@ export function Item({
 	iconName = 'fa fa-bars',
 }: Partial<IMenuItem>) {
 	return (
-		<Link
-			title={name}
-			className="button-style menu descend"
-			to={navigateTo}
-			onClick={onClick}
-		>
-			{iconName && (
-				<i
-					data-testid={iconName}
-					className={iconName}
-				/>
-			)}
-		</Link>
+		<div>
+			<Link
+				title={name}
+				className="button-style menu descend"
+				to={navigateTo}
+				onClick={onClick}
+			>
+				{iconName && (
+					<i
+						data-testid={iconName}
+						className={iconName}
+					/>
+				)}
+			</Link>
+		</div>
 	)
 }

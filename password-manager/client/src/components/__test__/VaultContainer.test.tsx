@@ -13,7 +13,7 @@ describe('Keychain components', () => {
 			<MemoryRouter>
 				<VaultContainer
 					vault={keychains}
-					actionCallback={listEvent}
+					actionHandler={listEvent}
 				/>
 			</MemoryRouter>
 		)
@@ -30,7 +30,7 @@ describe('Keychain components', () => {
 			<MemoryRouter>
 				<VaultContainer
 					vault={keychains}
-					actionCallback={listEvent}
+					actionHandler={listEvent}
 				/>
 			</MemoryRouter>
 		)
@@ -43,7 +43,7 @@ describe('Keychain components', () => {
 			      class="keychain-item"
 			    >
 			      <a
-			        href="link1"
+			        href="http://link1"
 			        rel="noreferrer"
 			        style="text-decoration: none;"
 			        target="_blank"
@@ -58,7 +58,7 @@ describe('Keychain components', () => {
 			        class="keychain-card-details"
 			      >
 			        <a
-			          href="link1"
+			          href="http://link1"
 			          rel="noreferrer"
 			          target="_blank"
 			        >
@@ -86,7 +86,7 @@ describe('Keychain components', () => {
 			      class="keychain-item"
 			    >
 			      <a
-			        href="link2"
+			        href="http://link2"
 			        rel="noreferrer"
 			        style="text-decoration: none;"
 			        target="_blank"
@@ -101,7 +101,7 @@ describe('Keychain components', () => {
 			        class="keychain-card-details"
 			      >
 			        <a
-			          href="link2"
+			          href="http://link2"
 			          rel="noreferrer"
 			          target="_blank"
 			        >
