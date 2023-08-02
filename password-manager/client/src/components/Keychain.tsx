@@ -56,7 +56,7 @@ export function Keychain({
 				onClick={handleAction.showVault}
 			/>
 
-			<div className="keychain-item details vr">
+			<div className="keychain-item details">
 				<div className="keychain-item-description">
 					<p className="keychain-label">User Name</p>
 					<div>
@@ -82,7 +82,11 @@ export function Keychain({
 							/>
 						</div>
 					</div>
+				</div>
+			</div>
 
+			<div className="keychain-item details vr">
+				<div className="keychain-item-description">
 					<div>
 						<p className="keychain-label">Password</p>
 						<PasswordStrength password={password} />
@@ -98,7 +102,7 @@ export function Keychain({
 						/>
 						<div className="action-container password">
 							<AnimatedIcon
-								title={revealPassword ? 'hide' : 'reveal'}
+								title={`${revealPassword ? 'Hide' : 'Reveal'} Password`}
 								className={`action-button small active`}
 								iconName={`fa fa-eye${revealPassword ? '-slash scale-up' : ' scale-down'}`}
 								onClick={() => setRevealPassword(prev => !prev)}
@@ -132,7 +136,7 @@ export function Keychain({
 			<div>
 				<SubmitButton
 					props={{
-						variant: 'default',
+						variant: 'primary',
 						iconName: 'fa fa-pen-to-square',
 					}}
 					onClick={handleAction.modifyKeychain}

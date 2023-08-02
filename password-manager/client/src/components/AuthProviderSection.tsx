@@ -1,7 +1,7 @@
 import '@/assets/modules/AuthProviderSection.css'
 import google from '@/assets/google.png'
 import github from '@/assets/github.png'
-import facebook from '@/assets/facebook.png'
+import meta from '@/assets/facebook.png'
 import type { TFunction } from '@/types'
 import type { TProvider } from '@shared'
 
@@ -19,22 +19,22 @@ export function AuthProviderSection({ callbackFn }: IAuthProviderSection) {
 		>
 			<button onClick={() => callbackFn('facebook')}>
 				<img
-					src={facebook}
-					alt="facebook"
+					src={meta}
+					alt="Meta"
 				/>{' '}
-				Facebook
+				Meta
 			</button>
 			<button onClick={() => callbackFn('google')}>
 				<img
 					src={google}
-					alt="google"
+					alt="Google"
 				/>{' '}
 				Google
 			</button>
 			<button onClick={() => callbackFn('github')}>
 				<img
 					src={github}
-					alt="github"
+					alt="Github"
 				/>{' '}
 				Github
 			</button>

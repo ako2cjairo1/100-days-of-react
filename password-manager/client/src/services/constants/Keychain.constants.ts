@@ -1,8 +1,8 @@
 import type { TExportKeychain, TKeychain, TStatus } from '@/types'
 
 export const KEYCHAIN_CONST = {
-	STATUS: { success: false, message: '' },
-	KEYCHAIN: {
+	INIT_STATUS: { success: false, message: '' },
+	INIT_KEYCHAIN: {
 		keychainId: '',
 		password: '',
 		username: '',
@@ -16,8 +16,8 @@ export const KEYCHAIN_CONST = {
 		password: 'Password',
 	},
 } satisfies {
-	STATUS: TStatus
-	KEYCHAIN: TKeychain
+	INIT_STATUS: TStatus
+	INIT_KEYCHAIN: TKeychain
 	WEBSITE_REGEX: RegExp
 	HEADERS: TExportKeychain
 }

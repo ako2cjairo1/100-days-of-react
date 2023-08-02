@@ -12,7 +12,7 @@ describe('AuthProviderSection', () => {
 			const buttonElements = socialDiv.querySelectorAll('button')
 			expect(buttonElements).toHaveLength(3)
 
-			expect(buttonElements[0]!.textContent).toBe(' Facebook')
+			expect(buttonElements[0]!.textContent).toBe(' Meta')
 			expect(buttonElements[1]!.textContent).toBe(' Google')
 			expect(buttonElements[2]!.textContent).toBe(' Github')
 		} else {

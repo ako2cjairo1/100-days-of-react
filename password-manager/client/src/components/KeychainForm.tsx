@@ -25,7 +25,7 @@ import {
 import { KEYCHAIN_CONST, RequestType } from '@/services/constants'
 import type { TFunction, TKeychain, TStatus, TRequestType } from '@/types'
 
-const { STATUS, KEYCHAIN, WEBSITE_REGEX } = KEYCHAIN_CONST
+const { INIT_STATUS, INIT_KEYCHAIN, WEBSITE_REGEX } = KEYCHAIN_CONST
 const { add, modify, remove } = RequestType
 
 interface INewKeychainForm {
@@ -45,12 +45,13 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 		onBlur,
 		isSubmitted,
 		isFocus,
-	} = useInput<TKeychain>(KEYCHAIN)
+	} = useInput<TKeychain>(INIT_KEYCHAIN)
 	const updateInputRef = useRef(updateInput)
 
 	const websiteInputRef = useRef<HTMLInputElement>(null)
 	const [revealPassword, setRevealPassword] = useState(false)
-	const { objState: keychainStatus, mutate: updateKeychainStatus } = useStateObj<TStatus>(STATUS)
+	const { objState: keychainStatus, mutate: updateKeychainStatus } =
+		useStateObj<TStatus>(INIT_STATUS)
 	const updateKeychainStatusRef = useRef(updateKeychainStatus)
 
 	const usernameClipboard = useTimedCopyToClipboard({ message: 'Username is copied to clipboard!' })
@@ -132,7 +133,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 				// after sometime, reset status and close modal
 				RunAfterSomeTime(() => {
-					updateKeychainStatusRef.current(STATUS)
+					updateKeychainStatusRef.current(INIT_STATUS)
 					showForm(false)
 					// invoke resetInput
 					resetInput()
@@ -145,7 +146,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 			if (!isSubmitted) {
 				// set to submit and reset status
 				isSubmit(true)
-				updateKeychainStatusRef.current(STATUS)
+				updateKeychainStatusRef.current(INIT_STATUS)
 
 				try {
 					// post request to update/add keychain info
@@ -164,7 +165,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 					// after sometime, reset status and close modal
 					RunAfterSomeTime(() => {
-						updateKeychainStatusRef.current(STATUS)
+						updateKeychainStatusRef.current(INIT_STATUS)
 						showForm(false)
 						// invoke resetInput
 						resetInput()
@@ -218,7 +219,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							</div>
 						</LinkLabel>
 					</KeychainCard>
-					<Separator></Separator>
+					<Separator />
 				</>
 			)}
 
@@ -323,7 +324,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						{!IsEmpty(input.password) && (
 							<>
 								<AnimatedIcon
-									title={revealPassword ? 'hide' : 'reveal'}
+									title={`${revealPassword ? 'Hide' : 'Reveal'} Password`}
 									className={`action-button small ${input.password.length > 0 && 'active'}`}
 									iconName={`fa fa-eye${revealPassword ? '-slash scale-up' : ' scale-down'}`}
 									onClick={handleAction.revealPassword}
@@ -341,7 +342,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							</>
 						)}
 						<AnimatedIcon
-							title="Generate Password"
+							title="Create Strong Password"
 							className={`action-button small ${checkIf.canGeneratePassword && 'active'}`}
 							iconName="fa fa-refresh"
 							animation="fa-spin"
@@ -373,7 +374,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 				</div>
 
 				<div>
-					<p className="center small descend">
+					<p className="center tonedown-info small descend">
 						Adding the password here saves it only to your registered account. Make sure the
 						password you save here matches your password for the website.
 					</p>

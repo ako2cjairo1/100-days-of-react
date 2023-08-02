@@ -10,6 +10,7 @@
 	--toggle-size: 40px;
 
 	--border: 1px solid rgba(255, 255, 255, 0.3);
+
 	--background-color: rgba(255, 255, 255, 0.27);
 	--accent-color: rgb(0, 108, 190);
 	--danger-color: rgb(248, 120, 116);
@@ -106,6 +107,10 @@ p {
 .fa-exclamation,
 .fa-exclamation-circle {
 	color: var(--danger-color);
+}
+
+.tonedown-info {
+	color: rgba(255, 255, 255, 0.4);
 }
 
 .lit-error {

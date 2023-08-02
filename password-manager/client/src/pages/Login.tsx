@@ -170,8 +170,9 @@ export function Login() {
 				{loginStatus.success ? (
 					<Header>
 						<AnimatedIcon
-							className="scale-up"
 							iconName="fa fa-check-circle"
+							animation="fa fa-bounce"
+							animateOnLoad
 						/>
 						<Header.Title
 							title="You are logged in!"

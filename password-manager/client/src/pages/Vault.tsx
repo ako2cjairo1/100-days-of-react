@@ -26,7 +26,7 @@ import {
 import { RequestType, KEYCHAIN_CONST, FormContent, AUTH_CONTEXT } from '@/services/constants'
 import { logoutUserService, updateVaultService } from '@/services/api'
 
-const { KEYCHAIN, STATUS } = KEYCHAIN_CONST
+const { INIT_KEYCHAIN, INIT_STATUS } = KEYCHAIN_CONST
 const { add, modify, view } = RequestType
 const { vault_component, keychain_component } = FormContent
 /**
@@ -34,8 +34,8 @@ const { vault_component, keychain_component } = FormContent
  * returns A div element with the class "vault-container" containing a KeychainContainer, a Toolbar, and Modal component
  */
 export function Vault() {
-	const { objState: keychain, mutate: updateKeychain } = useStateObj<TKeychain>(KEYCHAIN)
-	const { objState: vaultStatus, mutate: updateVaultStatus } = useStateObj<TStatus>(STATUS)
+	const { objState: keychain, mutate: updateKeychain } = useStateObj<TKeychain>(INIT_KEYCHAIN)
+	const { objState: vaultStatus, mutate: updateVaultStatus } = useStateObj<TStatus>(INIT_STATUS)
 	const [vault, setVault] = useState<TKeychain[]>([])
 
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
@@ -144,7 +144,7 @@ export function Vault() {
 			}
 		} catch (error) {
 			const { code, message } = CreateError(error)
-			if (code === 401 || code === 403) navigate({ pathname: '/error', search: `error=${message}` })
+			if (code === 401 || code === 403) navigate({ pathname: '/error', search: `error=${error}` })
 			return {
 				success: false,
 				message: message,
@@ -182,8 +182,8 @@ export function Vault() {
 	const keychainHandler = (keychainId?: string) => {
 		// hide keychain info and reset clipboard status
 		setFormContent(vault_component)
-		updateVaultStatus(STATUS)
-		updateKeychain(KEYCHAIN)
+		updateVaultStatus(INIT_STATUS)
+		updateKeychain(INIT_KEYCHAIN)
 		// subsequently open a modal form if user choose to "Update" a keychain
 		if (keychainId) openKeychain(keychainId, modify)
 	}
@@ -208,13 +208,13 @@ export function Vault() {
 		return {
 			open: (info?: TKeychain) => {
 				// open Modal form with keychain info, blank if otherwise
-				updateKeychain(info ? info : KEYCHAIN)
+				updateKeychain(info ? info : INIT_KEYCHAIN)
 				setIsOpenModalForm(true)
 			},
 			close: () => {
 				setIsOpenModalForm(false)
 				// set the keychain state to initial values
-				updateKeychain(KEYCHAIN)
+				updateKeychain(INIT_KEYCHAIN)
 				// then show Vault (keychain list)
 				setFormContent(vault_component)
 			},

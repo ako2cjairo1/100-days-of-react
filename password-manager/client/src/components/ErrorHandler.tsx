@@ -29,7 +29,7 @@ export function ErrorHandler(error: unknown) {
 			<Header>
 				<Header.Logo>
 					<AnimatedIcon
-						iconName="fa fa-face-rolling-eyes"
+						iconName="fa fa-face-sad-cry"
 						animation="fa-shake"
 						animateOnLoad
 					/>

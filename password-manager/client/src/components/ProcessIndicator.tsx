@@ -7,7 +7,7 @@ export function ProcessIndicator({ title, subTitle }: ComponentProps<typeof Titl
 		<div className="form-container">
 			<Header>
 				<AnimatedIcon
-					iconName="fa fa-cog"
+					iconName="fa fa-gear"
 					animation="fa-spin"
 					animateOnLoad
 				/>

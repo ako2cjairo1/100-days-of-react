@@ -404,16 +404,17 @@ export function ExportToCSV(
 	fileTitle = 'Passwords',
 	headers = KEYCHAIN_CONST.HEADERS
 ) {
-	const exportVault = [...vault]
-	// include headers to csv export
-	if (headers) {
-		exportVault.unshift(headers)
-	}
-
-	const convertToCSV = () => {
+	const convertVaultToCSV = () => {
 		let csvItem = ''
+		const vaultClone = [...vault]
+
+		// include headers to csv export
+		if (headers) {
+			vaultClone.unshift(headers)
+		}
+
 		try {
-			const tempVault = typeof exportVault !== 'object' ? JSON.parse(exportVault) : exportVault
+			const tempVault = typeof vaultClone !== 'object' ? JSON.parse(vaultClone) : vaultClone
 
 			for (let idx = 0; idx < tempVault.length; idx++) {
 				let line = ''
@@ -430,11 +431,12 @@ export function ExportToCSV(
 		return csvItem
 	}
 
+	let url = ''
 	const link = document.createElement('a')
 
-	if (link.download !== undefined) {
-		const blob = new Blob([convertToCSV()], { type: 'text/csv;charset=utf-8;' })
-		const url = URL.createObjectURL(blob)
+	try {
+		const blob = new Blob([convertVaultToCSV()], { type: 'text/csv;charset=utf-8;' })
+		url = URL.createObjectURL(blob)
 		// Browsers that support HTML5 download attribute
 		link.setAttribute('href', url)
 		link.setAttribute('download', `${fileTitle}.csv`)
@@ -443,6 +445,11 @@ export function ExportToCSV(
 		document.body.appendChild(link)
 		// trigger download action
 		link.click()
+	} catch (error) {
+		Log(CreateError(error).message)
+	} finally {
+		// destroy from memory
+		URL.revokeObjectURL(url)
 		document.body.removeChild(link)
 	}
 }
