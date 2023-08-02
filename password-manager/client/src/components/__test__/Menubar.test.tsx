@@ -4,17 +4,17 @@ import { MemoryRouter } from 'react-router-dom'
 
 describe('Item', () => {
 	it('renders a Link with the given name as title', () => {
-		const { getByTitle } = render(
+		const { getByTestId } = render(
 			<MemoryRouter>
 				<Menubar.Item name="Test" />
 			</MemoryRouter>
 		)
-		expect(getByTitle('Test')).toBeInTheDocument()
+		expect(getByTestId('menubar-item')).toBeInTheDocument()
 	})
 
 	it('navigates to the given URL when clicked', () => {
 		const navigateTo = '/test'
-		const { getByTitle } = render(
+		const { getByTestId } = render(
 			<MemoryRouter>
 				<Menubar.Item
 					name="Test"
@@ -22,13 +22,13 @@ describe('Item', () => {
 				/>
 			</MemoryRouter>
 		)
-		fireEvent.click(getByTitle('Test'))
+		fireEvent.click(getByTestId('menubar-item'))
 		// expect the URL to have changed to the given navigateTo value
 	})
 
 	it('calls the given callback function when clicked', () => {
 		const menuCb = vi.fn()
-		const { getByTitle } = render(
+		const { getByTestId } = render(
 			<MemoryRouter>
 				<Menubar.Item
 					name="Test"
@@ -36,12 +36,12 @@ describe('Item', () => {
 				/>
 			</MemoryRouter>
 		)
-		fireEvent.click(getByTitle('Test'))
+		fireEvent.click(getByTestId('menubar-item'))
 		expect(menuCb).toHaveBeenCalled()
 	})
 
 	it('renders an icon with the given iconName', () => {
-		const iconName = 'fa fa-test'
+		const iconName = 'animated-icon'
 		const { getByTestId } = render(
 			<MemoryRouter>
 				<Menubar.Item

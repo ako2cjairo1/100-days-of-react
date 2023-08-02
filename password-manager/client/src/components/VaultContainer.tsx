@@ -15,9 +15,10 @@ interface IVaultContainer extends Pick<IKeychain, 'actionHandler'> {
 export function VaultContainer({ vault, actionHandler }: IVaultContainer) {
 	return (
 		<div className="vault-list">
-			{vault.map(({ keychainId, logo, website, username }) => (
+			{vault.map(({ keychainId, logo, website, username }, idx) => (
 				<KeychainCard
-					key={keychainId}
+					// combine keychainid and idx to trigger animation
+					key={`${keychainId}${idx}`}
 					logo={logo}
 					website={website}
 					subText={username}

@@ -316,8 +316,10 @@ export function GetDomainUrl(siteUrl: string): { domain: string; url: string } {
 		if (!siteUrl.includes('//')) siteUrl = `http://${siteUrl}`
 		const url = new URL(siteUrl)
 		const hostname = url.hostname
-		console.table({ url, hostname })
-		return { domain: hostname.split('.').slice(-2).join('.'), url: siteUrl }
+		return {
+			domain: hostname.split('.').slice(-2).join('.'),
+			url: siteUrl,
+		}
 	} catch (error) {
 		Log(CreateError(error).message)
 	}

@@ -253,11 +253,13 @@ export function Vault() {
 					<Menubar.Item
 						name="Add Keychain"
 						iconName="fa fa-plus"
+						animation="fa fa-beat-fade"
 						onClick={() => keychainModal.open()}
 					/>
 					<Menubar.Item
 						name="Import"
 						iconName="fa fa-upload"
+						animation="fa fa-bounce"
 						onClick={() => null}
 					/>
 					{/* show Export button if there are items to export */}
@@ -265,6 +267,7 @@ export function Vault() {
 						<Menubar.Item
 							name="Export"
 							iconName="fa fa-download"
+							animation="fa fa-bounce"
 							onClick={() => ExportToCSV(vault)}
 						/>
 					)}
@@ -272,6 +275,7 @@ export function Vault() {
 					<Menubar.Item
 						name="Logout"
 						iconName="fa fa-lock"
+						animation="fa fa-beat-fade"
 						navigateTo="/login"
 						onClick={handleLogout}
 					/>
@@ -298,7 +302,7 @@ export function Vault() {
 							/>
 						</Header.Logo>
 						<Header.Title
-							title="There are no Keychains"
+							title="There are no keychains"
 							subTitle='click "+" to Add one'
 						/>
 					</Header>

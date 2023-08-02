@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import type { TFunction } from '@/types'
+import { AnimatedIcon } from '../AnimatedIcon'
 
 interface IMenuItem {
 	onClick: TFunction
 	navigateTo: string
 	name: string
 	iconName: string
+	animation: string
 }
 /**
  * Item component
@@ -21,21 +23,23 @@ export function Item({
 	navigateTo = '',
 	onClick,
 	iconName = 'fa fa-bars',
+	animation = '',
 }: Partial<IMenuItem>) {
 	return (
 		<div>
 			<Link
+				data-testid="menubar-item"
 				title={name}
 				className="button-style menu descend"
 				to={navigateTo}
 				onClick={onClick}
 			>
-				{iconName && (
-					<i
-						data-testid={iconName}
-						className={iconName}
-					/>
-				)}
+				<AnimatedIcon
+					title={name}
+					className={iconName}
+					iconName={iconName}
+					animation={animation}
+				/>
 			</Link>
 		</div>
 	)

@@ -19,7 +19,10 @@ interface ILinkLabel extends IChildren, Pick<TDetailedHTMLProps, 'className' | '
 export function LinkLabel({ children, linkRef, routeTo, preText, className, onClick }: ILinkLabel) {
 	return (
 		<div className={`${className} center small descend`}>
-			<p className="small enabled">
+			<div
+				className="small enabled"
+				style={{ margin: '10px 0' }}
+			>
 				{preText}{' '}
 				<Link
 					ref={linkRef} // to handle focus from parent component
@@ -28,7 +31,7 @@ export function LinkLabel({ children, linkRef, routeTo, preText, className, onCl
 				>
 					{children}
 				</Link>
-			</p>
+			</div>
 		</div>
 	)
 }

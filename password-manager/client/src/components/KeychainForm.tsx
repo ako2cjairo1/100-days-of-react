@@ -61,7 +61,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 		isEditing: !IsEmpty(keychainInfo?.keychainId),
 		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
 		isValidWebsite: WEBSITE_REGEX.test(input.website),
-		isValidPassword: !input.password.includes(','),
+		isValidPassword: !IsEmpty(input.password) && !input.password.includes(','),
 		canCopyUsername: !usernameClipboard.isCopied && !IsEmpty(input.username),
 		canCopyPassword: !passwordClipboard.isCopied && !IsEmpty(input.password),
 		canGeneratePassword: !isSubmitted && !keychainStatus.success,
@@ -203,13 +203,19 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							routeTo="/vault"
 							onClick={handleAction.deletePassword}
 						>
-							<AnimatedIcon
-								className={`regular ${
-									isSubmitted || keychainStatus.success ? 'disabled' : 'active'
-								}`}
-								iconName="fa fa-trash"
-								animation="fa-shake danger"
-							/>
+							<div
+								className="action-container"
+								style={{ position: 'initial' }}
+							>
+								<AnimatedIcon
+									title="Delete Keychain"
+									className={`action-button small ${
+										isSubmitted || keychainStatus.success ? 'disabled' : 'active'
+									}`}
+									iconName="fa fa-trash"
+									animation="fa-shake"
+								/>
+							</div>
 						</LinkLabel>
 					</KeychainCard>
 					<Separator></Separator>
@@ -299,13 +305,14 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						id="password"
 						style={{ paddingRight: '106px' }}
 						type={revealPassword ? 'text' : 'password'}
+						placeholder="Secure Password"
 						value={input.password}
 						disabled={isSubmitted}
 						required
 						className={`${
 							isSubmitted
 								? 'disabled'
-								: !IsEmpty(input.password)
+								: checkIf.isValidPassword
 								? ''
 								: !isFocus.password && 'invalid'
 						}`}
@@ -334,7 +341,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							</>
 						)}
 						<AnimatedIcon
-							title="generate password"
+							title="Generate Password"
 							className={`action-button small ${checkIf.canGeneratePassword && 'active'}`}
 							iconName="fa fa-refresh"
 							animation="fa-spin"
