@@ -14,10 +14,11 @@ import {
 	Separator,
 } from '@/components'
 import { useAuthContext, useStateObj } from '@/hooks'
-import type { TKeychain, TStatus, TRequestType, TVaultContent } from '@/types'
+import type { TKeychain, TStatus, TRequestType, TVaultContent, TExportKeychain } from '@/types'
 import {
 	CreateError,
 	ExportToCSV,
+	ImportCSVToJSON,
 	Log,
 	SessionStorage,
 	decryptVault,
@@ -260,7 +261,12 @@ export function Vault() {
 						name="Import"
 						iconName="fa fa-upload"
 						animation="fa fa-bounce"
-						onClick={() => null}
+						onClick={() => {
+							// TODO: callback function to copy imported keychains to Vault
+							const syncToVault = (content: Partial<TExportKeychain>[]) =>
+								console.log(content[0]?.username)
+							ImportCSVToJSON(syncToVault)
+						}}
 					/>
 					{/* show Export button if there are items to export */}
 					{vault.some(Boolean) && (
@@ -311,7 +317,6 @@ export function Vault() {
 				{formContent === vault_component ? (
 					<>
 						{vaultCountRef.current > 0 && <SearchBar searchCallback={handleSearch} />}
-
 						<VaultContainer
 							vault={vault}
 							actionHandler={openKeychain}

@@ -453,3 +453,56 @@ export function ExportToCSV(
 		document.body.removeChild(link)
 	}
 }
+
+export function ImportCSVToJSON(copyToVault: (content: Partial<TExportKeychain>[]) => void) {
+	// create and set attributes of a fileDialog
+	const fileDialog = document.createElement('input')
+	fileDialog.type = 'file'
+	fileDialog.style.visibility = 'hidden'
+
+	try {
+		const CSVToJSON = (fileDialog: HTMLInputElement) => {
+			const validateAndGetHeaders = (headers: string[]) => {
+				if (headers.every(key => Object.hasOwn(KEYCHAIN_CONST.HEADERS, key.toLowerCase()))) {
+					return headers
+				}
+				throw Error('Missing or invalid header')
+			}
+			const mapContentToKeychain = (content: string[]) => {
+				if (content[0] === undefined) throw Error('No Content')
+
+				const keys = validateAndGetHeaders(content[0].split(','))
+				const initVal: Partial<TExportKeychain> = {}
+				return content.slice(1).map(line => {
+					return line.split(',').reduce((acc, cur, i) => {
+						const prop = (keys[i] as string).toLowerCase()
+						return { ...acc, [prop]: cur }
+					}, initVal)
+				})
+			}
+
+			// make sure a file is selected
+			if (fileDialog.files && fileDialog.files[0]) {
+				const reader = new FileReader()
+
+				reader.onload = () => {
+					const stringData = reader.result
+					if (stringData) {
+						const content = stringData.toString().split('\r\n')
+						copyToVault(mapContentToKeychain(content))
+					}
+				}
+				reader.readAsText(fileDialog.files[0])
+			}
+		}
+
+		fileDialog.onchange = () => CSVToJSON(fileDialog)
+		document.body.appendChild(fileDialog)
+		fileDialog.click()
+	} catch (error) {
+		console.log('HERE')
+		Log(CreateError(error).message)
+	} finally {
+		document.body.removeChild(fileDialog)
+	}
+}
