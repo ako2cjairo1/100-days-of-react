@@ -75,8 +75,8 @@ export function Keychain({
 								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
 								iconName={`fa ${
 									!checkIf.canCopyUsername && checkIf.debounceCopyUserName
-										? 'fa-check active scale-up'
-										: 'fa-clone'
+										? 'fa-circle-check active scale-up'
+										: 'fa-solid fa-copy'
 								}`}
 								onClick={handleAction.copyUserName}
 							/>
@@ -112,8 +112,8 @@ export function Keychain({
 								className={`action-button small ${checkIf.canCopyPassword && 'active scale-down'}`}
 								iconName={`fa ${
 									!checkIf.canCopyPassword && checkIf.debounceCopyPassword
-										? 'fa-check active scale-up'
-										: 'fa-clone'
+										? 'fa-circle-check active scale-up'
+										: 'fa-solid fa-copy'
 								}`}
 								onClick={handleAction.copyPassword}
 							/>

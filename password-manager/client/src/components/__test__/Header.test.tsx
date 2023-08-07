@@ -42,7 +42,7 @@ describe('Header', () => {
 				<Header.Status status={{ success: true, message: 'success message' }} />
 			</Header>
 		)
-		expect(container.querySelector('.fa.fa-check-circle')).toBeInTheDocument()
+		expect(container.querySelector('.fa.fa-circle-check')).toBeInTheDocument()
 	})
 
 	it('should not render Header.Status when either success and message are not truthy', () => {
@@ -51,7 +51,7 @@ describe('Header', () => {
 				<Header.Status status={{ success: true, message: '' }} />
 			</Header>
 		)
-		expect(container.querySelector('.fa.fa-check-circle')).not.toBeInTheDocument()
+		expect(container.querySelector('.fa.fa-circle-check')).not.toBeInTheDocument()
 	})
 
 	it('should render Header.Status error icon and message when "success" is false and "errMsg" is defined', () => {

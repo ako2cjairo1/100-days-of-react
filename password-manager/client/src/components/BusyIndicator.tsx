@@ -7,7 +7,7 @@ export function BusyIndicator({ title, subTitle }: ComponentProps<typeof Title>)
 		<div className="form-container">
 			<Header>
 				<AnimatedIcon
-					iconName="fa fa-gear"
+					iconName="fa fa-atom"
 					animation="fa-spin"
 					animateOnLoad
 				/>

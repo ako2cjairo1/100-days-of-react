@@ -14,8 +14,8 @@ describe('InlineNotification', () => {
 
 	it('renders the provided iconName when it is provided', () => {
 		const { getByTestId } = render(
-			<InlineNotification iconName="fa fa-check">Test</InlineNotification>
+			<InlineNotification iconName="fa fa-circle-check">Test</InlineNotification>
 		)
-		expect(getByTestId('animated-icon')).toHaveClass('fa fa-check')
+		expect(getByTestId('animated-icon')).toHaveClass('fa fa-circle-check')
 	})
 })

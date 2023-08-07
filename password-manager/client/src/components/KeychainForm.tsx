@@ -192,7 +192,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					status={keychainStatus}
 					icon={
 						keychainStatus.message.toLowerCase().includes('delete')
-							? 'danger fa fa-trash fa-bounce'
+							? 'danger fa fa-trash-can fa-bounce'
 							: ''
 					}
 				/>
@@ -291,7 +291,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
 								iconName={`fa ${
-									checkIf.debounceUsernameClipboard ? 'fa-check active scale-up' : 'fa-clone'
+									checkIf.debounceUsernameClipboard
+										? 'fa-circle-check active scale-up'
+										: 'fa-solid fa-copy'
 								}`}
 								onClick={handleAction.copyUserName}
 							/>
@@ -342,7 +344,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 										checkIf.canCopyPassword && 'active scale-down'
 									}`}
 									iconName={`fa ${
-										checkIf.debouncePasswordClipboard ? 'fa-check active scale-up' : 'fa-clone'
+										checkIf.debouncePasswordClipboard
+											? 'fa-circle-check active scale-up'
+											: 'fa-solid fa-copy'
 									}`}
 									onClick={handleAction.copyPassword}
 								/>

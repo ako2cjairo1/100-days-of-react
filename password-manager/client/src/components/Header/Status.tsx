@@ -27,7 +27,7 @@ export function Status({ children, status, icon }: IStatus) {
 						<>
 							<AnimatedIcon
 								className={`${icon ? icon : ''}`}
-								iconName={`fa ${icon ? icon : 'fa-check-circle'}`}
+								iconName={`fa ${icon ? icon : 'fa-regular fa-circle-check'}`}
 								animation={`${icon ? icon : 'fa-beat-fade'}`}
 								animateOnLoad
 							/>

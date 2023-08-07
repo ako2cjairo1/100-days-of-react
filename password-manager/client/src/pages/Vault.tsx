@@ -281,7 +281,7 @@ export function Vault() {
 		},
 		{
 			name: 'Logout',
-			iconName: 'fa fa-lock',
+			iconName: 'fa fa-solid fa-unlock-keyhole',
 			animation: 'fa fa-beat-fade',
 			navigateTo: '/login',
 			onClick: handleLogout,
@@ -307,8 +307,9 @@ export function Vault() {
 					<Header>
 						<Header.Logo>
 							<AnimatedIcon
-								iconName="fa fa-face-rolling-eyes"
-								animation="fa-shake"
+								iconName="danger fa fa-ban"
+								animation="fa-beat-fade"
+								animateOnLoad
 							/>
 						</Header.Logo>
 						<Header.Title

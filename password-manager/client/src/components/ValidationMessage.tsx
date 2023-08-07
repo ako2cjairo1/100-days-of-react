@@ -22,7 +22,7 @@ export function ValidationMessage({ isVisible, title, validations }: IValidation
 								<i
 									style={{ animationDelay: `${idx * 0.1}s` }}
 									className={`smooth small fa-li fa ${
-										isValid ? 'fa-check scale-up' : 'fa-close scale-down spins'
+										isValid ? 'fa-circle-check scale-up' : 'fa-close scale-down spins'
 									}`}
 								/>
 								{message}

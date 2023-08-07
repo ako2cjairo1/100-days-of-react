@@ -161,7 +161,7 @@ export function Registration() {
 				<Header>
 					<AnimatedIcon
 						className="scale-up"
-						iconName="fa fa-check-circle"
+						iconName="fa fa-circle-check"
 					/>
 					<Header.Title title="Registration completed!">
 						<LinkLabel

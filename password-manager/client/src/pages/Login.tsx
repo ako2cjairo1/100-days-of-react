@@ -170,7 +170,7 @@ export function Login() {
 				{loginStatus.success ? (
 					<Header>
 						<AnimatedIcon
-							iconName="fa fa-check-circle"
+							iconName="fa fa-regular fa-circle-check"
 							animation="fa fa-bounce"
 							animateOnLoad
 						/>

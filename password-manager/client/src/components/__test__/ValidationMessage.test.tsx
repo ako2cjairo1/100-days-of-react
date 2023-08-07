@@ -73,7 +73,7 @@ describe('ValidationMessage', () => {
 				validations={validations}
 			/>
 		)
-		expect(container.querySelector('.fa-check')).toBeInTheDocument()
+		expect(container.querySelector('.fa-circle-check')).toBeInTheDocument()
 	})
 
 	it('should render an error icon for invalid validations', () => {
