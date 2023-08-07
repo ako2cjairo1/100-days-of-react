@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '@/assets/modules/Vault.css'
 import {
@@ -19,6 +19,7 @@ import {
 	CreateError,
 	ExportToCSV,
 	ImportCSVToJSON,
+	IsEmpty,
 	Log,
 	SessionStorage,
 	decryptVault,
@@ -94,7 +95,7 @@ export function Vault() {
 	}, [authenticate, hydrateAndGetVault, isLoggedIn, navigate, updateVaultStatus])
 
 	// encrypt current Vault, store on session storage and finally, update database
-	const syncDatabaseUpdate = async (vault: TKeychain[]) => {
+	const syncVaultUpdate = async (vault: TKeychain[]) => {
 		const encryptedVault = encryptVault({ vault, vaultKey })
 		// send encrypted update to database
 		await updateVaultService({ encryptedVault })
@@ -124,7 +125,7 @@ export function Vault() {
 				}
 			}
 			// for "Delete" action, remove keychain from current Vault
-			let tempVault = currentVault.filter(
+			let vaultUpdate = currentVault.filter(
 				({ keychainId }) => keychainId !== keychainUpdate.keychainId
 			)
 			// for "Add" and "Modify" actions: append timeAgo prop
@@ -134,10 +135,10 @@ export function Vault() {
 					timeAgo: new Date().toString(),
 				}
 				// clone current Vault then append Keychain update on the top of the list
-				tempVault = [keychainUpdateWithTimeAgo, ...tempVault]
+				vaultUpdate = [keychainUpdateWithTimeAgo, ...vaultUpdate]
 			}
 
-			await syncDatabaseUpdate(tempVault)
+			await syncVaultUpdate(vaultUpdate)
 
 			return {
 				success: true,
@@ -189,11 +190,11 @@ export function Vault() {
 		if (keychainId) openKeychain(keychainId, modify)
 	}
 
-	const handleSearch = (searchKey: string): number => {
+	const handleSearch = (searchKey = ''): number => {
 		const vaultData: TKeychain[] = hydrateAndGetVault()
 		let searchResult = vaultData
 
-		if (searchKey.length > 0) {
+		if (!IsEmpty(searchKey)) {
 			const key = searchKey.toLowerCase()
 			searchResult = vaultData.filter(
 				item =>
@@ -205,23 +206,21 @@ export function Vault() {
 		return searchResult.length
 	}
 
-	const keychainModal = useMemo(() => {
-		return {
-			open: (info?: TKeychain) => {
-				// open Modal form with keychain info, blank if otherwise
-				updateKeychain(info ? info : INIT_KEYCHAIN)
-				setIsOpenModalForm(true)
-			},
-			close: () => {
-				setIsOpenModalForm(false)
-				// set the keychain state to initial values
-				updateKeychain(INIT_KEYCHAIN)
-				// then show Vault (keychain list)
-				setFormContent(vault_component)
-			},
-			toggle: (toggle: boolean) => (toggle ? keychainModal.open() : keychainModal.close()),
-		}
-	}, [updateKeychain])
+	const keychainModal = {
+		open: (info?: TKeychain) => {
+			// open Modal form with keychain info, blank if otherwise
+			updateKeychain(info ? info : INIT_KEYCHAIN)
+			setIsOpenModalForm(true)
+		},
+		close: () => {
+			setIsOpenModalForm(false)
+			// set the keychain state to initial values
+			updateKeychain(INIT_KEYCHAIN)
+			// then show Vault (keychain list)
+			setFormContent(vault_component)
+		},
+		toggle: (toggle: boolean) => (toggle ? keychainModal.open() : keychainModal.close()),
+	}
 
 	const handleLogout = async () => {
 		try {
@@ -316,7 +315,7 @@ export function Vault() {
 
 				{formContent === vault_component ? (
 					<>
-						{vaultCountRef.current > 0 && <SearchBar searchCallback={handleSearch} />}
+						{vaultCountRef.current > 0 && <SearchBar searchCb={handleSearch} />}
 						<VaultContainer
 							vault={vault}
 							actionHandler={openKeychain}

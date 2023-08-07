@@ -188,7 +188,14 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					<Header.Title subTitle="We will save this password in your session storage and cloud account" />
 				)}
 
-				<Header.Status status={keychainStatus} />
+				<Header.Status
+					status={keychainStatus}
+					icon={
+						keychainStatus.message.toLowerCase().includes('delete')
+							? 'danger fa fa-trash fa-bounce'
+							: ''
+					}
+				/>
 			</Header>
 
 			{checkIf.isEditing && (
@@ -213,7 +220,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 									className={`action-button small ${
 										isSubmitted || keychainStatus.success ? 'disabled' : 'active'
 									}`}
-									iconName="fa fa-trash"
+									iconName="fa fa-trash-can"
 									animation="fa-shake"
 								/>
 							</div>
@@ -325,7 +332,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							<>
 								<AnimatedIcon
 									title={`${revealPassword ? 'Hide' : 'Reveal'} Password`}
-									className={`action-button small ${input.password.length > 0 && 'active'}`}
+									className={`action-button small ${!IsEmpty(input.password) && 'active'}`}
 									iconName={`fa fa-eye${revealPassword ? '-slash scale-up' : ' scale-down'}`}
 									onClick={handleAction.revealPassword}
 								/>

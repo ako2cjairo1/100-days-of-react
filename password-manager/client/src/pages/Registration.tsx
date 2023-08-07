@@ -218,7 +218,7 @@ export function Registration() {
 						}
 					/>
 					<ValidationMessage
-						isVisible={!isFocus.email && !checkIf.isValidEmail && input.email.length > 0}
+						isVisible={!isFocus.email && !checkIf.isValidEmail && !IsEmpty(input.email)}
 						validations={emailReq}
 					/>
 				</div>

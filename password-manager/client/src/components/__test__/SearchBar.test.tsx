@@ -2,22 +2,20 @@ import { SearchBar } from '@/components'
 import { fireEvent, render } from '@/services/Utils/test.util'
 
 describe('SearchBar', () => {
-	// it('calls searchCallback when search input changes', () => {
-	// 	const searchCallback = vi.fn()
-	// 	const { getByPlaceholderText } = render(<SearchBar searchCallback={searchCallback} />)
+	it('calls searchCallback when search input changes', () => {
+		const searchCallback = vi.fn(() => 1)
+		const { getByPlaceholderText } = render(<SearchBar searchCb={searchCallback} />)
 
-	// 	fireEvent.change(getByPlaceholderText('Search keychains'), {
-	// 		target: { value: 'test' },
-	// 	})
+		fireEvent.change(getByPlaceholderText('Search keychains'), {
+			target: { value: 'test' },
+		})
 
-	// 	expect(searchCallback).toHaveBeenCalledWith('test')
-	// })
+		expect(searchCallback).toHaveBeenCalledWith('test')
+	})
 
 	it('displays message when search input changes', () => {
 		const searchCallback = vi.fn(() => 3)
-		const { getByPlaceholderText, getByText } = render(
-			<SearchBar searchCallback={searchCallback} />
-		)
+		const { getByPlaceholderText, getByText } = render(<SearchBar searchCb={searchCallback} />)
 
 		fireEvent.change(getByPlaceholderText('Search keychains'), {
 			target: { value: 'test' },
@@ -28,9 +26,7 @@ describe('SearchBar', () => {
 
 	it('displays no results message when no results are found', () => {
 		const searchCallback = vi.fn(() => 0)
-		const { getByPlaceholderText, getByText } = render(
-			<SearchBar searchCallback={searchCallback} />
-		)
+		const { getByPlaceholderText, getByText } = render(<SearchBar searchCb={searchCallback} />)
 
 		fireEvent.change(getByPlaceholderText('Search keychains'), {
 			target: { value: 'test' },
@@ -41,9 +37,7 @@ describe('SearchBar', () => {
 
 	it('displays suggestion to check spelling when no results are found', () => {
 		const searchCallback = vi.fn(() => 0)
-		const { getByPlaceholderText, getByText } = render(
-			<SearchBar searchCallback={searchCallback} />
-		)
+		const { getByPlaceholderText, getByText } = render(<SearchBar searchCb={searchCallback} />)
 
 		fireEvent.change(getByPlaceholderText('Search keychains'), {
 			target: { value: 'test' },
@@ -54,9 +48,7 @@ describe('SearchBar', () => {
 
 	it('clears search input when clear button is clicked', () => {
 		const searchCallback = vi.fn(() => 3)
-		const { getByPlaceholderText, getByTestId } = render(
-			<SearchBar searchCallback={searchCallback} />
-		)
+		const { getByPlaceholderText, getByTestId } = render(<SearchBar searchCb={searchCallback} />)
 
 		fireEvent.change(getByPlaceholderText('Search keychains'), {
 			target: { value: 'test' },
