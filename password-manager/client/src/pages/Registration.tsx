@@ -21,7 +21,7 @@ import {
 	PasswordStrength,
 	AnimatedIcon,
 	Header,
-	ProcessIndicator,
+	BusyIndicator,
 } from '@/components'
 import { useInput, useAuthContext, useStateObj } from '@/hooks'
 import { registerUserService, ssoService } from '@/services/api'
@@ -148,7 +148,7 @@ export function Registration() {
 	// process indicator while doing oAuth
 	if (loading)
 		return (
-			<ProcessIndicator
+			<BusyIndicator
 				title="Please wait..."
 				subTitle={registrationStatus.message}
 			/>

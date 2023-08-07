@@ -5,7 +5,7 @@ import {
 	FormGroup,
 	Header,
 	LinkLabel,
-	ProcessIndicator,
+	BusyIndicator,
 	Separator,
 	SubmitButton,
 	Toggle,
@@ -158,7 +158,7 @@ export function Login() {
 	// process indicator while oAuth
 	if (loading)
 		return (
-			<ProcessIndicator
+			<BusyIndicator
 				title="Please wait..."
 				subTitle={loginStatus.message}
 			/>

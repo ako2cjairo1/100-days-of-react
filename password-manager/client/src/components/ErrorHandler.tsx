@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CreateError } from '@/services/Utils'
+import { CreateError, IsEmpty } from '@/services/Utils'
 import { Header, AnimatedIcon, LinkLabel } from '../components'
 
 export function ErrorHandler(error: unknown) {
@@ -8,7 +8,7 @@ export function ErrorHandler(error: unknown) {
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		if (error instanceof Object && Object.keys(error).some(Boolean)) {
+		if (error instanceof Object && !IsEmpty(Object.keys(error))) {
 			return setMessage(CreateError(error).message)
 		}
 

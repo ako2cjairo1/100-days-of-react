@@ -1,14 +1,7 @@
 import { Link } from 'react-router-dom'
-import type { TFunction } from '@/types'
+import type { IMenuItem } from '@/types'
 import { AnimatedIcon } from '../AnimatedIcon'
 
-interface IMenuItem {
-	onClick: TFunction
-	navigateTo: string
-	name: string
-	iconName: string
-	animation: string
-}
 /**
  * Item component
  * param {string} name - The name of the item

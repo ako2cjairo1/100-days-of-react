@@ -1,3 +1,5 @@
+import { TFunction } from './global.type'
+
 // Component Interfaces
 export type TDetailedHTMLProps<T = HTMLElement> = React.DetailedHTMLProps<
 	React.HTMLAttributes<T>,
@@ -20,4 +22,12 @@ export interface IInputElement
 	id: string // override id as required
 	type?: React.HTMLInputTypeAttribute
 	linkRef?: React.Ref<HTMLInputElement>
+}
+
+export interface IMenuItem {
+	onClick: TFunction
+	navigateTo: string
+	name: string
+	iconName: string
+	animation: string
 }

@@ -2,7 +2,7 @@ import { createContext, useCallback, useState } from 'react'
 import type { TAuthContext, TAuthProvider, IChildren, TStatus } from '@/types'
 import type { ISession, TCredentials } from '@shared'
 import { AUTH_CONTEXT } from '@/services/constants'
-import { CreateError, SessionStorage, generateVaultKey, hashPassword } from '../Utils'
+import { CreateError, IsEmpty, SessionStorage, generateVaultKey, hashPassword } from '../Utils'
 import { getSessionService, loginUserService } from '@/services/api'
 
 export const AuthContext = createContext<TAuthContext<TAuthProvider> | null>(null)
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: IChildren) {
 					status.message = 'Authentication Successful!'
 				}
 
-				if (Object.values(session).some(Boolean)) {
+				if (!IsEmpty(Object.values(session))) {
 					createUserSession(session)
 					// return successful authentication state
 					status.success = true

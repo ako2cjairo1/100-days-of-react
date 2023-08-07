@@ -2,7 +2,7 @@ import { ComponentProps } from 'react'
 import { Header, Title } from './Header'
 import { AnimatedIcon } from './AnimatedIcon'
 
-export function ProcessIndicator({ title, subTitle }: ComponentProps<typeof Title>) {
+export function BusyIndicator({ title, subTitle }: ComponentProps<typeof Title>) {
 	return (
 		<div className="form-container">
 			<Header>

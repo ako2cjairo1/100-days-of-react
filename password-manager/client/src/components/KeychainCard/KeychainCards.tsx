@@ -2,7 +2,7 @@ import type { TKeychain } from '@/types'
 import type { IKeychain } from '@/components'
 import { KeychainCard } from '@/components/KeychainCard'
 
-interface IVaultContainer extends Pick<IKeychain, 'actionHandler'> {
+interface IKeychainCards extends Pick<IKeychain, 'actionHandler'> {
 	vault: Omit<TKeychain, 'password' | 'timeAgo'>[]
 }
 /**
@@ -12,12 +12,12 @@ interface IVaultContainer extends Pick<IKeychain, 'actionHandler'> {
  *
  * returns A React fragment containing a list of KeychainItem components
  */
-export function VaultContainer({ vault, actionHandler }: IVaultContainer) {
+export function KeychainCards({ vault, actionHandler }: IKeychainCards) {
 	return (
 		<div className="vault-list">
 			{vault.map(({ keychainId, logo, website, username }, idx) => (
 				<KeychainCard
-					// combine keychainid and idx to trigger animation
+					// combine keychainId and idx to trigger animation
 					key={`${keychainId}${idx}`}
 					logo={logo}
 					website={website}
