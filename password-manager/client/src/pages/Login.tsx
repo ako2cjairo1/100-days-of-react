@@ -1,4 +1,6 @@
 import '@/assets/modules/Login.css'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import type { TInputLogin } from '@/types'
 import {
 	AnimatedIcon,
 	AuthProviderSection,
@@ -11,12 +13,12 @@ import {
 	Toggle,
 	ValidationMessage,
 } from '@/components'
-import { useAuthContext, useInput, useStateObj } from '@/hooks'
+import { useAuthContext, useInput } from '@/hooks'
 import { ExtractValFromRegEx, IsEmpty, LocalStorage, RunAfterSomeTime } from '@/services/Utils'
 import { ssoService } from '@/services/api'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
-import type { TInputLogin, TStatus } from '@/types'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { updateStatus, selectStatusInfo } from '@/services/store/features/statusSlice'
+import { useAppDispatch, useAppSelector } from '@/services/store/hooks'
 
 // constants
 const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
@@ -38,32 +40,31 @@ export function Login() {
 	const updateInputRef = useRef(updateInput)
 
 	const [isEmailInput, setIsEmailInput] = useState(true)
-	const { objState: loginStatus, mutate: updateLoginStatus } = useStateObj<TStatus>(
-		LOGIN_STATE.Status
-	)
-	const updateLoginStatusRef = useRef(updateLoginStatus)
 	const emailInputRef = useRef<HTMLInputElement>(null)
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
+
+	// context attribs
 	const {
 		authenticate,
 		authInfo: { isLoggedIn },
 	} = useAuthContext()
-	const [loading, setLoading] = useState(false)
+
+	// redux attribs
+	const dispatch = useRef(useAppDispatch())
+	const loginStatus = useAppSelector(selectStatusInfo)
 
 	// side-effect to persist authentication
 	useLayoutEffect(() => {
 		const authenticateSession = () => {
 			if (!isLoggedIn) {
 				// show authentication progress window
-				setLoading(true)
-				updateLoginStatusRef.current({ status: false, message: '' })
+				dispatch.current(updateStatus({ loading: true, success: false, message: '' }))
 				// authenticate current session by verifying to auth server
 				authenticate().then(({ success, message }) => {
 					// hide authentication progress window
-					setLoading(false)
 					// show success or failed authentication
-					updateLoginStatusRef.current({ success, message })
+					dispatch.current(updateStatus({ loading: false, success, message }))
 				})
 			}
 		}
@@ -89,11 +90,11 @@ export function Login() {
 		if (isEmailInput) return emailInputRef.current?.focus()
 		// else, focus on password input control
 		passwordInputRef.current?.focus()
-	}, [isEmailInput, loginStatus.success, isSubmitted])
+	}, [isEmailInput, isSubmitted, loginStatus.success])
 
 	// side-effect to reset notification message when user is actively typing
 	useLayoutEffect(() => {
-		if (input) updateLoginStatusRef.current({ message: '' })
+		if (input) dispatch.current(updateStatus({ message: '' }))
 	}, [input])
 
 	// 2 step submit: email and password.
@@ -101,7 +102,7 @@ export function Login() {
 	const handleSubmit = (formEvent: React.FormEvent) => {
 		formEvent.preventDefault()
 
-		updateLoginStatusRef.current({ message: '' })
+		// dispatch.current(loginStatus({ message: '' }))
 		if (isEmailInput) {
 			// move to password input
 			setIsEmailInput(false)
@@ -122,7 +123,7 @@ export function Login() {
 						resetInput()
 					}
 					// show success or failed authentication
-					updateLoginStatusRef.current({ success, message })
+					dispatch.current(updateStatus({ success, message }))
 					// end progress status of submit button
 					isSubmit(false)
 				}
@@ -156,7 +157,7 @@ export function Login() {
 	}
 
 	// process indicator while oAuth
-	if (loading)
+	if (loginStatus.loading)
 		return (
 			<BusyIndicator
 				title="Please wait..."
@@ -310,16 +311,19 @@ export function Login() {
 						<footer>
 							<AuthProviderSection
 								callbackFn={provider => {
-									setLoading(true)
-									updateLoginStatusRef.current({ message: `Sign-in via ${provider}` })
+									dispatch.current(
+										updateStatus({ loading: true, message: `Sign-in via ${provider}` })
+									)
 
 									RunAfterSomeTime(() => {
-										if (!loading) {
-											setLoading(false)
-											updateLoginStatusRef.current({
-												success: false,
-												message: `${provider} didn't respond, please try again`,
-											})
+										if (!loginStatus.loading) {
+											dispatch.current(
+												updateStatus({
+													loading: true,
+													success: false,
+													message: `${provider} didn't respond, please try again`,
+												})
+											)
 											window.location.reload()
 										}
 									}, 5)

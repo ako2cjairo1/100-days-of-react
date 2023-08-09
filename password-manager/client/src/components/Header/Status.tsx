@@ -1,4 +1,5 @@
 import { AnimatedIcon } from '@/components'
+import { IsEmpty } from '@/services/Utils'
 import type { IChildren, TStatus } from '@/types'
 
 interface IStatus extends IChildren {
@@ -14,7 +15,7 @@ interface IStatus extends IChildren {
  */
 
 export function Status({ children, status, icon }: IStatus) {
-	const isSuccessfulWithMessage = Object.values(status ? status : {}).every(Boolean)
+	const isSuccessfulWithMessage = status?.success && !IsEmpty(status.message)
 
 	return (
 		<>

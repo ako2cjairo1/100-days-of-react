@@ -12,7 +12,7 @@ import {
 	ValidationMessage,
 } from '@/components'
 import { KeychainCard } from '@/components/KeychainCard'
-import { useDebounceToggle, useInput, useStateObj, useTimedCopyToClipboard } from '@/hooks'
+import { useDebounceToggle, useInput, useTimedCopyToClipboard } from '@/hooks'
 import {
 	CreateError,
 	GeneratePassword,
@@ -24,6 +24,8 @@ import {
 } from '@/services/Utils/password-manager.helper'
 import { KEYCHAIN_CONST, RequestType } from '@/services/constants'
 import type { TFunction, TKeychain, TStatus, TRequestType } from '@/types'
+import { useAppDispatch, useAppSelector } from '@/services/store/hooks'
+import { selectStatusInfo, updateStatus } from '@/services/store/features/statusSlice'
 
 const { INIT_STATUS, INIT_KEYCHAIN, WEBSITE_REGEX } = KEYCHAIN_CONST
 const { add, modify, remove } = RequestType
@@ -50,12 +52,13 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 	const websiteInputRef = useRef<HTMLInputElement>(null)
 	const [revealPassword, setRevealPassword] = useState(false)
-	const { objState: keychainStatus, mutate: updateKeychainStatus } =
-		useStateObj<TStatus>(INIT_STATUS)
-	const updateKeychainStatusRef = useRef(updateKeychainStatus)
 
 	const usernameClipboard = useTimedCopyToClipboard({ message: 'Username is copied to clipboard!' })
 	const passwordClipboard = useTimedCopyToClipboard({ message: 'Password is copied to clipboard!' })
+
+	// redux attribs
+	const dispatch = useRef(useAppDispatch())
+	const keychainStatus = useAppSelector(selectStatusInfo)
 
 	// conditional rendering properties
 	const checkIf = {
@@ -102,7 +105,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 	// side-effect to clear the status message when user updated keychain form
 	useEffect(() => {
-		updateKeychainStatusRef.current({ message: '' })
+		dispatch.current(updateStatus({ message: '' }))
 	}, [input])
 
 	const handleAction = {
@@ -129,11 +132,11 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 				if (!success) throw new Error(message)
 
 				// show success status before closing the modal
-				updateKeychainStatusRef.current({ success: true, message: 'Password Deleted!' })
+				dispatch.current(updateStatus({ success: true, message: 'Password Deleted!' }))
 
 				// after sometime, reset status and close modal
 				RunAfterSomeTime(() => {
-					updateKeychainStatusRef.current(INIT_STATUS)
+					dispatch.current(updateStatus(INIT_STATUS))
 					showForm(false)
 					// invoke resetInput
 					resetInput()
@@ -146,7 +149,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 			if (!isSubmitted) {
 				// set to submit and reset status
 				isSubmit(true)
-				updateKeychainStatusRef.current(INIT_STATUS)
+				dispatch.current(updateStatus(INIT_STATUS))
 
 				try {
 					// post request to update/add keychain info
@@ -161,17 +164,17 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						? 'The changes have been saved'
 						: 'Password have been added!'
 					// show success status before closing the modal
-					updateKeychainStatusRef.current({ success: true, message: successMessage })
+					dispatch.current(updateStatus({ success: true, message: successMessage }))
 
 					// after sometime, reset status and close modal
 					RunAfterSomeTime(() => {
-						updateKeychainStatusRef.current(INIT_STATUS)
+						dispatch.current(updateStatus(INIT_STATUS))
 						showForm(false)
 						// invoke resetInput
 						resetInput()
 					}, 2)
 				} catch (error) {
-					updateKeychainStatusRef.current({ success: false, message: CreateError(error).message })
+					dispatch.current(updateStatus({ success: false, message: CreateError(error).message }))
 				} finally {
 					isSubmit(false)
 				}
@@ -400,7 +403,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						onClick={() => {
 							setRevealPassword(false)
 							showForm(false)
-							updateKeychainStatusRef.current({ success: false, message: '' })
+							dispatch.current(updateStatus({ success: false, message: '' }))
 						}}
 					>
 						Cancel

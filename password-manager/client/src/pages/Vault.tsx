@@ -33,6 +33,8 @@ import {
 import { RequestType, KEYCHAIN_CONST, FormContent, AUTH_CONTEXT } from '@/services/constants'
 import { logoutUserService, updateVaultService } from '@/services/api'
 import { MenubarContainer } from '@/components/Menubar/MenubarContainer'
+import { useAppDispatch, useAppSelector } from '@/services/store/hooks'
+import { selectStatusInfo, updateStatus } from '@/services/store/features/statusSlice'
 
 const { INIT_KEYCHAIN, INIT_STATUS } = KEYCHAIN_CONST
 const { add, modify, view } = RequestType
@@ -42,22 +44,25 @@ const { vault_component, keychain_component } = FormContent
  * returns A div element with the class "vault-container" containing a KeychainContainer, a Toolbar, and Modal component
  */
 export function Vault() {
-	const { objState: keychain, mutate: updateKeychain } = useStateObj<TKeychain>(INIT_KEYCHAIN)
-	const { objState: vaultStatus, mutate: updateVaultStatus } = useStateObj<TStatus>(INIT_STATUS)
-	const updateVaultStatusRef = useRef(updateVaultStatus)
+	const [keychain, mutateKeychain] = useStateObj<TKeychain>(INIT_KEYCHAIN)
 	const [vault, setVault] = useState<TKeychain[]>([])
-
 	const [isOpenModalForm, setIsOpenModalForm] = useState(false)
 	const [formContent, setFormContent] = useState<TVaultContent>(vault_component)
+
+	const vaultCountRef = useRef(0)
+	const authRef = useRef(true)
+	const navigate = useRef(useNavigate())
+
+	// context attribs
 	const {
 		authInfo: { isLoggedIn, vaultKey },
 		mutateAuth,
 		authenticate,
 	} = useAuthContext()
-	const vaultCountRef = useRef(0)
-	const authRef = useRef(true)
-	const [loading, setLoading] = useState(false)
-	const navigate = useNavigate()
+
+	// redux attribs
+	const dispatch = useRef(useAppDispatch())
+	const vaultStatus = useAppSelector(selectStatusInfo)
 
 	const hydrateAndGetVault = () => {
 		let decryptedVault = []
@@ -72,10 +77,12 @@ export function Vault() {
 			// remember how many items on current Vault
 			vaultCountRef.current = decryptedVault.length
 		} catch (error) {
-			updateVaultStatusRef.current({
-				success: false,
-				message: "We can't access your Vault! Try logging out and in..",
-			})
+			dispatch.current(
+				updateStatus({
+					success: false,
+					message: "We can't access your Vault! Try logging out and in..",
+				})
+			)
 		}
 
 		return decryptedVault
@@ -83,6 +90,7 @@ export function Vault() {
 	const hydrateAndGetVaultRef = useRef(hydrateAndGetVault)
 
 	useLayoutEffect(() => {
+		dispatch.current(updateStatus({ message: '', success: false }))
 		// currently logged-in? hydrate current User's Vault
 		if (isLoggedIn) {
 			hydrateAndGetVaultRef.current()
@@ -92,15 +100,14 @@ export function Vault() {
 		// otherwise, get authentication from auth server
 		if (authRef.current) {
 			// show authentication progress window
-			setLoading(true)
-			updateVaultStatusRef.current({ status: false, message: '' })
+			dispatch.current(updateStatus({ loading: true, success: false }))
 			authenticate().then(({ success }) => {
-				setLoading(false)
-				if (!success) navigate('/login', { replace: true })
+				dispatch.current(updateStatus({ loading: false }))
+				if (!success) navigate.current('/login', { replace: true })
 			})
 			authRef.current = false
 		}
-	}, [authenticate, isLoggedIn, navigate])
+	}, [authenticate, isLoggedIn])
 
 	// encrypt current Vault, store on session storage and finally, update database
 	const syncVaultUpdate = async (vault: TKeychain[]) => {
@@ -154,7 +161,8 @@ export function Vault() {
 			}
 		} catch (error) {
 			const { code, message } = CreateError(error)
-			if (code === 401 || code === 403) navigate({ pathname: '/error', search: `error=${error}` })
+			if (code === 401 || code === 403)
+				navigate.current({ pathname: '/error', search: `error=${error}` })
 			return {
 				success: false,
 				message: message,
@@ -164,23 +172,25 @@ export function Vault() {
 
 	const openKeychain = (keychainId?: string, action?: TRequestType) => {
 		if (!isLoggedIn) {
-			navigate('/login', { replace: true })
+			navigate.current('/login', { replace: true })
 		} else {
 			authenticate().then(({ success }) =>
-				!success ? navigate('/login', { replace: true }) : null
+				!success ? navigate.current('/login', { replace: true }) : null
 			)
 		}
 		const info = vault.find(info => info.keychainId === keychainId)
 		// throw an error message if keychainId is not found
 		if (!info) {
-			return updateVaultStatus({
-				success: false,
-				message: 'Keychain information not found! Try again after a while.',
-			})
+			return dispatch.current(
+				updateStatus({
+					success: false,
+					message: 'Keychain information not found! Try again after a while.',
+				})
+			)
 		}
 		// open the keychain info
 		if (!action || action === view) {
-			updateKeychain(info)
+			mutateKeychain(info)
 			return setFormContent(keychain_component)
 		}
 		// submit keychain info to Modal for update
@@ -192,8 +202,8 @@ export function Vault() {
 	const keychainHandler = (keychainId?: string) => {
 		// hide keychain info and reset clipboard status
 		setFormContent(vault_component)
-		updateVaultStatus(INIT_STATUS)
-		updateKeychain(INIT_KEYCHAIN)
+		dispatch.current(updateStatus(INIT_STATUS))
+		mutateKeychain(INIT_KEYCHAIN)
 		// subsequently open a modal form if user choose to "Update" a keychain
 		if (keychainId) openKeychain(keychainId, modify)
 	}
@@ -224,6 +234,7 @@ export function Vault() {
 		} finally {
 			// reset auth context
 			mutateAuth(AUTH_CONTEXT.authInfo)
+			dispatch.current(updateStatus({ success: false }))
 			// clear session storage (Vault and saltKey)
 			SessionStorage.clear()
 		}
@@ -232,13 +243,13 @@ export function Vault() {
 	const keychainModal = {
 		open: (info?: TKeychain) => {
 			// open Modal form with keychain info, blank if otherwise
-			updateKeychain(info ? info : INIT_KEYCHAIN)
+			mutateKeychain(info ? info : INIT_KEYCHAIN)
 			setIsOpenModalForm(true)
 		},
 		close: () => {
 			setIsOpenModalForm(false)
 			// set the keychain state to initial values
-			updateKeychain(INIT_KEYCHAIN)
+			mutateKeychain(INIT_KEYCHAIN)
 			// then show Vault (keychain list)
 			setFormContent(vault_component)
 		},
@@ -246,7 +257,7 @@ export function Vault() {
 	}
 
 	// process indicator while oAuth
-	if (loading)
+	if (vaultStatus.loading)
 		return (
 			<BusyIndicator
 				title="Please wait..."

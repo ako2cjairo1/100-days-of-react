@@ -1,6 +1,6 @@
 import type { TInputLogin, TStatus } from '@/types'
 
-export const LOGIN_STATE = {
+export const LOGIN_STATE: Record<'Credential', TInputLogin> & Record<'Status', TStatus> = {
 	Credential: {
 		email: '',
 		password: '',
@@ -10,4 +10,4 @@ export const LOGIN_STATE = {
 		success: false,
 		message: '',
 	},
-} satisfies Record<'Credential', TInputLogin> & Record<'Status', TStatus>
+}

@@ -500,7 +500,6 @@ export function ImportCSVToJSON(copyToVault: (content: Partial<TExportKeychain>[
 		document.body.appendChild(fileDialog)
 		fileDialog.click()
 	} catch (error) {
-		console.log('HERE')
 		Log(CreateError(error).message)
 	} finally {
 		document.body.removeChild(fileDialog)

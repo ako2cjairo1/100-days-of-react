@@ -33,11 +33,10 @@ export function useTimedCopyToClipboard({
 	copyCallbackFn = () => null,
 	expiration = CLIPBOARD_TIMEOUT,
 }: Partial<IUseTimedCopyToClipboard>) {
-	const { objState: clipboard, mutate: mutateStatus } = useStateObj({
+	const [{ isCopied, statusMessage }, mutateStatus] = useStateObj({
 		isCopied: false,
 		statusMessage: message,
 	})
-	const { isCopied, statusMessage } = clipboard
 	const timerRef = useRef<NodeJS.Timeout>()
 	const timeoutRef = useRef<NodeJS.Timeout>()
 

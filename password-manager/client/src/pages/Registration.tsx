@@ -1,6 +1,6 @@
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { FormEvent, useEffect, useRef } from 'react'
 import '@/assets/modules/Login.css'
-import type { TStatus, TInputRegistration, TValidation } from '@/types'
+import type { TInputRegistration, TValidation } from '@/types'
 import { REGISTER_STATE } from '@/services/constants'
 import {
 	RunAfterSomeTime,
@@ -23,11 +23,13 @@ import {
 	Header,
 	BusyIndicator,
 } from '@/components'
-import { useInput, useAuthContext, useStateObj } from '@/hooks'
+import { useInput, useAuthContext } from '@/hooks'
 import { registerUserService, ssoService } from '@/services/api'
+import { useAppDispatch, useAppSelector } from '@/services/store/hooks'
+import { selectStatusInfo, updateStatus } from '@/services/store/features/statusSlice'
 
 // constants
-const { CREDENTIALS, STATUS, EMAIL_REGEX, PASSWORD_REGEX } = REGISTER_STATE
+const { CREDENTIALS, EMAIL_REGEX, PASSWORD_REGEX } = REGISTER_STATE
 const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
 
 export function Registration() {
@@ -35,14 +37,14 @@ export function Registration() {
 	const { isSubmit, resetInput, input, onChange, onFocus, onBlur, isFocus, isSubmitted } =
 		useInput<TInputRegistration>(CREDENTIALS)
 
-	const { objState: registrationStatus, mutate: updateRegistrationStatus } =
-		useStateObj<TStatus>(STATUS)
-	const updateRegistrationStatusRef = useRef(updateRegistrationStatus)
-
 	const emailRef = useRef<HTMLInputElement>(null)
 	const loginRef = useRef<HTMLAnchorElement>(null)
+
+	// context attribs
 	const { mutateAuth } = useAuthContext()
-	const [loading, setLoading] = useState(false)
+	// redux attribs
+	const dispatch = useRef(useAppDispatch())
+	const registrationStatus = useAppSelector(selectStatusInfo)
 
 	useEffect(() => {
 		if (!registrationStatus.success) emailRef.current?.focus()
@@ -50,7 +52,7 @@ export function Registration() {
 	}, [registrationStatus.success])
 
 	useEffect(() => {
-		updateRegistrationStatusRef.current({ message: '' })
+		dispatch.current(updateStatus({ message: '' }))
 	}, [input])
 
 	const passwordRequirement = {
@@ -112,7 +114,7 @@ export function Registration() {
 		event.preventDefault()
 
 		if (!isSubmitted) {
-			updateRegistrationStatus({ message: '' })
+			dispatch.current(updateStatus({ message: '' }))
 			isSubmit(true)
 
 			RunAfterSomeTime(async () => {
@@ -128,25 +130,29 @@ export function Registration() {
 						mutateAuth({ email: input.email })
 						// clear form input states and status
 						resetInput()
-						updateRegistrationStatus({ success: true, message: '' })
+						dispatch.current(updateStatus({ success: true }))
 					} else {
-						updateRegistrationStatus({
-							success: false,
-							message: 'Registration Failed!',
-						})
+						dispatch.current(
+							updateStatus({
+								success: false,
+								message: 'Registration Failed!',
+							})
+						)
 					}
 
 					isSubmit(false)
 				} catch (error) {
 					isSubmit(false)
-					return updateRegistrationStatus({ success: false, message: CreateError(error).message })
+					return dispatch.current(
+						updateStatus({ success: false, message: CreateError(error).message })
+					)
 				}
 			}, 3)
 		}
 	}
 
 	// process indicator while doing oAuth
-	if (loading)
+	if (registrationStatus.loading)
 		return (
 			<BusyIndicator
 				title="Please wait..."
@@ -255,7 +261,7 @@ export function Registration() {
 						}
 					/>
 					<ValidationMessage
-						title="Your master password must contain:"
+						title="Your password must contain:"
 						isVisible={!isFocus.password && !checkIf.isValidPassword && !IsEmpty(input.password)}
 						validations={passwordReq}
 					/>
@@ -343,16 +349,19 @@ export function Registration() {
 			<footer>
 				<AuthProviderSection
 					callbackFn={provider => {
-						setLoading(true)
-						updateRegistrationStatus({ message: `Register and Sign-in via ${provider}` })
+						dispatch.current(
+							updateStatus({ loading: true, message: `Register and Sign-in via ${provider}` })
+						)
 
 						RunAfterSomeTime(() => {
-							if (!loading) {
-								setLoading(false)
-								updateRegistrationStatus({
-									success: false,
-									message: `${provider} didn't respond, please try again`,
-								})
+							if (!registrationStatus.loading) {
+								dispatch.current(
+									updateStatus({
+										loading: false,
+										success: false,
+										message: `${provider} didn't respond, please try again`,
+									})
+								)
 								window.location.reload()
 							}
 						}, 5)

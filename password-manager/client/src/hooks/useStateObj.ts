@@ -9,10 +9,10 @@ export function useStateObj<T>(initialValue: T) {
 	const [objState, setObjState] = useState<T>(initialValue)
 
 	type TStateUpdate = T | [keyof T] | { [key: string]: unknown }
-	const mutate = useCallback(
+	const mutateFn = useCallback(
 		(update: Partial<TStateUpdate>) => setObjState(prev => ({ ...prev, ...update })),
 		[]
 	)
 
-	return { objState, mutate }
+	return [objState, mutateFn] as const
 }
