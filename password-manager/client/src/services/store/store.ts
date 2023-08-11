@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authReducer from './features/authenticationSlice'
-import statusReducer from './features/statusSlice'
+import appStatusReducer from './features/appStatusSlice'
 
 // wrap reducers with middleware (thunk, etc.)
 export const store = configureStore({
 	reducer: {
 		auth: authReducer,
-		status: statusReducer,
+		appStatus: appStatusReducer,
 	},
 	middleware: getDefaultMiddleware => getDefaultMiddleware(), //.concat(createLogger()),
 	devTools: true,

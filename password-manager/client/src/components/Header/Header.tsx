@@ -1,5 +1,5 @@
 import type { IChildren, TDetailedHTMLProps } from '@/types'
-import { Logo } from '@/components/Header/Logo'
+import { Logo } from '@/components/Header/Header.Logo'
 import { Title } from '@/components/Header/Title'
 import { Status } from '@/components/Header/Status'
 

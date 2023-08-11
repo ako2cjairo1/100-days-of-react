@@ -1,6 +1,6 @@
 import { fireEvent, render } from '@/services/Utils/test.util'
 import { MemoryRouter } from 'react-router-dom'
-import { KeychainCard, Logo } from '@/components/KeychainCard'
+import { KeychainCard, CardLogo } from '@/components/KeychainCard'
 
 describe('KeychainCard', () => {
 	it('renders the website domain name and subText', () => {
@@ -34,7 +34,7 @@ describe('KeychainCard', () => {
 describe('Logo', () => {
 	it('renders an img element with the provided logo', () => {
 		const { getByAltText } = render(
-			<Logo
+			<CardLogo
 				logo="logo.png"
 				website="example.com"
 			/>
@@ -43,7 +43,7 @@ describe('Logo', () => {
 	})
 
 	it('renders an AnimatedIcon with the first letter of the website domain if logo is not provided', () => {
-		const { getByText } = render(<Logo website="example.com" />)
+		const { getByText } = render(<CardLogo website="example.com" />)
 		expect(getByText('E')).toBeInTheDocument()
 	})
 })

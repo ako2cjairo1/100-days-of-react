@@ -1,5 +1,6 @@
 import { TKeychain } from '@/types'
 import { SHA256, PBKDF2, AES, enc } from 'crypto-js'
+import { CreateError } from '@/services/Utils'
 
 export function hashPassword(password: string) {
 	return SHA256(password).toString()
@@ -31,7 +32,7 @@ export function decryptVault({ vault, vaultKey }: IEncryptVault<string>) {
 		const decrypted = AES.decrypt(vault, vaultKey).toString(enc.Utf8)
 		return JSON.parse(decrypted)
 	} catch (err) {
-		console.warn('Decryption error')
+		throw Error(CreateError(err).message)
 	}
 	return []
 }

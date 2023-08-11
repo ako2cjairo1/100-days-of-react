@@ -1,3 +1,3 @@
 export * from './KeychainCard'
-export * from './Logo'
-export * from './KeychainCards'
+export * from './KeychainCard.Logo'
+export * from './KeychainCardContainer'

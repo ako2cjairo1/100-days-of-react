@@ -1,17 +1,6 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '@/assets/modules/Vault.css'
-import {
-	Modal,
-	KeychainForm,
-	Keychain,
-	AnimatedIcon,
-	Header,
-	SearchBar,
-	BusyIndicator,
-} from '@/components'
-import { KeychainCards } from '@/components/KeychainCard'
-import { useAuthContext, useStateObj } from '@/hooks'
 import type {
 	TKeychain,
 	TStatus,
@@ -21,23 +10,39 @@ import type {
 	IMenuItem,
 } from '@/types'
 import {
+	Modal,
+	KeychainForm,
+	Keychain,
+	AnimatedIcon,
+	Header,
+	SearchBar,
+	BusyIndicator,
+	MenubarContainer,
+	KeychainCardContainer,
+} from '@/components'
+import { useStateObj } from '@/hooks'
+import {
 	CreateError,
 	ExportToCSV,
 	ImportCSVToJSON,
 	IsEmpty,
-	Log,
 	SessionStorage,
 	decryptVault,
 	encryptVault,
 } from '@/services/Utils'
-import { RequestType, KEYCHAIN_CONST, FormContent, AUTH_CONTEXT } from '@/services/constants'
-import { logoutUserService, updateVaultService } from '@/services/api'
-import { MenubarContainer } from '@/components/Menubar/MenubarContainer'
+import { updateVaultService } from '@/services/api'
+import { RequestType, KEYCHAIN_CONST, FormContent } from '@/services/constants'
 import { useAppDispatch, useAppSelector } from '@/services/store/hooks'
-import { selectStatusInfo, updateStatus } from '@/services/store/features/statusSlice'
+import {
+	fetchAuthSession,
+	logoutUser,
+	selectAuthentication,
+	updateAppStatus,
+	updateAuthStatus,
+} from '@/services/store/features'
 
 const { INIT_KEYCHAIN, INIT_STATUS } = KEYCHAIN_CONST
-const { add, modify, view } = RequestType
+const { add, update: modify, view } = RequestType
 const { vault_component, keychain_component } = FormContent
 /**
  * Renders a Keychain component
@@ -53,19 +58,17 @@ export function Vault() {
 	const authRef = useRef(true)
 	const navigate = useRef(useNavigate())
 
-	// context attribs
-	const {
-		authInfo: { isLoggedIn, vaultKey },
-		mutateAuth,
-		authenticate,
-	} = useAuthContext()
-
 	// redux attribs
 	const dispatch = useRef(useAppDispatch())
-	const vaultStatus = useAppSelector(selectStatusInfo)
+	const {
+		auth: { isLoggedIn, vaultKey },
+		loading,
+		message,
+		success,
+	} = useAppSelector(selectAuthentication)
 
-	const hydrateAndGetVault = () => {
-		let decryptedVault = []
+	const hydrateAndGetVault = useCallback(() => {
+		let decryptedVault: TKeychain[] = []
 		try {
 			const vault = SessionStorage.read('PM_encrypted_vault')
 			if (vault) {
@@ -77,37 +80,31 @@ export function Vault() {
 			// remember how many items on current Vault
 			vaultCountRef.current = decryptedVault.length
 		} catch (error) {
-			dispatch.current(
-				updateStatus({
-					success: false,
-					message: "We can't access your Vault! Try logging out and in..",
-				})
+			navigate.current(
+				{
+					pathname: '/error',
+					search: `error=We can't access your Vault. ${CreateError(error).message}`,
+				},
+				{ replace: true }
 			)
 		}
 
 		return decryptedVault
-	}
-	const hydrateAndGetVaultRef = useRef(hydrateAndGetVault)
+	}, [vaultKey])
 
-	useLayoutEffect(() => {
-		dispatch.current(updateStatus({ message: '', success: false }))
+	// to persist authentication
+	useEffect(() => {
+		dispatch.current(updateAuthStatus({ message: '', success: false }))
 		// currently logged-in? hydrate current User's Vault
-		if (isLoggedIn) {
-			hydrateAndGetVaultRef.current()
-			return
-		}
-
-		// otherwise, get authentication from auth server
-		if (authRef.current) {
-			// show authentication progress window
-			dispatch.current(updateStatus({ loading: true, success: false }))
-			authenticate().then(({ success }) => {
-				dispatch.current(updateStatus({ loading: false }))
-				if (!success) navigate.current('/login', { replace: true })
-			})
+		if (isLoggedIn) hydrateAndGetVault()
+		// otherwise, get authentication from auth server (only once: authRef)
+		else if (authRef.current) {
+			dispatch.current(fetchAuthSession())
+			// redirect to login if unsuccessful authentication
+			if (!success) navigate.current('/login', { replace: true })
 			authRef.current = false
 		}
-	}, [authenticate, isLoggedIn])
+	}, [hydrateAndGetVault, isLoggedIn, success])
 
 	// encrypt current Vault, store on session storage and finally, update database
 	const syncVaultUpdate = async (vault: TKeychain[]) => {
@@ -116,14 +113,14 @@ export function Vault() {
 		await updateVaultService({ encryptedVault })
 		// store local copy of encryptedVault in session storage
 		SessionStorage.write([['PM_encrypted_vault', encryptedVault]])
-		hydrateAndGetVaultRef.current()
+		hydrateAndGetVault()
 	}
 
 	const mutateVault = async (
 		keychainUpdate: TKeychain,
 		requestType: TRequestType
 	): Promise<TStatus> => {
-		const currentVault: TKeychain[] = hydrateAndGetVaultRef.current()
+		const currentVault = hydrateAndGetVault()
 
 		try {
 			// checks if email and website is already on the Vault list
@@ -140,17 +137,16 @@ export function Vault() {
 				}
 			}
 			// for "Delete" action, remove keychain from current Vault
-			let vaultUpdate = currentVault.filter(
+			const vaultUpdate = currentVault.filter(
 				({ keychainId }) => keychainId !== keychainUpdate.keychainId
 			)
 			// for "Add" and "Modify" actions: append timeAgo prop
 			if (requestType === add || requestType === modify) {
-				const keychainUpdateWithTimeAgo: TKeychain = {
+				// append Keychain update on the top of the list
+				vaultUpdate.unshift({
 					...keychainUpdate,
 					timeAgo: new Date().toString(),
-				}
-				// clone current Vault then append Keychain update on the top of the list
-				vaultUpdate = [keychainUpdateWithTimeAgo, ...vaultUpdate]
+				})
 			}
 
 			await syncVaultUpdate(vaultUpdate)
@@ -171,45 +167,40 @@ export function Vault() {
 	}
 
 	const openKeychain = (keychainId?: string, action?: TRequestType) => {
-		if (!isLoggedIn) {
-			navigate.current('/login', { replace: true })
-		} else {
-			authenticate().then(({ success }) =>
-				!success ? navigate.current('/login', { replace: true }) : null
-			)
-		}
-		const info = vault.find(info => info.keychainId === keychainId)
+		if (!isLoggedIn) navigate.current('/login', { replace: true })
+
+		const keychainInfo = vault.find(info => info.keychainId === keychainId)
 		// throw an error message if keychainId is not found
-		if (!info) {
+		if (!keychainInfo) {
 			return dispatch.current(
-				updateStatus({
+				updateAppStatus({
 					success: false,
 					message: 'Keychain information not found! Try again after a while.',
 				})
 			)
 		}
 		// open the keychain info
-		if (!action || action === view) {
-			mutateKeychain(info)
+		if (IsEmpty(action) || action === view) {
+			mutateKeychain(keychainInfo)
 			return setFormContent(keychain_component)
 		}
 		// submit keychain info to Modal for update
 		if (action === modify) {
-			return keychainModal.open(info)
+			return keychainModal.open(keychainInfo)
 		}
 	}
 
 	const keychainHandler = (keychainId?: string) => {
 		// hide keychain info and reset clipboard status
 		setFormContent(vault_component)
-		dispatch.current(updateStatus(INIT_STATUS))
+		dispatch.current(updateAppStatus(INIT_STATUS))
 		mutateKeychain(INIT_KEYCHAIN)
 		// subsequently open a modal form if user choose to "Update" a keychain
 		if (keychainId) openKeychain(keychainId, modify)
 	}
 
 	const handleSearch = (searchKey = ''): number => {
-		const vaultData: TKeychain[] = hydrateAndGetVaultRef.current()
+		const vaultData: TKeychain[] = hydrateAndGetVault()
 		let searchResult = vaultData
 
 		if (!IsEmpty(searchKey)) {
@@ -225,19 +216,10 @@ export function Vault() {
 	}
 
 	const handleLogout = async () => {
-		try {
-			// call backend to invalidate user tokens
-			// ..update login info to database
-			await logoutUserService()
-		} catch (error) {
-			Log(CreateError(error).message)
-		} finally {
-			// reset auth context
-			mutateAuth(AUTH_CONTEXT.authInfo)
-			dispatch.current(updateStatus({ success: false }))
-			// clear session storage (Vault and saltKey)
-			SessionStorage.clear()
-		}
+		// to invalidate user tokens, update login info to database
+		dispatch.current(logoutUser())
+		// clear session storage (Vault and saltKey)
+		SessionStorage.clear()
 	}
 
 	const keychainModal = {
@@ -257,11 +239,11 @@ export function Vault() {
 	}
 
 	// process indicator while oAuth
-	if (vaultStatus.loading)
+	if (loading)
 		return (
 			<BusyIndicator
 				title="Please wait..."
-				subTitle={vaultStatus.message}
+				subTitle={message}
 			/>
 		)
 
@@ -279,8 +261,9 @@ export function Vault() {
 			animation: 'fa fa-bounce',
 			onClick: () => {
 				// TODO: callback function to copy imported keychains to Vault
-				const syncToVault = (content: Partial<TExportKeychain>[]) =>
-					console.log(content[0]?.username)
+				const syncToVault = (content: Partial<TExportKeychain>[]) => {
+					for (const item of content) console.table({ item })
+				}
 				ImportCSVToJSON(syncToVault)
 			},
 		},
@@ -301,51 +284,6 @@ export function Vault() {
 
 	return (
 		<div className="vault-container">
-			<MenubarContainer {...{ menus }} />
-
-			<section className="form-container">
-				{!IsEmpty(vault) ? (
-					<Header>
-						<Header.Logo />
-						<Header.Title title="Secured Vault" />
-						<div className="center">
-							<p className="small">{`${vaultCountRef.current} keychains save.`}</p>
-							<p className="x-small disabled">(0 leaked, 0 reused, 5 weak)</p>
-						</div>
-						<Header.Status status={vaultStatus} />
-					</Header>
-				) : (
-					<Header>
-						<Header.Logo>
-							<AnimatedIcon
-								iconName="danger fa fa-ban"
-								animation="fa-beat-fade"
-								animateOnLoad
-							/>
-						</Header.Logo>
-						<Header.Title
-							title="There are no keychains"
-							subTitle='click "+" to Add one'
-						/>
-					</Header>
-				)}
-
-				{formContent === vault_component ? (
-					<>
-						{vaultCountRef.current > 0 && <SearchBar searchCb={handleSearch} />}
-						<KeychainCards
-							vault={vault}
-							actionHandler={openKeychain}
-						/>
-					</>
-				) : (
-					<Keychain
-						{...keychain}
-						actionHandler={keychainHandler}
-					/>
-				)}
-			</section>
-
 			<Modal
 				isOpen={isOpenModalForm}
 				onClose={keychainModal.close}
@@ -358,6 +296,52 @@ export function Vault() {
 					updateCallback={mutateVault}
 				/>
 			</Modal>
+
+			<MenubarContainer {...{ menus }} />
+
+			<section className="form-container">
+				{!IsEmpty(vault) ? (
+					<Header>
+						<Header.Logo />
+						<Header.Title title="Secured Vault" />
+						<div className="center">
+							<p className="small">{`${vaultCountRef.current} keychains save.`}</p>
+							<p className="x-small disabled">(0 leaked, 0 reused, 5 weak)</p>
+						</div>
+						<Header.Status status={{ success, message }} />
+					</Header>
+				) : (
+					<Header>
+						<Header.Logo>
+							<AnimatedIcon
+								className="danger"
+								iconName="fa fa-triangle-exclamation"
+								animation="fa-beat-fade"
+								animateOnLoad
+							/>
+						</Header.Logo>
+						<Header.Title
+							title="This vault is empty..."
+							subTitle='click "+" to Add one'
+						/>
+					</Header>
+				)}
+
+				{formContent === vault_component ? (
+					<>
+						{vaultCountRef.current > 0 && <SearchBar searchCb={handleSearch} />}
+						<KeychainCardContainer
+							vault={vault}
+							actionHandler={openKeychain}
+						/>
+					</>
+				) : (
+					<Keychain
+						{...keychain}
+						actionHandler={keychainHandler}
+					/>
+				)}
+			</section>
 		</div>
 	)
 }

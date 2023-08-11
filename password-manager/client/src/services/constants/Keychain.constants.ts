@@ -10,6 +10,7 @@ export const KEYCHAIN_CONST = {
 		logo: '',
 	},
 	WEBSITE_REGEX: /^(https?:\/\/)?((localhost)|([\da-z.-]+)\.([a-z.]{2,6}))([/\w .-]*)*\/?$/,
+	ILLEGAL_REGEX: /(?=.*[,])/,
 	HEADERS: {
 		website: 'URL',
 		username: 'Username',
@@ -19,5 +20,6 @@ export const KEYCHAIN_CONST = {
 	INIT_STATUS: TStatus
 	INIT_KEYCHAIN: TKeychain
 	WEBSITE_REGEX: RegExp
+	ILLEGAL_REGEX: RegExp
 	HEADERS: TExportKeychain
 }

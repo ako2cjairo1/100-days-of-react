@@ -1,10 +1,28 @@
-import { AuthProviderSection } from '@/components'
+import { AuthProviderContainer } from '@/components/AuthProvider'
 import { render, fireEvent } from '@/services/Utils/test.util'
 
-describe('AuthProviderSection', () => {
+describe('AuthProviderContainer', () => {
 	const callbackFn = vi.fn()
 	it('renders a div with class social and has 3 buttons inside it', async () => {
-		const { getByTestId } = render(<AuthProviderSection callbackFn={callbackFn} />)
+		const { getByTestId } = render(
+			<AuthProviderContainer>
+				<AuthProviderContainer.Provider
+					actionHandler={callbackFn}
+					label="Meta"
+					src="icon.png"
+				/>
+				<AuthProviderContainer.Provider
+					actionHandler={callbackFn}
+					label="Google"
+					src="icon.png"
+				/>
+				<AuthProviderContainer.Provider
+					actionHandler={callbackFn}
+					label="Github"
+					src="icon.png"
+				/>
+			</AuthProviderContainer>
+		)
 		const socialDiv = getByTestId('social')
 
 		if (socialDiv) {
@@ -21,14 +39,50 @@ describe('AuthProviderSection', () => {
 	})
 
 	it('renders three buttons', () => {
-		const { getAllByRole } = render(<AuthProviderSection callbackFn={callbackFn} />)
+		const { getAllByRole } = render(
+			<AuthProviderContainer>
+				<AuthProviderContainer.Provider
+					actionHandler={callbackFn}
+					label="Meta"
+					src="icon.png"
+				/>
+				<AuthProviderContainer.Provider
+					actionHandler={callbackFn}
+					label="Google"
+					src="icon.png"
+				/>
+				<AuthProviderContainer.Provider
+					actionHandler={callbackFn}
+					label="Github"
+					src="icon.png"
+				/>
+			</AuthProviderContainer>
+		)
 		const buttons = getAllByRole('button')
 		expect(buttons).toHaveLength(3)
 	})
 
 	it('calls handleExternalAuth when a button is clicked', () => {
 		const callbackFn = vi.fn()
-		const { getAllByRole } = render(<AuthProviderSection callbackFn={callbackFn} />)
+		const { getAllByRole } = render(
+			<AuthProviderContainer>
+				<AuthProviderContainer.Provider
+					actionHandler={callbackFn}
+					label="Meta"
+					src="icon.png"
+				/>
+				<AuthProviderContainer.Provider
+					actionHandler={callbackFn}
+					label="Google"
+					src="icon.png"
+				/>
+				<AuthProviderContainer.Provider
+					actionHandler={callbackFn}
+					label="Github"
+					src="icon.png"
+				/>
+			</AuthProviderContainer>
+		)
 		const buttons = getAllByRole('button')
 
 		fireEvent.click(buttons[0]!)

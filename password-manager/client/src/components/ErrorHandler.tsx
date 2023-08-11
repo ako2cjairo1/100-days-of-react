@@ -1,25 +1,37 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import type { IChildren } from '@/types'
 import { CreateError, IsEmpty } from '@/services/Utils'
-import { Header, AnimatedIcon, LinkLabel } from '../components'
+import { Header, AnimatedIcon, LinkLabel } from '@/components'
+import { useAppSelector } from '@/services/store/hooks'
+import { selectAuthentication } from '@/services/store/features'
 
-export function ErrorHandler(error: unknown) {
-	const [message, setMessage] = useState('')
+interface IErrorHandler extends IChildren {
+	error?: unknown
+}
+export function ErrorHandler({ children, error }: IErrorHandler) {
+	const [errorMessage, setErrorMessage] = useState('')
 	const navigate = useNavigate()
+	const { message, success } = useAppSelector(selectAuthentication)
 
 	useEffect(() => {
 		if (error instanceof Object && !IsEmpty(Object.keys(error))) {
-			return setMessage(CreateError(error).message)
+			return setErrorMessage(CreateError(error).message)
 		}
-
+		if (!IsEmpty(error)) {
+			return setErrorMessage(error as string)
+		}
+		if (!success && message) {
+			return setErrorMessage(message)
+		}
 		// error message from redirection url with query params
 		const errorFromQueryParam = window.location.search
 		if (errorFromQueryParam) {
-			// decode error message
+			// parse error message from query string
 			const errorMsg = new URLSearchParams(errorFromQueryParam).get('error')
-			if (errorMsg) setMessage(errorMsg)
+			if (errorMsg) setErrorMessage(errorMsg)
 		}
-	}, [error])
+	}, [error, message, success])
 
 	return (
 		<div
@@ -35,8 +47,8 @@ export function ErrorHandler(error: unknown) {
 					/>
 				</Header.Logo>
 				<Header.Title
-					title="Something went wrong"
-					subTitle={message}
+					title="Uh oh!"
+					subTitle={errorMessage ? errorMessage : 'Something went wrong.'}
 				>
 					<LinkLabel
 						routeTo=""
@@ -47,6 +59,7 @@ export function ErrorHandler(error: unknown) {
 					</LinkLabel>
 				</Header.Title>
 			</Header>
+			{children}
 		</div>
 	)
 }

@@ -10,7 +10,7 @@ import {
 	MergeRegExObj,
 	OverrideEventTarget,
 	RunAfterSomeTime,
-} from '@/services/Utils/password-manager.helper'
+} from '@/services/Utils'
 import { REGISTER_STATE } from '@/services/constants'
 import { ChangeEvent, FocusEvent } from 'react'
 

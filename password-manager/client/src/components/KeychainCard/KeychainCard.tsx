@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import type { IChildren, TFunction, TKeychain } from '@/types'
-import { GetDomainUrl } from '@/services/Utils/password-manager.helper'
+import { GetDomainUrl } from '@/services/Utils'
 import { AnchorWrapper, AnimatedIcon } from '@/components'
-import { Logo } from '@/components/KeychainCard'
+import { CardLogo } from '@/components/KeychainCard'
 import { useMemo } from 'react'
 
 export interface IKeychainCard extends IChildren, Partial<Pick<TKeychain, 'logo' | 'website'>> {
@@ -37,7 +37,7 @@ export function KeychainCard({
 	return (
 		<div className={className}>
 			<AnchorWrapper href={url}>
-				<Logo
+				<CardLogo
 					logo={logo}
 					website={domain}
 				/>

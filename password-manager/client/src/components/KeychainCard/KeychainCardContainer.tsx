@@ -12,7 +12,7 @@ interface IKeychainCards extends Pick<IKeychain, 'actionHandler'> {
  *
  * returns A React fragment containing a list of KeychainItem components
  */
-export function KeychainCards({ vault, actionHandler }: IKeychainCards) {
+export function KeychainCardContainer({ vault, actionHandler }: IKeychainCards) {
 	return (
 		<div className="vault-list">
 			{vault.map(({ keychainId, logo, website, username }, idx) => (

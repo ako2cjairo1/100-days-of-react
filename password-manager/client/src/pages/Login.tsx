@@ -1,9 +1,13 @@
-import '@/assets/modules/Login.css'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import '@/assets/modules/Login.css'
+import google from '@/assets/google.png'
+import github from '@/assets/github.png'
+import meta from '@/assets/facebook.png'
 import type { TInputLogin } from '@/types'
+import type { TProvider } from '@shared'
 import {
 	AnimatedIcon,
-	AuthProviderSection,
 	FormGroup,
 	Header,
 	LinkLabel,
@@ -12,13 +16,25 @@ import {
 	SubmitButton,
 	Toggle,
 	ValidationMessage,
+	AuthProviderContainer,
 } from '@/components'
-import { useAuthContext, useInput } from '@/hooks'
-import { ExtractValFromRegEx, IsEmpty, LocalStorage, RunAfterSomeTime } from '@/services/Utils'
+import { useInput } from '@/hooks'
+import {
+	ExtractValFromRegEx,
+	IsEmpty,
+	LocalStorage,
+	RunAfterSomeTime,
+	hashPassword,
+} from '@/services/Utils'
 import { ssoService } from '@/services/api'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
-import { updateStatus, selectStatusInfo } from '@/services/store/features/statusSlice'
 import { useAppDispatch, useAppSelector } from '@/services/store/hooks'
+import {
+	fetchAuthSession,
+	loginUser,
+	selectAuthentication,
+	updateAuthStatus,
+} from '@/services/store/features'
 
 // constants
 const { PASSWORD_REGEX, EMAIL_REGEX } = REGISTER_STATE
@@ -28,14 +44,12 @@ export function Login() {
 	// custom form input hook
 	const {
 		mutate: updateInput,
-		isSubmit,
 		resetInput,
 		input,
 		isFocus,
 		onChange,
 		onFocus,
 		onBlur,
-		isSubmitted,
 	} = useInput<TInputLogin>(LOGIN_STATE.Credential)
 	const updateInputRef = useRef(updateInput)
 
@@ -43,41 +57,35 @@ export function Login() {
 	const emailInputRef = useRef<HTMLInputElement>(null)
 	const passwordInputRef = useRef<HTMLInputElement>(null)
 	const securedVaultLinkRef = useRef<HTMLAnchorElement>(null)
-
-	// context attribs
-	const {
-		authenticate,
-		authInfo: { isLoggedIn },
-	} = useAuthContext()
+	const authRef = useRef(true)
+	const navigate = useRef(useNavigate())
 
 	// redux attribs
 	const dispatch = useRef(useAppDispatch())
-	const loginStatus = useAppSelector(selectStatusInfo)
+	const {
+		auth: { isLoggedIn },
+		loading,
+		message,
+		success,
+	} = useAppSelector(selectAuthentication)
 
 	// side-effect to persist authentication
-	useLayoutEffect(() => {
-		const authenticateSession = () => {
-			if (!isLoggedIn) {
-				// show authentication progress window
-				dispatch.current(updateStatus({ loading: true, success: false, message: '' }))
-				// authenticate current session by verifying to auth server
-				authenticate().then(({ success, message }) => {
-					// hide authentication progress window
-					// show success or failed authentication
-					dispatch.current(updateStatus({ loading: false, success, message }))
-				})
-			}
+	useEffect(() => {
+		if (!isLoggedIn && authRef.current) {
+			dispatch.current(fetchAuthSession())
+			// redirect to login if unsuccessful authentication
+			if (!success) navigate.current('/login', { replace: true })
+			authRef.current = false
 		}
-		authenticateSession()
-	}, [authenticate, isLoggedIn])
+	}, [isLoggedIn, success])
 
 	// side-effect to remember user's email..
-	useEffect(() => {
-		const rememberedEmail = LocalStorage.read('PM_remember_email')
+	useLayoutEffect(() => {
+		const cachedEmail = LocalStorage.read('PM_remember_email')
 		// load remembered email from local storage
 		updateInputRef.current({
-			email: rememberedEmail,
-			isRemember: rememberedEmail ? true : false,
+			email: cachedEmail,
+			isRemember: !IsEmpty(cachedEmail),
 		})
 		emailInputRef.current?.focus()
 	}, [])
@@ -85,16 +93,16 @@ export function Login() {
 	// side-effect to determine focused control
 	useLayoutEffect(() => {
 		// focus to link button "proceed to secured vault"
-		if (loginStatus.success) return securedVaultLinkRef.current?.focus()
+		if (success) return securedVaultLinkRef.current?.focus()
 		// focus to email input control
 		if (isEmailInput) return emailInputRef.current?.focus()
 		// else, focus on password input control
 		passwordInputRef.current?.focus()
-	}, [isEmailInput, isSubmitted, loginStatus.success])
+	}, [isEmailInput, success, loading])
 
 	// side-effect to reset notification message when user is actively typing
 	useLayoutEffect(() => {
-		if (input) dispatch.current(updateStatus({ message: '' }))
+		if (input) dispatch.current(updateAuthStatus({ message: '' }))
 	}, [input])
 
 	// 2 step submit: email and password.
@@ -102,7 +110,6 @@ export function Login() {
 	const handleSubmit = (formEvent: React.FormEvent) => {
 		formEvent.preventDefault()
 
-		// dispatch.current(loginStatus({ message: '' }))
 		if (isEmailInput) {
 			// move to password input
 			setIsEmailInput(false)
@@ -112,23 +119,41 @@ export function Login() {
 				: LocalStorage.remove('PM_remember_email')
 		}
 
-		if (!isSubmitted) {
-			// indicate start progress status of submit button
-			isSubmit(true)
-			// authenticate email and password credential via auth server
-			authenticate({ email: input.email, password: input.password }).then(
-				({ success, message }) => {
-					if (success) {
-						// clear input form states and status
-						resetInput()
-					}
-					// show success or failed authentication
-					dispatch.current(updateStatus({ success, message }))
-					// end progress status of submit button
-					isSubmit(false)
-				}
+		if (!loading) {
+			// authenticate using email and password credential via auth server
+			dispatch.current(
+				loginUser({
+					email: input.email,
+					password: hashPassword(input.password),
+				})
 			)
 		}
+	}
+
+	const handleSSOProvider = (provider: TProvider) => {
+		dispatch.current(
+			updateAuthStatus({
+				loading: true,
+				message: `Sign-in via ${provider}`,
+			})
+		)
+
+		RunAfterSomeTime(() => {
+			if (!loading) {
+				dispatch.current(
+					updateAuthStatus({
+						loading: false,
+						success: false,
+						message: `${provider} didn't respond, please try again`,
+					})
+				)
+				// reload to get auth (cookies)
+				window.location.reload()
+			}
+		}, 5)
+
+		// call sso, expect callback from provider on side-effects (Login render)
+		ssoService(provider)
 	}
 
 	const backToEmailInput = () => {
@@ -157,18 +182,18 @@ export function Login() {
 	}
 
 	// process indicator while oAuth
-	if (loginStatus.loading)
+	if (loading)
 		return (
 			<BusyIndicator
 				title="Please wait..."
-				subTitle={loginStatus.message}
+				subTitle={message}
 			/>
 		)
 
 	return (
 		<section>
 			<div className="form-container">
-				{loginStatus.success ? (
+				{success ? (
 					<Header>
 						<AnimatedIcon
 							iconName="fa fa-regular fa-circle-check"
@@ -177,7 +202,7 @@ export function Login() {
 						/>
 						<Header.Title
 							title="You are logged in!"
-							// subTitle={loginStatus.message}
+							// subTitle={message}
 						>
 							<LinkLabel
 								linkRef={securedVaultLinkRef}
@@ -196,7 +221,7 @@ export function Login() {
 								title="Welcome back"
 								subTitle="Log in or create a new account to access your secured vault"
 							/>
-							<Header.Status status={loginStatus} />
+							<Header.Status status={{ message, success }} />
 						</Header>
 
 						<FormGroup onSubmit={handleSubmit}>
@@ -218,7 +243,7 @@ export function Login() {
 										required
 										value={input.email}
 										linkRef={emailInputRef}
-										disabled={isSubmitted}
+										disabled={loading}
 										className={!checkIf.isValidEmail ? (!isFocus.email ? 'invalid' : '') : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
@@ -243,7 +268,7 @@ export function Login() {
 										required
 										value={input.password}
 										linkRef={passwordInputRef}
-										disabled={isSubmitted}
+										disabled={loading}
 										className={!checkIf.minLengthPassed ? (!isFocus.password ? 'invalid' : '') : ''}
 										{...{ onChange, onFocus, onBlur }}
 									/>
@@ -275,10 +300,9 @@ export function Login() {
 										variant: 'primary',
 										textStatus: 'Logging in...',
 										iconName: isEmailInput ? '' : 'fa fa-sign-in',
-										submitted: isSubmitted,
+										submitted: !loading && success,
 										disabled:
-											isSubmitted ||
-											(isEmailInput ? !checkIf.isValidEmail : !checkIf.minLengthPassed),
+											loading || (isEmailInput ? !checkIf.isValidEmail : !checkIf.minLengthPassed),
 									}}
 								>
 									{isEmailInput ? 'Continue' : 'Log in with Master Password'}
@@ -309,29 +333,23 @@ export function Login() {
 						</div>
 
 						<footer>
-							<AuthProviderSection
-								callbackFn={provider => {
-									dispatch.current(
-										updateStatus({ loading: true, message: `Sign-in via ${provider}` })
-									)
-
-									RunAfterSomeTime(() => {
-										if (!loginStatus.loading) {
-											dispatch.current(
-												updateStatus({
-													loading: true,
-													success: false,
-													message: `${provider} didn't respond, please try again`,
-												})
-											)
-											window.location.reload()
-										}
-									}, 5)
-
-									// call sso, expect callback from provider on side-effects (Login render)
-									ssoService(provider)
-								}}
-							/>
+							<AuthProviderContainer>
+								<AuthProviderContainer.Provider
+									actionHandler={() => handleSSOProvider('facebook')}
+									label="Meta"
+									src={meta}
+								/>
+								<AuthProviderContainer.Provider
+									actionHandler={() => handleSSOProvider('google')}
+									label="Google"
+									src={google}
+								/>
+								<AuthProviderContainer.Provider
+									actionHandler={() => handleSSOProvider('github')}
+									label="Github"
+									src={github}
+								/>
+							</AuthProviderContainer>
 						</footer>
 					</>
 				)}

@@ -1,5 +1,8 @@
 import { FormEvent, useEffect, useRef } from 'react'
 import '@/assets/modules/Login.css'
+import google from '@/assets/google.png'
+import github from '@/assets/github.png'
+import meta from '@/assets/facebook.png'
 import type { TInputRegistration, TValidation } from '@/types'
 import { REGISTER_STATE } from '@/services/constants'
 import {
@@ -13,7 +16,6 @@ import {
 import {
 	LinkLabel,
 	Separator,
-	AuthProviderSection,
 	SubmitButton,
 	Toggle,
 	FormGroup,
@@ -23,13 +25,15 @@ import {
 	Header,
 	BusyIndicator,
 } from '@/components'
+import { AuthProviderContainer } from '@/components/AuthProvider'
 import { useInput, useAuthContext } from '@/hooks'
 import { registerUserService, ssoService } from '@/services/api'
 import { useAppDispatch, useAppSelector } from '@/services/store/hooks'
-import { selectStatusInfo, updateStatus } from '@/services/store/features/statusSlice'
+import { selectAppStatus, updateAppStatus } from '@/services/store/features/appStatusSlice'
+import { TProvider } from '../../../shared/types.shared'
 
 // constants
-const { CREDENTIALS, EMAIL_REGEX, PASSWORD_REGEX } = REGISTER_STATE
+const { CREDENTIALS, EMAIL_REGEX, PASSWORD_REGEX, ILLEGAL_REGEX } = REGISTER_STATE
 const { alphabet, minLength, number, symbol } = PASSWORD_REGEX
 
 export function Registration() {
@@ -44,15 +48,15 @@ export function Registration() {
 	const { mutateAuth } = useAuthContext()
 	// redux attribs
 	const dispatch = useRef(useAppDispatch())
-	const registrationStatus = useAppSelector(selectStatusInfo)
+	const { loading, message, success } = useAppSelector(selectAppStatus)
 
 	useEffect(() => {
-		if (!registrationStatus.success) emailRef.current?.focus()
+		if (!success) emailRef.current?.focus()
 		else loginRef.current?.focus()
-	}, [registrationStatus.success])
+	}, [success])
 
 	useEffect(() => {
-		dispatch.current(updateStatus({ message: '' }))
+		dispatch.current(updateAppStatus({ message: '' }))
 	}, [input])
 
 	const passwordRequirement = {
@@ -60,7 +64,7 @@ export function Registration() {
 		alphabet: alphabet.test(input.password),
 		number: number.test(input.password),
 		symbol: symbol.test(input.password),
-		illegalSymbol: !input.password.includes(','),
+		illegalSymbol: !ILLEGAL_REGEX.test(input.password),
 	}
 
 	const checkIf = {
@@ -99,7 +103,7 @@ export function Registration() {
 			},
 			{
 				isValid: passwordRequirement.illegalSymbol,
-				message: 'does not contain illegal symbol: comma (,)',
+				message: `does not contain illegal symbol: ${ExtractValFromRegEx(ILLEGAL_REGEX.source)}`,
 			},
 		] satisfies TValidation[],
 		confirmReq: [
@@ -114,7 +118,7 @@ export function Registration() {
 		event.preventDefault()
 
 		if (!isSubmitted) {
-			dispatch.current(updateStatus({ message: '' }))
+			dispatch.current(updateAppStatus({ message: '' }))
 			isSubmit(true)
 
 			RunAfterSomeTime(async () => {
@@ -130,10 +134,10 @@ export function Registration() {
 						mutateAuth({ email: input.email })
 						// clear form input states and status
 						resetInput()
-						dispatch.current(updateStatus({ success: true }))
+						dispatch.current(updateAppStatus({ success: true }))
 					} else {
 						dispatch.current(
-							updateStatus({
+							updateAppStatus({
 								success: false,
 								message: 'Registration Failed!',
 							})
@@ -144,24 +148,50 @@ export function Registration() {
 				} catch (error) {
 					isSubmit(false)
 					return dispatch.current(
-						updateStatus({ success: false, message: CreateError(error).message })
+						updateAppStatus({ success: false, message: CreateError(error).message })
 					)
 				}
 			}, 3)
 		}
 	}
 
+	const handleSSOProvider = (provider: TProvider) => {
+		dispatch.current(
+			updateAppStatus({
+				loading: true,
+				message: `Register and Sign-in via ${provider}`,
+			})
+		)
+
+		RunAfterSomeTime(() => {
+			if (!loading) {
+				dispatch.current(
+					updateAppStatus({
+						loading: false,
+						success: false,
+						message: `${provider} didn't respond, please try again`,
+					})
+				)
+				// reload to get auth (cookies)
+				window.location.reload()
+			}
+		}, 5)
+
+		// call sso, expect callback from provider on side-effects (Login render)
+		ssoService(provider)
+	}
+
 	// process indicator while doing oAuth
-	if (registrationStatus.loading)
+	if (loading)
 		return (
 			<BusyIndicator
 				title="Please wait..."
-				subTitle={registrationStatus.message}
+				subTitle={message}
 			/>
 		)
 
 	// success registration indicator
-	if (registrationStatus.success)
+	if (success)
 		return (
 			<div className="form-container">
 				<Header>
@@ -189,7 +219,7 @@ export function Registration() {
 					title="Create Account"
 					subTitle="Create a free account with your email."
 				/>
-				<Header.Status status={registrationStatus} />
+				<Header.Status status={{ success, message }} />
 			</Header>
 
 			<FormGroup onSubmit={handleSubmit}>
@@ -347,29 +377,23 @@ export function Registration() {
 			</div>
 
 			<footer>
-				<AuthProviderSection
-					callbackFn={provider => {
-						dispatch.current(
-							updateStatus({ loading: true, message: `Register and Sign-in via ${provider}` })
-						)
-
-						RunAfterSomeTime(() => {
-							if (!registrationStatus.loading) {
-								dispatch.current(
-									updateStatus({
-										loading: false,
-										success: false,
-										message: `${provider} didn't respond, please try again`,
-									})
-								)
-								window.location.reload()
-							}
-						}, 5)
-
-						// call sso, expect callback from provider on side-effects (Login render)
-						ssoService(provider)
-					}}
-				/>
+				<AuthProviderContainer>
+					<AuthProviderContainer.Provider
+						actionHandler={() => handleSSOProvider('facebook')}
+						label="Meta"
+						src={meta}
+					/>
+					<AuthProviderContainer.Provider
+						actionHandler={() => handleSSOProvider('google')}
+						label="Google"
+						src={google}
+					/>
+					<AuthProviderContainer.Provider
+						actionHandler={() => handleSSOProvider('github')}
+						label="Github"
+						src={github}
+					/>
+				</AuthProviderContainer>
 			</footer>
 		</section>
 	)

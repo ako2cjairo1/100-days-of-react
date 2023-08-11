@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { IChildren, TFunction } from '@/types'
 import { CloseIcon, Input } from '@/components'
-import { IsEmpty, LocalStorage } from '@/services/Utils/password-manager.helper'
+import { IsEmpty, LocalStorage } from '@/services/Utils'
 
 const STATUS = {
 	message: '',

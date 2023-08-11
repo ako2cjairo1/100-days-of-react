@@ -1,9 +1,14 @@
 import { useState } from 'react'
 import type { TFunction, TKeychain } from '@/types'
 import { useDebounceToggle, useTimedCopyToClipboard } from '@/hooks'
-import { AnimatedIcon, InlineNotification, PasswordStrength, SubmitButton } from '@/components'
-import { KeychainCard } from '@/components/KeychainCard'
-import { TimeAgo } from '@/services/Utils/password-manager.helper'
+import {
+	AnimatedIcon,
+	InlineNotification,
+	PasswordStrength,
+	SubmitButton,
+	KeychainCard,
+} from '@/components'
+import { TimeAgo } from '@/services/Utils'
 
 export interface IKeychain extends Partial<TKeychain> {
 	actionHandler: TFunction<[keychainId?: string]>

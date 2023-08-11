@@ -9,7 +9,7 @@ export const PasswordStatus = {
 
 export const RequestType = {
 	add: 'add',
-	modify: 'modify',
+	update: 'update',
 	view: 'view',
 	remove: 'remove',
 } as const

@@ -27,6 +27,10 @@ export type TStatus = {
 	message: string
 }
 
+export type TAppStatus = TStatus & {
+	loading: boolean
+}
+
 export type TInputValidation = {
 	isValidEmail: boolean
 	isValidPassword: boolean

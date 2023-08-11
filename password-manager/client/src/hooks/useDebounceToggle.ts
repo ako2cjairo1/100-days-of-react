@@ -1,4 +1,4 @@
-import { RunAfterSomeTime } from '@/services/Utils/password-manager.helper'
+import { RunAfterSomeTime } from '@/services/Utils'
 import { useEffect, useState } from 'react'
 
 /**

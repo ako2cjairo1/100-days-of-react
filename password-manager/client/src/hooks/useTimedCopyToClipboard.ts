@@ -1,12 +1,7 @@
 import { useRef } from 'react'
 import type { TFunction } from '@/types'
 import { useStateObj } from '@/hooks'
-import {
-	CopyToClipboard,
-	IsEmpty,
-	Log,
-	RunAfterSomeTime,
-} from '@/services/Utils/password-manager.helper'
+import { CopyToClipboard, IsEmpty, Log, RunAfterSomeTime } from '@/services/Utils'
 
 const CLIPBOARD_TIMEOUT = 15
 interface IUseTimedCopyToClipboard {

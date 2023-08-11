@@ -454,7 +454,9 @@ export function ExportToCSV(
 	}
 }
 
-export function ImportCSVToJSON(copyToVault: (content: Partial<TExportKeychain>[]) => void) {
+export function ImportCSVToJSON(
+	importToVaultCallbackFn: (content: Partial<TExportKeychain>[]) => void
+) {
 	// create and set attributes of a fileDialog
 	const fileDialog = document.createElement('input')
 	fileDialog.type = 'file'
@@ -463,15 +465,17 @@ export function ImportCSVToJSON(copyToVault: (content: Partial<TExportKeychain>[
 	try {
 		const CSVToJSON = (fileDialog: HTMLInputElement) => {
 			const validateAndGetHeaders = (headers: string[]) => {
-				if (headers.every(key => Object.hasOwn(KEYCHAIN_CONST.HEADERS, key.toLowerCase()))) {
+				if (headers.some(key => Object.hasOwn(KEYCHAIN_CONST.HEADERS, key.toLowerCase()))) {
 					return headers
 				}
-				throw Error('Missing or invalid header')
+				// throw Error('Missing or invalid header')
+				return []
 			}
 			const mapContentToKeychain = (content: string[]) => {
-				if (content[0] === undefined) throw Error('No Content')
+				const contentHeaders = content[0]
+				if (contentHeaders === undefined) throw Error('No Content')
 
-				const keys = validateAndGetHeaders(content[0].split(','))
+				const keys = validateAndGetHeaders(contentHeaders.split(','))
 				const initVal: Partial<TExportKeychain> = {}
 				return content.slice(1).map(line => {
 					return line.split(',').reduce((acc, cur, i) => {
@@ -489,7 +493,7 @@ export function ImportCSVToJSON(copyToVault: (content: Partial<TExportKeychain>[
 					const stringData = reader.result
 					if (stringData) {
 						const content = stringData.toString().split('\r\n')
-						copyToVault(mapContentToKeychain(content))
+						importToVaultCallbackFn(mapContentToKeychain(content))
 					}
 				}
 				reader.readAsText(fileDialog.files[0])

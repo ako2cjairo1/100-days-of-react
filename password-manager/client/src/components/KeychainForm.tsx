@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import '@/assets/modules/KeychainForm.css'
+import type { TFunction, TKeychain, TStatus, TRequestType } from '@/types'
 import {
 	FormGroup,
 	PasswordStrength,
@@ -10,25 +11,26 @@ import {
 	Header,
 	Separator,
 	ValidationMessage,
+	BusyIndicator,
+	KeychainCard,
 } from '@/components'
-import { KeychainCard } from '@/components/KeychainCard'
 import { useDebounceToggle, useInput, useTimedCopyToClipboard } from '@/hooks'
 import {
 	CreateError,
+	ExtractValFromRegEx,
 	GeneratePassword,
 	GenerateUUID,
 	GetDomainUrl,
 	IsEmpty,
 	RunAfterSomeTime,
 	TimeAgo,
-} from '@/services/Utils/password-manager.helper'
+} from '@/services/Utils'
 import { KEYCHAIN_CONST, RequestType } from '@/services/constants'
-import type { TFunction, TKeychain, TStatus, TRequestType } from '@/types'
 import { useAppDispatch, useAppSelector } from '@/services/store/hooks'
-import { selectStatusInfo, updateStatus } from '@/services/store/features/statusSlice'
+import { selectAppStatus, updateAppStatus } from '@/services/store/features'
 
-const { INIT_STATUS, INIT_KEYCHAIN, WEBSITE_REGEX } = KEYCHAIN_CONST
-const { add, modify, remove } = RequestType
+const { INIT_STATUS, INIT_KEYCHAIN, WEBSITE_REGEX, ILLEGAL_REGEX } = KEYCHAIN_CONST
+const { add, update, remove } = RequestType
 
 interface INewKeychainForm {
 	showForm: TFunction<boolean>
@@ -58,17 +60,18 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 	// redux attribs
 	const dispatch = useRef(useAppDispatch())
-	const keychainStatus = useAppSelector(selectStatusInfo)
+	const { loading, message, success } = useAppSelector(selectAppStatus)
 
 	// conditional rendering properties
 	const checkIf = {
-		isEditing: !IsEmpty(keychainInfo?.keychainId),
+		isKeychainIdPresent: !IsEmpty(keychainInfo?.keychainId),
 		isClipboardTriggered: usernameClipboard.isCopied || passwordClipboard.isCopied,
 		isValidWebsite: WEBSITE_REGEX.test(input.website),
-		isValidPassword: !IsEmpty(input.password) && !input.password.includes(','),
+		isValidUsername: !IsEmpty(input.username) && !ILLEGAL_REGEX.test(input.username),
+		isValidPassword: !IsEmpty(input.password) && !ILLEGAL_REGEX.test(input.password),
 		canCopyUsername: !usernameClipboard.isCopied && !IsEmpty(input.username),
 		canCopyPassword: !passwordClipboard.isCopied && !IsEmpty(input.password),
-		canGeneratePassword: !isSubmitted && !keychainStatus.success,
+		canGeneratePassword: !isSubmitted && !success,
 		debounceUsernameClipboard:
 			useDebounceToggle(usernameClipboard.isCopied, 2) &&
 			usernameClipboard.isCopied &&
@@ -80,8 +83,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 		canDisableSubmit() {
 			return (
 				isSubmitted ||
-				keychainStatus.success ||
+				success ||
 				!checkIf.isValidWebsite ||
+				!checkIf.isValidUsername ||
 				!checkIf.isValidPassword ||
 				IsEmpty(input.username) ||
 				IsEmpty(input.password)
@@ -93,20 +97,15 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 	useEffect(() => {
 		updateInputRef.current({
 			...keychainInfo,
-			keychainId: checkIf.isEditing ? keychainInfo?.keychainId : GenerateUUID(),
-			password: checkIf.isEditing ? keychainInfo?.password : GeneratePassword(),
+			keychainId: checkIf.isKeychainIdPresent ? keychainInfo?.keychainId : GenerateUUID(),
+			password: checkIf.isKeychainIdPresent ? keychainInfo?.password : GeneratePassword(),
 		})
-	}, [checkIf.isEditing, keychainInfo])
+	}, [checkIf.isKeychainIdPresent, keychainInfo])
 
 	// side-effect to focus the cursor to input Website
 	useEffect(() => {
-		if (!keychainStatus.success) websiteInputRef.current?.focus()
-	}, [keychainStatus.success])
-
-	// side-effect to clear the status message when user updated keychain form
-	useEffect(() => {
-		dispatch.current(updateStatus({ message: '' }))
-	}, [input])
+		if (!success) websiteInputRef.current?.focus()
+	}, [success])
 
 	const handleAction = {
 		copyPassword: () => {
@@ -132,11 +131,11 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 				if (!success) throw new Error(message)
 
 				// show success status before closing the modal
-				dispatch.current(updateStatus({ success: true, message: 'Password Deleted!' }))
+				dispatch.current(updateAppStatus({ success: true, message: 'Password Deleted!' }))
 
 				// after sometime, reset status and close modal
 				RunAfterSomeTime(() => {
-					dispatch.current(updateStatus(INIT_STATUS))
+					dispatch.current(updateAppStatus(INIT_STATUS))
 					showForm(false)
 					// invoke resetInput
 					resetInput()
@@ -149,32 +148,32 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 			if (!isSubmitted) {
 				// set to submit and reset status
 				isSubmit(true)
-				dispatch.current(updateStatus(INIT_STATUS))
+				dispatch.current(updateAppStatus(INIT_STATUS))
 
 				try {
 					// post request to update/add keychain info
 					const { success, message } = await updateCallback(
 						// format to correct website url
 						{ ...input, website: GetDomainUrl(input.website).url },
-						checkIf.isEditing ? modify : add
+						checkIf.isKeychainIdPresent ? update : add
 					)
 					if (!success) throw new Error(message)
 
-					const successMessage = checkIf.isEditing
+					const successMessage = checkIf.isKeychainIdPresent
 						? 'The changes have been saved'
 						: 'Password have been added!'
 					// show success status before closing the modal
-					dispatch.current(updateStatus({ success: true, message: successMessage }))
+					dispatch.current(updateAppStatus({ success: true, message: successMessage }))
 
 					// after sometime, reset status and close modal
 					RunAfterSomeTime(() => {
-						dispatch.current(updateStatus(INIT_STATUS))
+						dispatch.current(updateAppStatus(INIT_STATUS))
 						showForm(false)
 						// invoke resetInput
 						resetInput()
 					}, 2)
 				} catch (error) {
-					dispatch.current(updateStatus({ success: false, message: CreateError(error).message }))
+					dispatch.current(updateAppStatus({ success: false, message: CreateError(error).message }))
 				} finally {
 					isSubmit(false)
 				}
@@ -182,26 +181,31 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 		},
 	}
 
+	// process indicator while oAuth
+	if (loading)
+		return (
+			<BusyIndicator
+				title="Please wait..."
+				subTitle={message}
+			/>
+		)
+
 	return (
 		<>
 			<Header>
-				<Header.Logo>{checkIf.isEditing ? 'Edit Password' : 'Add Password'}</Header.Logo>
+				<Header.Logo>{checkIf.isKeychainIdPresent ? 'Edit Password' : 'Add Password'}</Header.Logo>
 
-				{!checkIf.isEditing && (
-					<Header.Title subTitle="We will save this password in your session storage and cloud account" />
+				{!checkIf.isKeychainIdPresent && (
+					<Header.Title subTitle="We will save this password in your session storage and in cloud." />
 				)}
 
 				<Header.Status
-					status={keychainStatus}
-					icon={
-						keychainStatus.message.toLowerCase().includes('delete')
-							? 'danger fa fa-trash-can fa-bounce'
-							: ''
-					}
+					status={{ success, message }}
+					icon={message.toLowerCase().includes('delete') ? 'danger fa fa-trash-can fa-bounce' : ''}
 				/>
 			</Header>
 
-			{checkIf.isEditing && (
+			{checkIf.isKeychainIdPresent && (
 				<>
 					<KeychainCard
 						logo={keychainInfo?.logo}
@@ -221,7 +225,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 								<AnimatedIcon
 									title="Delete Keychain"
 									className={`action-button small ${
-										isSubmitted || keychainStatus.success ? 'disabled' : 'active'
+										isSubmitted || success ? 'disabled' : 'active'
 									}`}
 									iconName="fa fa-trash-can"
 									animation="fa-shake"
@@ -234,7 +238,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 			)}
 
 			<FormGroup onSubmit={handleAction.submitForm}>
-				{!checkIf.isEditing && (
+				{!checkIf.isKeychainIdPresent && (
 					<div className="input-row">
 						<FormGroup.Label
 							props={{
@@ -269,7 +273,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						props={{
 							label: 'User Name',
 							labelFor: 'username',
-							isFulfilled: !IsEmpty(input.username),
+							isFulfilled: checkIf.isValidUsername,
 						}}
 					/>
 					<FormGroup.Input
@@ -282,7 +286,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						className={`${
 							isSubmitted
 								? 'disabled'
-								: !IsEmpty(input.username)
+								: checkIf.isValidUsername
 								? ''
 								: !isFocus.username && 'invalid'
 						}`}
@@ -302,6 +306,17 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							/>
 						)}
 					</div>
+					<ValidationMessage
+						isVisible={!isFocus.username && !checkIf.isValidUsername && !IsEmpty(input.username)}
+						validations={[
+							{
+								isValid: checkIf.isValidUsername,
+								message: `User Name must not contain illegal character(s): ${ExtractValFromRegEx(
+									ILLEGAL_REGEX.source
+								)}`,
+							},
+						]}
+					/>
 				</div>
 
 				<div className="input-row vr">
@@ -309,7 +324,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						props={{
 							label: 'Password',
 							labelFor: 'password',
-							isFulfilled: !IsEmpty(input.password),
+							isFulfilled: checkIf.isValidPassword,
 						}}
 					>
 						<PasswordStrength password={input.password} />
@@ -368,7 +383,9 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						validations={[
 							{
 								isValid: checkIf.isValidPassword,
-								message: 'Password must not contain illegal character(s): ,(comma)',
+								message: `Password must not contain illegal character(s): ${ExtractValFromRegEx(
+									ILLEGAL_REGEX.source
+								)}`,
 							},
 						]}
 					/>
@@ -389,8 +406,8 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 
 				<div>
 					<p className="center tonedown-info small descend">
-						Adding the password here saves it only to your registered account. Make sure the
-						password you save here matches your password for the website.
+						Adding password here saves it only to your Secured Vault account. Make sure the password
+						you save here matches your password for the website.
 					</p>
 				</div>
 
@@ -403,7 +420,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						onClick={() => {
 							setRevealPassword(false)
 							showForm(false)
-							dispatch.current(updateStatus({ success: false, message: '' }))
+							dispatch.current(updateAppStatus({ success: false, message: '' }))
 						}}
 					>
 						Cancel
@@ -417,7 +434,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 							disabled: checkIf.canDisableSubmit(),
 						}}
 					>
-						{checkIf.isEditing ? 'Save' : 'Add Password'}
+						{checkIf.isKeychainIdPresent ? 'Save' : 'Add Password'}
 					</SubmitButton>
 				</div>
 			</FormGroup>

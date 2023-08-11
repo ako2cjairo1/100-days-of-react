@@ -1,4 +1,4 @@
-import { KeychainCards } from '@/components/KeychainCard'
+import { KeychainCardContainer } from '@/components/KeychainCard'
 import { render } from '@/services/Utils/test.util'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -11,7 +11,7 @@ describe('Keychain components', () => {
 		const listEvent = vi.fn()
 		const { container } = render(
 			<MemoryRouter>
-				<KeychainCards
+				<KeychainCardContainer
 					vault={keychains}
 					actionHandler={listEvent}
 				/>
@@ -28,7 +28,7 @@ describe('Keychain components', () => {
 		const listEvent = vi.fn()
 		const { container } = render(
 			<MemoryRouter>
-				<KeychainCards
+				<KeychainCardContainer
 					vault={keychains}
 					actionHandler={listEvent}
 				/>

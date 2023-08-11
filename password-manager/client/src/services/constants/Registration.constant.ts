@@ -21,6 +21,8 @@ export const REGISTER_STATE = {
 	},
 	EMAIL_REGEX:
 		/^[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-]?[a-zA-Z0-9]+)*(\.[a-zA-Z]{2,4})+$/,
+	ILLEGAL_REGEX: /(?=.*[,])/,
+
 	PASSWORD_REGEX: {
 		minLength: /^(?=.{8})/,
 		alphabet: /(?=.*[A-Z])(?=.*[a-z])/,
@@ -32,4 +34,5 @@ export const REGISTER_STATE = {
 	Record<'INPUT_VALIDATION', TInputValidation> &
 	Record<'VALID_PASSWORD', TPassword> &
 	Record<'EMAIL_REGEX', RegExp> &
+	Record<'ILLEGAL_REGEX', RegExp> &
 	Record<'PASSWORD_REGEX', TConvertKeysOf<TPassword, RegExp>>

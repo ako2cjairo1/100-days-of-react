@@ -1,10 +1,10 @@
 import { render } from '@/services/Utils/test.util'
-import { Logo } from '../KeychainCard/Logo'
+import { CardLogo } from '../KeychainCard/KeychainCard.Logo'
 
 describe('Logo', () => {
 	it('renders an img element if the logo prop is provided', () => {
 		const { getByAltText } = render(
-			<Logo
+			<CardLogo
 				logo="https://www.example.com/logo.png"
 				website="example.com"
 			/>
@@ -13,7 +13,7 @@ describe('Logo', () => {
 	})
 
 	it('renders an AnimatedIcon element if the logo prop is not provided', () => {
-		const { getByText } = render(<Logo website="test.com" />)
+		const { getByText } = render(<CardLogo website="test.com" />)
 		expect(getByText('T')).toBeInTheDocument()
 	})
 })

@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { useInput } from '@/hooks/useInput'
 import { ChangeEvent, FocusEvent } from 'react'
-import { OverrideEventTarget } from '@/services/Utils/password-manager.helper'
+import { OverrideEventTarget } from '@/services/Utils'
 
 describe('useInput', () => {
 	const initState = { email: '', password: '', confirm: '' }

@@ -8,7 +8,7 @@ import { IKeychainCard } from './KeychainCard'
  *
  * returns A React element representing a Logo component
  */
-export function Logo({ logo, website }: Pick<IKeychainCard, 'logo' | 'website'>) {
+export function CardLogo({ logo, website }: Pick<IKeychainCard, 'logo' | 'website'>) {
 	const domainLogo = website?.slice(0, 1).toUpperCase()
 
 	if (logo) {
