@@ -1,5 +1,5 @@
 import { Description, Toggle } from '@/components'
-import { fireEvent, render } from '@/services/Utils/test.util'
+import { fireEvent, render } from '@/utils/test.util'
 
 describe('Toggle', () => {
 	it('renders a checkbox input', () => {

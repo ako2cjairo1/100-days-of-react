@@ -2,7 +2,7 @@ import { createContext, useCallback, useRef, useState } from 'react'
 import type { TAuthContext, TAuthProvider, IChildren, TStatus } from '@/types'
 import type { ISession, TCredentials } from '@shared'
 import { AUTH_CONTEXT } from '@/services/constants'
-import { CreateError, IsEmpty, SessionStorage, generateVaultKey, hashPassword } from '../Utils'
+import { CreateError, IsEmpty, SessionStorage, generateVaultKey, hashPassword } from '@/utils'
 import { getSessionService, loginUserService } from '@/services/api'
 
 export const AuthContext = createContext<TAuthContext<TAuthProvider> | null>(null)

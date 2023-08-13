@@ -1,6 +1,6 @@
 import { TKeychain } from '@/types'
 import { SHA256, PBKDF2, AES, enc } from 'crypto-js'
-import { CreateError } from '@/services/Utils'
+import { CreateError } from '@/utils'
 
 export function hashPassword(password: string) {
 	return SHA256(password).toString()

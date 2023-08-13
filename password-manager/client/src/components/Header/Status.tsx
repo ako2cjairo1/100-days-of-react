@@ -1,5 +1,5 @@
 import { AnimatedIcon } from '@/components'
-import { IsEmpty } from '@/services/Utils'
+import { IsEmpty } from '@/utils'
 import type { IChildren, TStatus } from '@/types'
 
 interface IStatus extends IChildren {

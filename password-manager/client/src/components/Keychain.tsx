@@ -8,7 +8,7 @@ import {
 	SubmitButton,
 	KeychainCard,
 } from '@/components'
-import { TimeAgo } from '@/services/Utils'
+import { TimeAgo } from '@/utils'
 
 export interface IKeychain extends Partial<TKeychain> {
 	actionHandler: TFunction<[keychainId?: string]>

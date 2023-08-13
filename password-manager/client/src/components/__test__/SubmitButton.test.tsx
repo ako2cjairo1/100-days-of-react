@@ -1,5 +1,5 @@
 import { SubmitButton } from '@/components'
-import { render, fireEvent } from '@/services/Utils/test.util'
+import { render, fireEvent } from '@/utils/test.util'
 
 describe('SubmitButton', () => {
 	it('renders with custom text', () => {

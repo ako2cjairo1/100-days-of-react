@@ -1,5 +1,5 @@
-import { KeychainCardContainer } from '@/components/KeychainCard'
-import { render } from '@/services/Utils/test.util'
+import { KeychainCardContainer } from '@/components'
+import { render } from '@/utils/test.util'
 import { MemoryRouter } from 'react-router-dom'
 
 describe('Keychain components', () => {

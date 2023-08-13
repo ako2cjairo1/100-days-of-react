@@ -1,5 +1,5 @@
 import { RotatingBackdrop } from '@/components'
-import { render } from '@/services/Utils/test.util'
+import { render } from '@/utils/test.util'
 
 describe('RotatingBackdrop', () => {
 	it('should render two shape elements', () => {

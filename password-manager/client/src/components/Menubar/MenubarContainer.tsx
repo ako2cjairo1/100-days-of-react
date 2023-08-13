@@ -1,8 +1,7 @@
 import React from 'react'
-import { IsEmpty } from '@/services/Utils'
-import { Separator } from '../Separator'
-import { Menubar } from './Menubar'
-import { IMenuItem } from '@/types'
+import type { IMenuItem } from '@/types'
+import { IsEmpty } from '@/utils'
+import { Separator, Menubar } from '@/components'
 
 interface IMenubarContainer {
 	menus: Partial<IMenuItem>[]

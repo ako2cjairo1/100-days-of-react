@@ -1,6 +1,6 @@
-import { fireEvent, render } from '@/services/Utils/test.util'
+import { fireEvent, render } from '@/utils/test.util'
 import { MemoryRouter } from 'react-router-dom'
-import { KeychainCard, CardLogo } from '@/components/KeychainCard'
+import { KeychainCard, CardLogo } from '@/components'
 
 describe('KeychainCard', () => {
 	it('renders the website domain name and subText', () => {

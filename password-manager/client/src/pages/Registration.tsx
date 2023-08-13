@@ -12,7 +12,7 @@ import {
 	CreateError,
 	IsEmpty,
 	hashPassword,
-} from '@/services/Utils'
+} from '@/utils'
 import {
 	LinkLabel,
 	Separator,

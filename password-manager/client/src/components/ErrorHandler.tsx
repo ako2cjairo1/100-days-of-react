@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { IChildren } from '@/types'
-import { CreateError, IsEmpty } from '@/services/Utils'
+import { CreateError, IsEmpty } from '@/utils'
 import { Header, AnimatedIcon, LinkLabel } from '@/components'
 import { useAppSelector } from '@/services/store/hooks'
 import { selectAuthentication } from '@/services/store/features'

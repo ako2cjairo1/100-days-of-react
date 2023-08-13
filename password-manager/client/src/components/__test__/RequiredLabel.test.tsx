@@ -1,5 +1,5 @@
 import { RequiredLabel } from '@/components'
-import { render } from '@/services/Utils/test.util'
+import { render } from '@/utils/test.util'
 import { act } from 'react-dom/test-utils'
 
 describe('RequiredLabel', () => {

@@ -2,7 +2,7 @@ import '@/assets/modules/PasswordStrength.css'
 import type { TEvaluatedPassword } from '@/types'
 import { PasswordStatus, REGISTER_STATE } from '@/services/constants'
 import { useEffect, useState } from 'react'
-import { MergeRegExObj } from '@/services/Utils'
+import { MergeRegExObj } from '@/utils'
 
 const { weak, mediocre, secure, strong, unbreakable, none } = PasswordStatus
 /**

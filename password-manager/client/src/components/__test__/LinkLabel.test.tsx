@@ -1,5 +1,5 @@
 import { LinkLabel } from '@/components'
-import { render, fireEvent } from '@/services/Utils/test.util'
+import { render, fireEvent } from '@/utils/test.util'
 import { MemoryRouter } from 'react-router-dom'
 
 describe('LinkLabel', () => {

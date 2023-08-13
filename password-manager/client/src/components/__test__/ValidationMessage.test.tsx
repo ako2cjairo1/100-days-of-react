@@ -1,5 +1,5 @@
 import { ValidationMessage } from '@/components'
-import { act, render } from '@/services/Utils/test.util'
+import { act, render } from '@/utils/test.util'
 
 describe('ValidationMessage', () => {
 	it('should render title when isVisible is true', () => {

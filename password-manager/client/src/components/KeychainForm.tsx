@@ -24,7 +24,7 @@ import {
 	IsEmpty,
 	RunAfterSomeTime,
 	TimeAgo,
-} from '@/services/Utils'
+} from '@/utils'
 import { KEYCHAIN_CONST, RequestType } from '@/services/constants'
 import { useAppDispatch, useAppSelector } from '@/services/store/hooks'
 import { selectAppStatus, updateAppStatus } from '@/services/store/features'

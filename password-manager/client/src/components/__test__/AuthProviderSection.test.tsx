@@ -1,5 +1,5 @@
 import { AuthProviderContainer } from '@/components/AuthProvider'
-import { render, fireEvent } from '@/services/Utils/test.util'
+import { render, fireEvent } from '@/utils/test.util'
 
 describe('AuthProviderContainer', () => {
 	const callbackFn = vi.fn()

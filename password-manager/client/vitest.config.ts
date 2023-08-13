@@ -13,7 +13,7 @@ export default defineConfig({
 	test: {
 		globals: true,
 		environment: 'jsdom',
-		setupFiles: './src/services/Utils/test.util.ts',
+		setupFiles: './src/utils/test.util.ts',
 		include: ['./src/**/*.test.*'],
 		// reporters: 'verbose',
 		// css: true,

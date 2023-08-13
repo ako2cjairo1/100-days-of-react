@@ -1,5 +1,5 @@
-import { render } from '@/services/Utils/test.util'
-import { Header } from '@/components/Header'
+import { render } from '@/utils/test.util'
+import { Header } from '@/components'
 
 describe('Header', () => {
 	it('should render a Header.Title with given "title" and "subtitle"', () => {

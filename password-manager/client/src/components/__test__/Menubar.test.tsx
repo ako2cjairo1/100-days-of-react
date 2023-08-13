@@ -1,5 +1,5 @@
 import { Menubar } from '@/components'
-import { fireEvent, render } from '@/services/Utils/test.util'
+import { fireEvent, render } from '@/utils/test.util'
 import { MemoryRouter } from 'react-router-dom'
 
 describe('Item', () => {

@@ -1,5 +1,5 @@
-import { render } from '@/services/Utils/test.util'
-import { CardLogo } from '../KeychainCard/KeychainCard.Logo'
+import { render } from '@/utils/test.util'
+import { CardLogo } from '@/components'
 
 describe('Logo', () => {
 	it('renders an img element if the logo prop is provided', () => {

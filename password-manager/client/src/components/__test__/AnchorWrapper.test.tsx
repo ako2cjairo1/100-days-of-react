@@ -1,6 +1,5 @@
-import { AnchorWrapper, LinkLabel } from '@/components'
-import { render, fireEvent } from '@/services/Utils/test.util'
-import { MemoryRouter } from 'react-router-dom'
+import { AnchorWrapper } from '@/components'
+import { render } from '@/utils/test.util'
 
 describe('AnchorWrapper', () => {
 	it('renders an anchor element with the provided href and children', () => {

@@ -1,7 +1,7 @@
-import { renderHook } from '@testing-library/react-hooks'
-import { useInput } from '@/hooks/useInput'
 import { ChangeEvent, FocusEvent } from 'react'
-import { OverrideEventTarget } from '@/services/Utils'
+import { renderHook } from '@testing-library/react-hooks'
+import { useInput } from '@/hooks'
+import { OverrideEventTarget } from '@/utils'
 
 describe('useInput', () => {
 	const initState = { email: '', password: '', confirm: '' }

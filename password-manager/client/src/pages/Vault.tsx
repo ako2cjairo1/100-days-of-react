@@ -29,7 +29,7 @@ import {
 	SessionStorage,
 	decryptVault,
 	encryptVault,
-} from '@/services/Utils'
+} from '@/utils'
 import { updateVaultService } from '@/services/api'
 import { RequestType, KEYCHAIN_CONST, FormContent } from '@/services/constants'
 import { useAppDispatch, useAppSelector } from '@/services/store/hooks'

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { IChildren, TFunction, TKeychain } from '@/types'
-import { GetDomainUrl } from '@/services/Utils'
+import { GetDomainUrl } from '@/utils'
 import { AnchorWrapper, AnimatedIcon } from '@/components'
 import { CardLogo } from '@/components/KeychainCard'
 import { useMemo } from 'react'

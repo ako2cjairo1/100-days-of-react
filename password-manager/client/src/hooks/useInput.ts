@@ -1,5 +1,5 @@
 import { ChangeEvent, FocusEvent, useEffect, useRef, useState } from 'react'
-import { ConvertPropsToBool } from '@/services/Utils'
+import { ConvertPropsToBool } from '@/utils'
 import { useStateObj } from '@/hooks'
 
 /**

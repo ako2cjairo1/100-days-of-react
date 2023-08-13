@@ -1,5 +1,5 @@
 import { ISession, IUpdateVault, IUserModel, TCredentials, TProvider } from '@shared'
-import { AxiosInstance, VITE_PUBLIC_API_BASEURL } from '../Utils/axios'
+import { AxiosInstance, VITE_PUBLIC_API_BASEURL } from '@/utils'
 
 export async function registerUserService(
 	userInfo: TCredentials

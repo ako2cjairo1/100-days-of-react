@@ -1,5 +1,5 @@
 import { Separator } from '@/components'
-import { render } from '@/services/Utils/test.util'
+import { render } from '@/utils/test.util'
 
 describe('Separator', () => {
 	it('renders a separator without children', () => {

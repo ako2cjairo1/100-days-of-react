@@ -19,13 +19,7 @@ import {
 	AuthProviderContainer,
 } from '@/components'
 import { useInput } from '@/hooks'
-import {
-	ExtractValFromRegEx,
-	IsEmpty,
-	LocalStorage,
-	RunAfterSomeTime,
-	hashPassword,
-} from '@/services/Utils'
+import { ExtractValFromRegEx, IsEmpty, LocalStorage, RunAfterSomeTime, hashPassword } from '@/utils'
 import { ssoService } from '@/services/api'
 import { LOGIN_STATE, REGISTER_STATE } from '@/services/constants'
 import { useAppDispatch, useAppSelector } from '@/services/store/hooks'

@@ -462,46 +462,55 @@ export function ImportCSVToJSON(
 	fileDialog.type = 'file'
 	fileDialog.style.visibility = 'hidden'
 
-	try {
-		const CSVToJSON = (fileDialog: HTMLInputElement) => {
-			const validateAndGetHeaders = (headers: string[]) => {
-				if (headers.some(key => Object.hasOwn(KEYCHAIN_CONST.HEADERS, key.toLowerCase()))) {
-					return headers
+	const parseCSV =
+		(file: File) => (importToVaultCallbackFn: TFunction<[Partial<TExportKeychain>[]]>) => {
+			const reader = new FileReader()
+			reader.onload = () => {
+				const stringData = reader.result
+				if (stringData) {
+					const content = stringData.toString().split('\r\n')
+					const mapToKeychain = validateContent(content)
+					importToVaultCallbackFn(mapToKeychain())
 				}
-				// throw Error('Missing or invalid header')
-				return []
 			}
-			const mapContentToKeychain = (content: string[]) => {
-				const contentHeaders = content[0]
-				if (contentHeaders === undefined) throw Error('No Content')
-
-				const keys = validateAndGetHeaders(contentHeaders.split(','))
-				const initVal: Partial<TExportKeychain> = {}
-				return content.slice(1).map(line => {
-					return line.split(',').reduce((acc, cur, i) => {
-						const prop = (keys[i] as string).toLowerCase()
-						return { ...acc, [prop]: cur }
-					}, initVal)
-				})
+			reader.onerror = () => {
+				throw new Error(`Error reading the file: ${CreateError(reader.error).message}`)
 			}
-
-			// make sure a file is selected
-			if (fileDialog.files && fileDialog.files[0]) {
-				const reader = new FileReader()
-
-				reader.onload = () => {
-					const stringData = reader.result
-					if (stringData) {
-						const content = stringData.toString().split('\r\n')
-						importToVaultCallbackFn(mapContentToKeychain(content))
-					}
-				}
-				reader.readAsText(fileDialog.files[0])
-			}
+			reader.readAsText(file)
 		}
 
-		fileDialog.onchange = () => CSVToJSON(fileDialog)
+	const validateContent = (content: string[]) => {
+		// extract and check 1st index (supposed header)
+		const csHeaders = content.at(0)
+		if (csHeaders === undefined) throw Error('No Content')
+
+		// convert csv to array, check if needed headers are present
+		const headers = csHeaders.split(',')
+		if (!headers.some(key => Object.hasOwn(KEYCHAIN_CONST.HEADERS, key.toLowerCase()))) {
+			// throw error, otherwise
+			throw Error('Missing or invalid header')
+		}
+
+		return () => {
+			const initialValue: Partial<TExportKeychain> = {}
+			return content.slice(1).map(line => {
+				return line.split(',').reduce((acc, cur, i) => {
+					const prop = (headers[i] as string).toLowerCase()
+					return { ...acc, [prop]: cur }
+				}, initialValue)
+			})
+		}
+	}
+
+	try {
+		fileDialog.onchange = () => {
+			const files = fileDialog.files
+			if (files && files[0]) {
+				parseCSV(files[0])(importToVaultCallbackFn)
+			}
+		}
 		document.body.appendChild(fileDialog)
+		// trigger the file dialog
 		fileDialog.click()
 	} catch (error) {
 		Log(CreateError(error).message)

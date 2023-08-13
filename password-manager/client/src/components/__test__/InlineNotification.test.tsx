@@ -1,5 +1,5 @@
 import { InlineNotification } from '@/components'
-import { render } from '@/services/Utils/test.util'
+import { render } from '@/utils/test.util'
 
 describe('InlineNotification', () => {
 	it('renders the children prop correctly', () => {

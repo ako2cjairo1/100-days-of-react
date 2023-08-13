@@ -1,5 +1,5 @@
 import { Modal } from '@/components'
-import { fireEvent, render } from '@/services/Utils/test.util'
+import { fireEvent, render } from '@/utils/test.util'
 
 beforeAll(() => {
 	const modalRoot = document.createElement('div')

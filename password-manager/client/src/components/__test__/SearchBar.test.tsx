@@ -1,5 +1,5 @@
 import { SearchBar } from '@/components'
-import { fireEvent, render } from '@/services/Utils/test.util'
+import { fireEvent, render } from '@/utils/test.util'
 
 describe('SearchBar', () => {
 	it('calls searchCallback when search input changes', () => {

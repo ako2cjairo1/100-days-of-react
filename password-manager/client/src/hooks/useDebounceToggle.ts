@@ -1,4 +1,4 @@
-import { RunAfterSomeTime } from '@/services/Utils'
+import { RunAfterSomeTime } from '@/utils'
 import { useEffect, useState } from 'react'
 
 /**

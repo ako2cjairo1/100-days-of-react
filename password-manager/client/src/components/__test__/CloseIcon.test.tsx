@@ -1,5 +1,5 @@
-import { CloseIcon } from '@/components/Modal'
-import { render, fireEvent } from '@/services/Utils/test.util'
+import { CloseIcon } from '@/components'
+import { render, fireEvent } from '@/utils/test.util'
 
 describe('CloseIcon', () => {
 	it('applies className to component', () => {

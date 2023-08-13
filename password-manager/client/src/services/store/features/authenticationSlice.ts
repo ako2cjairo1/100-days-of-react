@@ -4,7 +4,7 @@ import type { ISession, TCredentials } from '@shared'
 import type { TRootState } from '@/services/store'
 import { AUTH_CONTEXT } from '@/services/constants'
 import { getSessionService, loginUserService, logoutUserService } from '@/services/api'
-import { CreateError, SessionStorage, generateVaultKey } from '@/services/Utils'
+import { CreateError, SessionStorage, generateVaultKey } from '@/utils'
 
 export const loginUser = createAsyncThunk(
 	'authentication/login',

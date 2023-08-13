@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@/services/Utils/test.util'
+import { fireEvent, render } from '@/utils/test.util'
 import { FormGroup, Input, Label } from '@/components/FormGroup'
 
 describe('FormGroup', () => {
