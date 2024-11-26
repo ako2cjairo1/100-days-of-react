@@ -17,12 +17,12 @@
 		"isolatedModules": true,
 		"noEmit": true,
 		"jsx": "react-jsx",
-		"types": ["vitest/globals", "file-system"],
+		"types": ["vitest/globals"],
 		"paths": {
 			"@/*": ["./src/*"],
 			"@shared": ["../shared"]
 		}
 	},
-	"include": ["./src", "./src/types/file-system.d.ts"],
+	"include": ["./src"],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }
