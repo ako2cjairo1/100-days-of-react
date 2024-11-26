@@ -79,17 +79,17 @@ export type TVaultContent = TConvertToStringUnion<typeof FormContent>
 
 // File System Access API type declarations
 interface FilePickerOptions {
-  types?: Array<{
-    description?: string;
-    accept: Record<string, string[]>;
-  }>;
-  multiple?: boolean;
+	types?: Array<{
+		description?: string
+		accept: Record<string, string[]>
+	}>
+	multiple?: boolean
 }
 
 interface FileSystemFileHandle {
-  getFile(): Promise<File>;
+	getFile(): Promise<File>
 }
 
 interface Window {
-  showOpenFilePicker(options?: FilePickerOptions): Promise<FileSystemFileHandle[]>;
+	showOpenFilePicker(options?: FilePickerOptions): Promise<FileSystemFileHandle[]>
 }
