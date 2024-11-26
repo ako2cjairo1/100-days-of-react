@@ -76,3 +76,20 @@ export type TFunction<T = [], RT = void> = T extends unknown[]
 export type TRequestType = TConvertToStringUnion<typeof RequestType>
 
 export type TVaultContent = TConvertToStringUnion<typeof FormContent>
+
+// File System Access API type declarations
+interface FilePickerOptions {
+  types?: Array<{
+    description?: string;
+    accept: Record<string, string[]>;
+  }>;
+  multiple?: boolean;
+}
+
+interface FileSystemFileHandle {
+  getFile(): Promise<File>;
+}
+
+interface Window {
+  showOpenFilePicker(options?: FilePickerOptions): Promise<FileSystemFileHandle[]>;
+}

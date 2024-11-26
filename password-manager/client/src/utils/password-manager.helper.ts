@@ -1,4 +1,4 @@
-import type { TConvertToStringUnion, TExportKeychain, TFunction } from '@/types'
+import type { TConvertToStringUnion, TExportKeychain, TFunction, TKeychain } from '@/types'
 import { ChangeEvent, FocusEvent } from 'react'
 import { KEYCHAIN_CONST, REGISTER_STATE } from '@/services/constants'
 import { AxiosError } from 'axios'
@@ -170,6 +170,7 @@ type PasswordManagerError = Error & {
 	code: number
 	unknownError?: unknown
 }
+
 export function CreateError(error: unknown) {
 	let result: PasswordManagerError = {
 		code: -1,
@@ -233,9 +234,9 @@ type TLSKey =
  * param remove - Function that takes a key and removes it from local storage.
  */
 interface ILocalStorage {
-	write: TFunction<[key: TLSKey, value: string]>
-	read: TFunction<[key: TLSKey], string>
-	remove: TFunction<[key: TLSKey]>
+	write: (key: TLSKey, value: string) => void
+	read: (key: TLSKey) => string
+	remove: (key: TLSKey) => void
 }
 export const LocalStorage: ILocalStorage = {
 	write: (key, value) => localStorage.setItem(key, value),
@@ -244,10 +245,11 @@ export const LocalStorage: ILocalStorage = {
 }
 
 interface ISessionStorage {
-	write: TFunction<Array<Array<[key: TLSKey, value: string]>>>
-	read: TFunction<[key: TLSKey], string>
-	clear: TFunction
+	write: (data: Array<[TLSKey, string]>) => void
+	read: (key: TLSKey) => string
+	clear: () => void
 }
+
 export const SessionStorage: ISessionStorage = {
 	write: data => {
 		for (const [key, value] of data) {
@@ -399,122 +401,249 @@ export function IsEmpty<T>(value: T) {
 	)
 }
 
-export function ExportToCSV(
+/**
+ * Exports password vault data to a CSV file with improved error handling and type safety
+ * @param vault - Array of vault entries to export
+ * @param fileTitle - Optional title for the exported file
+ * @param headers - Optional custom headers for the CSV
+ * @throws Error if the export process fails
+ */
+export async function ExportToCSV(
 	vault: TExportKeychain[],
 	fileTitle = 'Passwords',
 	headers = KEYCHAIN_CONST.HEADERS
-) {
-	const convertVaultToCSV = () => {
-		let csvItem = ''
-		const vaultClone = [...vault]
+): Promise<void> {
+	const convertVaultToCSV = (): string => {
+		// Create header row
+		const headerRow = Object.values(headers).join(',')
 
-		// include headers to csv export
-		if (headers) {
-			vaultClone.unshift(headers)
-		}
+		// Map vault data to CSV rows
+		const dataRows = vault.map(entry => {
+			return Object.keys(headers)
+				.map(key => {
+					const value = entry[key as keyof TExportKeychain] || ''
+					// Escape special characters and wrap in quotes if needed
+					return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value
+				})
+				.join(',')
+		})
 
-		try {
-			const tempVault = typeof vaultClone !== 'object' ? JSON.parse(vaultClone) : vaultClone
-
-			for (let idx = 0; idx < tempVault.length; idx++) {
-				let line = ''
-				for (const prop in headers) {
-					if (line !== '') line += ','
-					line += tempVault[idx][prop]
-				}
-				csvItem += `${line}\r\n`
-			}
-		} catch (error) {
-			Log(CreateError(error).message)
-		}
-
-		return csvItem
+		// Combine headers and data
+		return [headerRow, ...dataRows].join('\r\n')
 	}
 
-	let url = ''
-	const link = document.createElement('a')
-
 	try {
-		const blob = new Blob([convertVaultToCSV()], { type: 'text/csv;charset=utf-8;' })
-		url = URL.createObjectURL(blob)
-		// Browsers that support HTML5 download attribute
-		link.setAttribute('href', url)
-		link.setAttribute('download', `${fileTitle}.csv`)
-		link.style.visibility = 'hidden'
+		const csvContent = convertVaultToCSV()
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
 
+		// Use the File System Access API if available
+		if ('showSaveFilePicker' in window) {
+			try {
+				const handle = await window.showSaveFilePicker({
+					types: [
+						{
+							description: 'CSV File',
+							accept: { 'text/csv': ['.csv'] },
+						},
+					],
+				})
+				const writable = await handle.createWritable()
+				await writable.write(blob)
+				await writable.close()
+				return
+			} catch (error) {
+				if ((error as Error).name !== 'AbortError') {
+					throw error
+				}
+				// User cancelled, fall back to traditional method
+			}
+		}
+
+		// Fallback for browsers without File System Access API
+		const url = URL.createObjectURL(blob)
+		const link = document.createElement('a')
+		link.href = url
+		link.download = `${fileTitle}.csv`
 		document.body.appendChild(link)
-		// trigger download action
 		link.click()
-	} catch (error) {
-		Log(CreateError(error).message)
-	} finally {
-		// destroy from memory
 		URL.revokeObjectURL(url)
 		document.body.removeChild(link)
+	} catch (error) {
+		const errorMessage = CreateError(error).message
+		Log(errorMessage)
+		throw new Error(`Failed to export vault: ${errorMessage}`)
 	}
 }
 
-export function ImportCSVToJSON(
-	importToVaultCallbackFn: (content: Partial<TExportKeychain>[]) => void
-) {
-	// create and set attributes of a fileDialog
-	const fileDialog = document.createElement('input')
-	fileDialog.type = 'file'
-	fileDialog.style.visibility = 'hidden'
+/**
+ * Imports password vault data from a CSV file with improved validation and error handling
+ * @param importToVaultCallbackFn - Callback function to handle imported data
+ * @param currentVault - Current vault entries to check for duplicates
+ * @throws Error if the import process fails
+ */
+export async function ImportCSVToJSON(
+	importToVaultCallbackFn: (content: Partial<TKeychain>[]) => void,
+	currentVault: TKeychain[] = []
+): Promise<void> {
+	const validateHeaders = (headers: string[]): { [key: number]: string } => {
+		const expectedHeaders = Object.values(KEYCHAIN_CONST.HEADERS)
+		const hasRequiredHeaders = expectedHeaders.every(header =>
+			headers.some(h => h.toLowerCase() === header.toLowerCase())
+		)
 
-	const parseCSV =
-		(file: File) => (importToVaultCallbackFn: TFunction<[Partial<TExportKeychain>[]]>) => {
-			const reader = new FileReader()
-			reader.onload = () => {
-				const stringData = reader.result
-				if (stringData) {
-					const content = stringData.toString().split('\r\n')
-					const mapToKeychain = validateContent(content)
-					importToVaultCallbackFn(mapToKeychain())
+		if (!hasRequiredHeaders) {
+			throw new Error(`Invalid CSV format. Required headers: ${expectedHeaders.join(', ')}`)
+		}
+
+		return headers.reduce((map, header, index) => {
+			const matchingHeader = Object.entries(KEYCHAIN_CONST.HEADERS).find(
+				([_, value]) => value.toLowerCase() === header.toLowerCase()
+			)
+			if (matchingHeader) {
+				map[index] = matchingHeader[0]
+			}
+			return map
+		}, {} as { [key: number]: string })
+	}
+
+	const handleDuplicates = (newEntries: Partial<TKeychain>[]): Partial<TKeychain>[] => {
+		// Create a map of existing entries using website-username as key
+		const existingMap = new Map(
+			currentVault.map(entry => [`${entry.website}-${entry.username}`.toLowerCase(), entry])
+		)
+
+		// Process new entries and override duplicates
+		const result = newEntries.map(newEntry => {
+			if (!newEntry.website || !newEntry.username) return newEntry
+
+			const key = `${newEntry.website}-${newEntry.username}`.toLowerCase()
+			const existingEntry = existingMap.get(key)
+
+			if (existingEntry) {
+				currentVault.splice(currentVault.indexOf(existingEntry), 1)
+				// If entry exists, take its ID and override other properties
+				return {
+					...newEntry,
+					keychainId: existingEntry.keychainId,
+					logo: existingEntry.logo,
 				}
 			}
-			reader.onerror = () => {
-				throw new Error(`Error reading the file: ${CreateError(reader.error).message}`)
+
+			return newEntry
+		})
+
+		return result
+	}
+
+	const parseCSVContent = (content: string): Partial<TExportKeychain>[] => {
+		const lines = content
+			.split(/\r?\n/)
+			.map(line => line.trim())
+			.filter(line => line.length > 0)
+
+		if (lines.length < 2) {
+			throw new Error('CSV file is empty or contains only headers')
+		}
+
+		const headers =
+			lines
+				.at(0)
+				?.split(',')
+				.map(h => h.trim()) ?? []
+		const headerMapping = validateHeaders(headers)
+
+		const entries = lines.slice(1).map(line => {
+			const values: string[] = []
+			let currentValue = ''
+			let insideQuotes = false
+
+			for (let i = 0; i < line.length; i++) {
+				const char = line[i]
+
+				if (char === '"') {
+					if (insideQuotes && line[i + 1] === '"') {
+						currentValue += '"'
+						i++
+					} else {
+						insideQuotes = !insideQuotes
+					}
+				} else if (char === ',' && !insideQuotes) {
+					values.push(currentValue.trim())
+					currentValue = ''
+				} else {
+					currentValue += char
+				}
 			}
-			reader.readAsText(file)
-		}
+			values.push(currentValue.trim())
 
-	const validateContent = (content: string[]) => {
-		// extract and check 1st index (supposed header)
-		const csHeaders = content.at(0)
-		if (csHeaders === undefined) throw Error('No Content')
-
-		// convert csv to array, check if needed headers are present
-		const headers = csHeaders.split(',')
-		if (!headers.some(key => Object.hasOwn(KEYCHAIN_CONST.HEADERS, key.toLowerCase()))) {
-			// throw error, otherwise
-			throw Error('Missing or invalid header')
-		}
-
-		return () => {
-			const initialValue: Partial<TExportKeychain> = {}
-			return content.slice(1).map(line => {
-				return line.split(',').reduce((acc, cur, i) => {
-					const prop = (headers[i] as string).toLowerCase()
-					return { ...acc, [prop]: cur }
-				}, initialValue)
+			const entry: Partial<TExportKeychain> = {}
+			Object.entries(headerMapping).forEach(([index, prop]) => {
+				const value = values[Number(index)]
+				entry[prop as keyof TExportKeychain] = value !== undefined ? value : ''
 			})
-		}
+
+			return entry
+		})
+
+		// Handle duplicates before returning
+		return handleDuplicates(entries)
 	}
 
 	try {
-		fileDialog.onchange = () => {
-			const files = fileDialog.files
-			if (files && files[0]) {
-				parseCSV(files[0])(importToVaultCallbackFn)
+		if ('showOpenFilePicker' in window) {
+			try {
+				const [handle] = await window.showOpenFilePicker({
+					types: [
+						{
+							description: 'CSV Files',
+							accept: { 'text/csv': ['.csv'] },
+						},
+					],
+					multiple: false,
+				})
+				const file = await handle?.getFile()
+				const content = await file?.text()
+				const result = parseCSVContent(content ?? '')
+				importToVaultCallbackFn(result)
+				return
+			} catch (error) {
+				if ((error as Error).name !== 'AbortError') {
+					throw error
+				}
 			}
 		}
-		document.body.appendChild(fileDialog)
-		// trigger the file dialog
-		fileDialog.click()
+
+		const input = document.createElement('input')
+		input.type = 'file'
+		input.accept = '.csv'
+		input.style.display = 'none'
+
+		const promise = new Promise<void>((resolve, reject) => {
+			input.onchange = async () => {
+				try {
+					const file = input.files?.[0]
+					if (!file) {
+						throw new Error('No file selected')
+					}
+
+					const content = await file.text()
+					const result = parseCSVContent(content)
+					importToVaultCallbackFn(result)
+					resolve()
+				} catch (error) {
+					reject(error)
+				} finally {
+					document.body.removeChild(input)
+				}
+			}
+		})
+
+		document.body.appendChild(input)
+		input.click()
+		await promise
 	} catch (error) {
-		Log(CreateError(error).message)
-	} finally {
-		document.body.removeChild(fileDialog)
+		const errorMessage = CreateError(error).message
+		Log(errorMessage)
+		throw new Error(`Failed to import vault: ${errorMessage}`)
 	}
 }

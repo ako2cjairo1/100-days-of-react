@@ -1,14 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '@/assets/modules/Vault.css'
-import type {
-	TKeychain,
-	TStatus,
-	TRequestType,
-	TVaultContent,
-	TExportKeychain,
-	IMenuItem,
-} from '@/types'
+import type { TKeychain, TStatus, TRequestType, TVaultContent, IMenuItem } from '@/types'
 import {
 	Modal,
 	KeychainForm,
@@ -29,6 +22,7 @@ import {
 	SessionStorage,
 	decryptVault,
 	encryptVault,
+	GenerateUUID,
 } from '@/utils'
 import { updateVaultService } from '@/services/api'
 import { RequestType, KEYCHAIN_CONST, FormContent } from '@/services/constants'
@@ -248,29 +242,43 @@ export function Vault() {
 		)
 
 	// add/provide for menu details here
-	const menus: Partial<IMenuItem>[] = [
+	const menuItems: IMenuItem[] = [
 		{
 			name: 'Add Keychain',
 			iconName: 'fa fa-plus',
 			animation: 'fa fa-beat-fade',
+			navigateTo: '',
 			onClick: () => keychainModal.open(),
 		},
 		{
 			name: 'Import',
 			iconName: 'fa fa-upload',
 			animation: 'fa fa-bounce',
+			navigateTo: '',
 			onClick: () => {
-				// TODO: callback function to copy imported keychains to Vault
-				const syncToVault = (content: Partial<TExportKeychain>[]) => {
-					for (const item of content) console.table({ item })
-				}
-				ImportCSVToJSON(syncToVault)
+				ImportCSVToJSON(importedVault => {
+					if (importedVault && importedVault.length > 0) {
+						// Transform imported data to match keychain structure
+						const transformedVault = importedVault.map(item => ({
+							keychainId: GenerateUUID(),
+							website: item.website ?? '',
+							username: item.username ?? '',
+							password: item.password ?? '',
+							logo: item.logo ?? '',
+							timeAgo: item.timeAgo ?? new Date().toString(),
+						}))
+
+						// Update state with the merged vault
+						syncVaultUpdate([...vault, ...transformedVault])
+					}
+				}, vault)
 			},
 		},
 		{
 			name: IsEmpty(vault) ? '' : 'Export',
 			iconName: 'fa fa-download',
 			animation: 'fa fa-bounce',
+			navigateTo: '',
 			onClick: () => ExportToCSV(vault),
 		},
 		{
@@ -297,7 +305,7 @@ export function Vault() {
 				/>
 			</Modal>
 
-			<MenubarContainer {...{ menus }} />
+			<MenubarContainer {...{ menus: menuItems }} />
 
 			<section className="form-container">
 				{!IsEmpty(vault) ? (

@@ -78,11 +78,10 @@ export function Keychain({
 							<AnimatedIcon
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyUsername && 'active scale-down'}`}
-								iconName={`fa ${
-									!checkIf.canCopyUsername && checkIf.debounceCopyUserName
+								iconName={`fa ${!checkIf.canCopyUsername && checkIf.debounceCopyUserName
 										? 'fa-circle-check active scale-up'
 										: 'fa-solid fa-copy'
-								}`}
+									}`}
 								onClick={handleAction.copyUserName}
 							/>
 						</div>
@@ -115,11 +114,10 @@ export function Keychain({
 							<AnimatedIcon
 								title="Copy"
 								className={`action-button small ${checkIf.canCopyPassword && 'active scale-down'}`}
-								iconName={`fa ${
-									!checkIf.canCopyPassword && checkIf.debounceCopyPassword
+								iconName={`fa ${!checkIf.canCopyPassword && checkIf.debounceCopyPassword
 										? 'fa-circle-check active scale-up'
 										: 'fa-solid fa-copy'
-								}`}
+									}`}
 								onClick={handleAction.copyPassword}
 							/>
 						</div>

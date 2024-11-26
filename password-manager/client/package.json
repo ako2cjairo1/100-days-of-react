@@ -11,17 +11,20 @@
 		"lint:format": "prettier --check .",
 		"lint": "eslint \"./src/**/*.{ts,tsx}\" --fix",
 		"test": "yarn format && yarn lint && yarn lint:format && vitest",
-		"coverage": "vitest run --coverage"
+		"coverage": "vitest run --coverage",
+		"knip": "knip"
 	},
 	"dependencies": {
 		"@reduxjs/toolkit": "^1.9.5",
 		"@types/crypto-js": "^4.1.1",
 		"axios": "^1.3.5",
 		"crypto-js": "^4.1.1",
+		"knip": "^4.2.1",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"react-redux": "^8.0.5",
-		"react-router-dom": "^6.9.0"
+		"react-router-dom": "^6.9.0",
+		"yarn": "^1.22.21"
 	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^5.16.5",
@@ -29,7 +32,7 @@
 		"@testing-library/react-hooks": "^8.0.1",
 		"@testing-library/user-event": "^14.4.3",
 		"@total-typescript/ts-reset": "^0.4.2",
-		"@types/node": "^18.15.3",
+		"@types/node": "^20.11.7",
 		"@types/react": "^18.0.27",
 		"@types/react-dom": "^18.0.10",
 		"@types/react-redux": "^7.1.25",
@@ -49,7 +52,7 @@
 		"jsonwebtoken": "^9.0.0",
 		"prettier": "^2.8.4",
 		"redux-logger": "^3.0.6",
-		"typescript": "^4.9.3",
+		"typescript": "^5.3.3",
 		"vite": "^4.1.0",
 		"vitest": "^0.29.3"
 	}
