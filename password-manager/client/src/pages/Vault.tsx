@@ -34,6 +34,7 @@ import {
 	updateAppStatus,
 	updateAuthStatus,
 } from '@/services/store/features'
+import { VaultHeader } from '@/components/Header/VaultHeader'
 
 const { INIT_KEYCHAIN, INIT_STATUS } = KEYCHAIN_CONST
 const { add, update: modify, view } = RequestType
@@ -308,34 +309,14 @@ export function Vault() {
 			<MenubarContainer {...{ menus: menuItems }} />
 
 			<section className="form-container">
-				{!IsEmpty(vault) ? (
-					<Header>
-						<Header.Logo />
-						<Header.Title title="Secured Vault" />
-						<div className="center">
-							<p className="small">{`${vaultCountRef.current} keychains save.`}</p>
-							<p className="x-small disabled">(0 leaked, 0 reused, 5 weak)</p>
-						</div>
-						<Header.Status status={{ success, message }} />
-					</Header>
-				) : (
-					<Header>
-						<Header.Logo>
-							<AnimatedIcon
-								className="danger"
-								iconName="fa fa-triangle-exclamation"
-								animation="fa-beat-fade"
-								animateOnLoad
-							/>
-						</Header.Logo>
-						<Header.Title
-							title="This vault is empty..."
-							subTitle='click "+" to Add one'
-						/>
-					</Header>
-				)}
+				<VaultHeader
+					vault={vault}
+					success={success}
+					message={message}
+					vaultCountRef={vaultCountRef}
+				/>
 
-				{formContent === vault_component ? (
+				{formContent === 'vault_component' && (
 					<>
 						{vaultCountRef.current > 0 && <SearchBar searchCb={handleSearch} />}
 						<KeychainCardContainer
@@ -343,7 +324,9 @@ export function Vault() {
 							actionHandler={openKeychain}
 						/>
 					</>
-				) : (
+				)}
+
+				{formContent === 'keychain_component' && (
 					<Keychain
 						{...keychain}
 						actionHandler={keychainHandler}
