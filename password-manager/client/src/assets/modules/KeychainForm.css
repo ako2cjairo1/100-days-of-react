@@ -17,6 +17,6 @@
 	right: 0 !important;
 }
 .password {
-	top: 33px !important;
-	right: 0 !important;
+	top: 33px;
+	right: 0;
 }
