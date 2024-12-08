@@ -35,7 +35,10 @@ export function KeychainCard({
 	const { domain, url } = useMemo(() => GetDomainUrl(website), [website])
 
 	return (
-		<div className={className}>
+		<div
+			className={className}
+			onClick={onClick}
+		>
 			<AnchorWrapper href={url}>
 				<CardLogo
 					logo={logo}
@@ -53,7 +56,6 @@ export function KeychainCard({
 					data-testid="keychain-card-link"
 					to="/vault"
 					className="menu descend"
-					onClick={onClick}
 				>
 					<AnimatedIcon
 						className="x-small"

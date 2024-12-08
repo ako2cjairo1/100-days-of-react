@@ -139,7 +139,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 					showForm(false)
 					// invoke resetInput
 					resetInput()
-				}, 2)
+				}, 1)
 			}
 		},
 		submitForm: async (e: FormEvent) => {
@@ -333,7 +333,7 @@ export function KeychainForm({ showForm, keychainInfo, updateCallback }: INewKey
 						value={input.password}
 						disabled={isSubmitted}
 						required
-						className={`${isSubmitted
+						className={`keychain-info ${revealPassword ? '' : 'password-font-size'} ${isSubmitted
 								? 'disabled'
 								: checkIf.isValidPassword
 									? ''

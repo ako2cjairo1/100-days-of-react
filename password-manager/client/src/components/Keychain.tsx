@@ -98,7 +98,8 @@ export function Keychain({
 
 					<div>
 						<input
-							className="keychain-info"
+							className={`keychain-info ${revealPassword ? '' : 'password-font-size'}`}
+							autoComplete="false"
 							type={revealPassword ? 'text' : 'password'}
 							value={password}
 							readOnly
